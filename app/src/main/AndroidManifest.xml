@@ -14,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Geoevent">
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.map.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.Geoevent">
             <intent-filter>
