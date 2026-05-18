@@ -5,7 +5,6 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -30,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import fr.miage.geoevent.ui.events.components.AppButton
 import fr.miage.geoevent.ui.events.components.AppImagePicker
 import fr.miage.geoevent.ui.events.components.AppTextField
+import fr.miage.geoevent.ui.events.components.AppTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,13 +44,9 @@ fun CreateEventPage(onBackClick: () -> Unit) {
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Créer un événement") },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Retour")
-                    }
-                }
+            AppTopBar(
+                title = "Créer un événement",
+                onBackClick = onBackClick
             )
         }
     ) { paddingValues ->
