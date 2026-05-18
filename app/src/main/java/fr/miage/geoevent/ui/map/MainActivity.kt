@@ -16,7 +16,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import fr.miage.geoevent.databinding.ActivityMainBinding
 import fr.miage.geoevent.ui.auth.LoginActivity
-import fr.miage.geoevent.ui.events.pages.CreateEventPage
+import fr.miage.geoevent.ui.events.CreateEventPage
 import fr.miage.geoevent.ui.map.pages.MapPage
 import fr.miage.geoevent.ui.profile.ProfileActivity
 import fr.miage.geoevent.ui.viewmodel.MainViewModel
@@ -54,11 +54,14 @@ class MainActivity : AppCompatActivity() {
                     binding.btnConnexion.visibility = View.VISIBLE
                 }
 
-                CreateEventPage(onBackClick = {
-                    showCreateEvent = false
-                    binding.btnProfil.visibility = View.VISIBLE
-                    binding.btnConnexion.visibility = View.VISIBLE
-                })
+                CreateEventPage(
+                    viewModel = viewModel,
+                    onBackClick = {
+                        showCreateEvent = false
+                        binding.btnProfil.visibility = View.VISIBLE
+                        binding.btnConnexion.visibility = View.VISIBLE
+                    }
+                )
             } else {
                 MapPage(
                     events = events,
