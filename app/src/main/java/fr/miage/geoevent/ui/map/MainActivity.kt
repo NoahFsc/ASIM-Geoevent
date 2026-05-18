@@ -2,6 +2,7 @@ package fr.miage.geoevent.ui.map
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -12,6 +13,7 @@ import fr.miage.geoevent.GeoEventApplication
 import fr.miage.geoevent.data.backend.SupabaseDatabaseService
 import fr.miage.geoevent.databinding.ActivityMainBinding
 import fr.miage.geoevent.domain.interfaces.IDatabaseService
+import fr.miage.geoevent.ui.auth.LoginActivity
 import fr.miage.geoevent.ui.profile.ProfileActivity
 import kotlinx.coroutines.launch
 
@@ -34,6 +36,10 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnProfil.setOnClickListener {
             startActivity(Intent(this, ProfileActivity::class.java))
+        }
+
+        binding.btnConnexion.setOnClickListener {
+            startActivity(Intent(this, LoginActivity::class.java))
         }
 
         setupMap()
@@ -70,4 +76,5 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
 }
