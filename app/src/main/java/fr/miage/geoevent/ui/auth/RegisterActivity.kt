@@ -12,21 +12,21 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import fr.miage.geoevent.GeoEventApplication
 import fr.miage.geoevent.R
-import fr.miage.geoevent.databinding.ActivityLoginBinding
+import fr.miage.geoevent.databinding.ActivityRegisterBinding
 import fr.miage.geoevent.ui.map.MainActivity
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
 import kotlinx.coroutines.launch
 
-class LoginActivity : AppCompatActivity() {
+class RegisterActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityLoginBinding
+    private lateinit var binding: ActivityRegisterBinding
 
-    // Initialise la vue, vérifie une session existante et branche les listeners.
+    // Initialise la vue et branche les listeners d'inscription et de retour.
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        binding = ActivityLoginBinding.inflate(layoutInflater)
+        binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
@@ -37,49 +37,40 @@ class LoginActivity : AppCompatActivity() {
 
         val supabase = (applicationContext as GeoEventApplication).supabase
 
-        // Vérifie si une session est déjà active (app relancée sans déconnexion).
-        // setLoading(true) pendant la vérification pour éviter un flash du formulaire.
-        lifecycleScope.launch {
-            setLoading(true)
-            if (supabase.auth.currentSessionOrNull() != null) {
-                goToMain()
-                return@launch
-            }
-            setLoading(false)
-        }
-
-        binding.btnConnexion.setOnClickListener {
-            // "emailInput" et "passwordInput" sont volontairement nommés différemment
-            // des propriétés du lambda Supabase (email, password) pour éviter le
-            // shadowing du receiver Kotlin qui causerait l'envoi de chaînes vides.
+        binding.btnInscription.setOnClickListener {
+            // "emailInput" / "passwordInput" : nommage explicite pour éviter le shadowing
+            // du receiver Kotlin dans le lambda signUpWith { email = ..., password = ... }.
             val emailInput = binding.etEmail.text?.toString()?.trim().orEmpty()
             val passwordInput = binding.etPassword.text?.toString().orEmpty()
+            val confirmInput = binding.etConfirmPassword.text?.toString().orEmpty()
 
-            if (!validerChamps(emailInput, passwordInput)) return@setOnClickListener
+            if (!validerChamps(emailInput, passwordInput, confirmInput)) return@setOnClickListener
 
             lifecycleScope.launch {
                 setLoading(true)
                 try {
-                    supabase.auth.signInWith(Email) {
+                    supabase.auth.signUpWith(Email) {
                         email = emailInput
                         password = passwordInput
                     }
+                    // La confirmation email est désactivée côté Supabase :
+                    // signUpWith établit directement la session, on navigue sans vérification.
                     goToMain()
                 } catch (e: Exception) {
-                    Toast.makeText(this@LoginActivity, traduireErreur(e.message), Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@RegisterActivity, traduireErreur(e.message), Toast.LENGTH_LONG).show()
                     setLoading(false)
                 }
             }
         }
 
-        binding.btnAllerInscription.setOnClickListener {
-            startActivity(Intent(this, RegisterActivity::class.java))
+        binding.btnRetourConnexion.setOnClickListener {
+            finish()
         }
     }
 
-    // Vérifie que l'email est non vide, bien formaté, et le mot de passe non vide.
-    // Affiche les erreurs directement sous les champs via TextInputLayout.
-    private fun validerChamps(emailInput: String, passwordInput: String): Boolean {
+    // Vérifie le format de l'email, la longueur minimale du mot de passe (6 car.)
+    // et la correspondance des deux saisies de mot de passe.
+    private fun validerChamps(emailInput: String, passwordInput: String, confirmInput: String): Boolean {
         var valid = true
 
         if (emailInput.isBlank()) {
@@ -95,8 +86,20 @@ class LoginActivity : AppCompatActivity() {
         if (passwordInput.isBlank()) {
             binding.tilPassword.error = getString(R.string.erreur_mot_de_passe_requis)
             valid = false
+        } else if (passwordInput.length < 6) {
+            // Supabase impose un minimum de 6 caractères côté serveur,
+            // on le vérifie aussi côté client pour un retour immédiat.
+            binding.tilPassword.error = getString(R.string.erreur_mot_de_passe_trop_court)
+            valid = false
         } else {
             binding.tilPassword.error = null
+        }
+
+        if (passwordInput.isNotBlank() && confirmInput != passwordInput) {
+            binding.tilConfirmPassword.error = getString(R.string.erreur_mots_de_passe_differents)
+            valid = false
+        } else {
+            binding.tilConfirmPassword.error = null
         }
 
         return valid
@@ -106,10 +109,13 @@ class LoginActivity : AppCompatActivity() {
     // On les traduit ici pour ne jamais exposer de message technique à l'utilisateur.
     private fun traduireErreur(message: String?): String = when {
         message == null -> "Une erreur inattendue s'est produite"
-        message.contains("Invalid login credentials", ignoreCase = true) ->
-            "Email ou mot de passe incorrect"
-        message.contains("Email not confirmed", ignoreCase = true) ->
-            "Veuillez confirmer votre email avant de vous connecter"
+        message.contains("User already registered", ignoreCase = true) ->
+            "Un compte existe déjà avec cette adresse email"
+        message.contains("Password should be at least", ignoreCase = true) ->
+            "Le mot de passe doit contenir au moins 6 caractères"
+        message.contains("Unable to validate email", ignoreCase = true) ||
+        message.contains("invalid email", ignoreCase = true) ->
+            "Adresse email invalide"
         message.contains("rate limit", ignoreCase = true) ||
         message.contains("too many requests", ignoreCase = true) ->
             "Trop de tentatives. Réessayez dans quelques minutes."
@@ -122,12 +128,12 @@ class LoginActivity : AppCompatActivity() {
     // Affiche ou masque le ProgressBar et désactive les boutons pendant un appel réseau.
     private fun setLoading(loading: Boolean) {
         binding.progressBar.visibility = if (loading) View.VISIBLE else View.GONE
-        binding.btnConnexion.isEnabled = !loading
-        binding.btnAllerInscription.isEnabled = !loading
+        binding.btnInscription.isEnabled = !loading
+        binding.btnRetourConnexion.isEnabled = !loading
     }
 
     // Navigue vers la carte en vidant la back stack : l'utilisateur ne peut pas
-    // revenir à l'écran de connexion avec le bouton retour une fois connecté.
+    // revenir à l'inscription avec le bouton retour une fois connecté.
     private fun goToMain() {
         startActivity(
             Intent(this, MainActivity::class.java)

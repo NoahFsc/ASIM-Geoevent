@@ -1,42 +1,25 @@
 package fr.miage.geoevent.ui.map
 
+import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
-import fr.miage.geoevent.BuildConfig
+import fr.miage.geoevent.GeoEventApplication
 import fr.miage.geoevent.data.backend.SupabaseDatabaseService
 import fr.miage.geoevent.databinding.ActivityMainBinding
 import fr.miage.geoevent.domain.interfaces.IDatabaseService
-import io.github.jan.supabase.createSupabaseClient
-import io.github.jan.supabase.postgrest.Postgrest
-import io.github.jan.supabase.realtime.Realtime
-import kotlinx.serialization.Serializable
+import fr.miage.geoevent.ui.auth.LoginActivity
+import fr.miage.geoevent.ui.profile.ProfileActivity
 import kotlinx.coroutines.launch
-
-val supabase = createSupabaseClient(
-    supabaseUrl = BuildConfig.SUPABASE_URL,
-    supabaseKey = BuildConfig.SUPABASE_KEY
-) {
-    install(Postgrest)
-    install(Realtime)
-}
-
-@Serializable
-data class TestItem(
-    val id: Long,
-    val created_at: String,
-    val name: String
-)
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-
-    // Noah : Utilisation de l'interface pour la modularité [cite: 27, 29]
     private lateinit var databaseService: IDatabaseService
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,16 +30,20 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setupWindowInsets()
-        // Il suffit de changer SupabaseDatabaseService par une autre implémentation
+
+        val supabase = (applicationContext as GeoEventApplication).supabase
         databaseService = SupabaseDatabaseService(supabase)
 
-        // Initialisation de la carte (OpenStreetMap) (cf. Lucas)
+        binding.btnProfil.setOnClickListener {
+            startActivity(Intent(this, ProfileActivity::class.java))
+        }
+
+        binding.btnConnexion.setOnClickListener {
+            startActivity(Intent(this, LoginActivity::class.java))
+        }
+
         setupMap()
-
-        // Gestion des permissions runtime (cf. Lucas)
         checkLocationPermissions()
-
-        // Listener en temps réel (cf. Noah)
         observeEvents()
     }
 
@@ -69,32 +56,25 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupMap() {
-        // C'est ici que Lucas configurera OpenStreetMap
+        // Lucas configurera OpenStreetMap ici
     }
 
     private fun checkLocationPermissions() {
         // Appel aux méthodes de Lucas pour la géolocalisation
     }
 
-    /**
-     * Noah : Cette méthode écoute les changements en base de données
-     * et demande à Lucas de mettre à jour les marqueurs sur la carte.
-     */
     private fun observeEvents() {
         lifecycleScope.launch {
             try {
                 databaseService.listenToEventsRealtime().collect { events ->
-                    // Ici, on envoie la liste d'événements à la carte de Lucas
-                    // Exemple : binding.mapView.updateMarkers(events)
-
                     if (events.isNotEmpty()) {
                         Toast.makeText(this@MainActivity, "${events.size} événements chargés", Toast.LENGTH_SHORT).show()
                     }
                 }
-            } catch (e: Exception) {
-                // Gestion des erreurs pour la robustesse [cite: 60, 62]
-                Toast.makeText(this@MainActivity, "Erreur de connexion temps réel", Toast.LENGTH_LONG).show()
+            } catch (_: Exception) {
+                // Connexion interrompue silencieusement (déconnexion ou perte réseau)
             }
         }
     }
+
 }
