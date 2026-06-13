@@ -55,7 +55,7 @@ fun AdminEventCard(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         AsyncImage(
-            model = event.image_url,
+            model = event.imageUrl,
             contentDescription = event.title,
             contentScale = ContentScale.Crop,
             modifier = Modifier

@@ -5,7 +5,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -69,7 +68,7 @@ fun SearchBar(
                 }
             }
         )
-        // Surcouche transparente pour rendre toute la pilule cliquable en mode bouton
+        // Surcouche pour rendre toute la pilule cliquable en mode bouton
         if (onClick != null) {
             Box(
                 modifier = Modifier
@@ -84,6 +83,6 @@ fun SearchBar(
 @Composable
 private fun SearchBarPreview() {
     Box(modifier = Modifier.padding(16.dp)) {
-        SearchBar(value = "", onValueChange = {}, placeholder = "Choisir votre lieu de randonnée")
+        SearchBar(value = "", onValueChange = {}, placeholder = "Choisir votre lieu de recherche")
     }
 }

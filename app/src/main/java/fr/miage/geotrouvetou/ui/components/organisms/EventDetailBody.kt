@@ -29,9 +29,10 @@ fun EventDetailBody(
     date: String,
     time: String,
     locationName: String,
-    locationDetail: String,
+    locationDetail: String?,
     description: String,
     modifier: Modifier = Modifier,
+    actions: (@Composable () -> Unit)? = null,
 ) {
     val context = LocalContext.current
 
@@ -50,6 +51,8 @@ fun EventDetailBody(
                 .clip(RoundedCornerShape(16.dp))
                 .background(colorResource(R.color.text_disabled))
         )
+
+        actions?.invoke()
 
         EventDetailCard(
             date = date,

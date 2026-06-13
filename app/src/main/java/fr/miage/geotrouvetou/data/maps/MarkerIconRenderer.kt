@@ -20,6 +20,8 @@ import fr.miage.geotrouvetou.R
 import fr.miage.geotrouvetou.ui.components.atoms.MarkerIcon
 import org.osmdroid.views.MapView
 import java.util.concurrent.CountDownLatch
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.drawable.toDrawable
 
 /**
  * Génère et met en cache les icônes (marqueur, cluster) de la carte.
@@ -28,19 +30,28 @@ import java.util.concurrent.CountDownLatch
 class MarkerIconRenderer(private val context: Context) {
 
     private var cachedMarkerIcon: BitmapDrawable? = null
+    private var cachedPrivateMarkerIcon: BitmapDrawable? = null
     private var cachedClusterIcon: Bitmap? = null
 
-    /** Icône d'un marqueur : rendu Compose si possible, sinon icône dessinée à la main. */
-    fun markerIcon(mapView: MapView): BitmapDrawable {
-        cachedMarkerIcon?.let { return it }
-        return createComposeMarkerIcon(mapView)?.also { cachedMarkerIcon = it }
-            ?: createFallbackIcon()
+    /**
+     * Icône d'un marqueur : rendu Compose si possible, sinon icône dessinée à la main.
+     * Les événements privés (brouillons) utilisent une couleur distincte.
+     */
+    fun markerIcon(mapView: MapView, isPrivate: Boolean = false): BitmapDrawable {
+        (if (isPrivate) cachedPrivateMarkerIcon else cachedMarkerIcon)?.let { return it }
+        // On ne met en cache que le rendu Compose réussi : le fallback peut être réessayé plus tard.
+        val composeIcon = createComposeMarkerIcon(mapView, isPrivate)
+        if (composeIcon != null) {
+            if (isPrivate) cachedPrivateMarkerIcon = composeIcon else cachedMarkerIcon = composeIcon
+            return composeIcon
+        }
+        return createFallbackIcon(isPrivate)
     }
 
     fun clusterIcon(): Bitmap {
         cachedClusterIcon?.let { return it }
         val sizePx = dip(40f).toInt()
-        val bitmap = Bitmap.createBitmap(sizePx, sizePx, Bitmap.Config.ARGB_8888)
+        val bitmap = createBitmap(sizePx, sizePx)
         val canvas = Canvas(bitmap)
         val center = sizePx / 2f
         val stroke = dip(3f)
@@ -57,22 +68,22 @@ class MarkerIconRenderer(private val context: Context) {
         return bitmap.also { cachedClusterIcon = it }
     }
 
-    /** Rend l'icône via Compose ; renvoie null si la vue n'est pas encore prête. */
-    private fun createComposeMarkerIcon(mapView: MapView): BitmapDrawable? {
+    /** Rend l'icône via Compose, renvoie null si la vue n'est pas encore prête. */
+    private fun createComposeMarkerIcon(mapView: MapView, isPrivate: Boolean): BitmapDrawable? {
         if (Looper.myLooper() != Looper.getMainLooper()) {
             // Le rendu Compose doit s'exécuter sur le thread principal.
             val latch = CountDownLatch(1)
             var result: BitmapDrawable? = null
             Handler(Looper.getMainLooper()).post {
-                try { result = createComposeMarkerIconInternal(mapView) } finally { latch.countDown() }
+                try { result = createComposeMarkerIconInternal(mapView, isPrivate) } finally { latch.countDown() }
             }
             latch.await()
             return result
         }
-        return createComposeMarkerIconInternal(mapView)
+        return createComposeMarkerIconInternal(mapView, isPrivate)
     }
 
-    private fun createComposeMarkerIconInternal(mapView: MapView): BitmapDrawable? {
+    private fun createComposeMarkerIconInternal(mapView: MapView, isPrivate: Boolean): BitmapDrawable? {
         val sizeDp = 40
         val sizePx = dip(sizeDp.toFloat()).toInt()
 
@@ -80,7 +91,7 @@ class MarkerIconRenderer(private val context: Context) {
 
         return try {
             val composeView = ComposeView(context).apply {
-                setContent { MarkerIcon(size = sizeDp.dp, borderWidth = 3.dp) }
+                setContent { MarkerIcon(size = sizeDp.dp, borderWidth = 3.dp, isPrivate = isPrivate) }
             }
             // Attaché temporairement à l'arbre de vues pour hériter des lifecycle owners de Compose.
             val parent = mapView.parent as? ViewGroup
@@ -95,7 +106,7 @@ class MarkerIconRenderer(private val context: Context) {
                 parent?.removeView(composeView)
             }
 
-            BitmapDrawable(context.resources, bitmap).also { it.setBounds(0, 0, bitmap.width, bitmap.height) }
+            bitmap.toDrawable(context.resources).also { it.setBounds(0, 0, bitmap.width, bitmap.height) }
         } catch (t: Throwable) {
             Log.w("MarkerIconRenderer", "Rendu Compose de l'icône échoué", t)
             null
@@ -103,16 +114,16 @@ class MarkerIconRenderer(private val context: Context) {
     }
 
     /** Icône de secours dessinée (cercle + drapeau) quand Compose n'est pas disponible. */
-    private fun createFallbackIcon(): BitmapDrawable {
+    private fun createFallbackIcon(isPrivate: Boolean = false): BitmapDrawable {
         val sizePx = dip(48f).toInt()
-        val bitmap = Bitmap.createBitmap(sizePx, sizePx, Bitmap.Config.ARGB_8888)
+        val bitmap = createBitmap(sizePx, sizePx)
         val canvas = Canvas(bitmap)
         val center = sizePx / 2f
         val stroke = dip(3f)
         val radius = center - stroke
         val fill = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             style = Paint.Style.FILL
-            color = context.getColor(R.color.primary_400)
+            color = context.getColor(if (isPrivate) R.color.warning_400 else R.color.primary_400)
         }
         val border = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             style = Paint.Style.STROKE
@@ -143,7 +154,7 @@ class MarkerIconRenderer(private val context: Context) {
             flagStemPaint,
         )
         canvas.drawCircle(center, center, radius, border)
-        return BitmapDrawable(context.resources, bitmap).also { it.setBounds(0, 0, bitmap.width, bitmap.height) }
+        return bitmap.toDrawable(context.resources).also { it.setBounds(0, 0, bitmap.width, bitmap.height) }
     }
 
     private fun dip(value: Float): Float =

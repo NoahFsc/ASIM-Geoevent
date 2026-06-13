@@ -138,12 +138,18 @@
     <string name="event_detail_coordinates">Lat: %1$s, Lon: %2$s</string>
     <string name="event_detail_not_found">Événement introuvable</string>
     <string name="event_detail_edit">Modifier</string>
-    <string name="event_detail_joined">Déjà inscrit</string>
+    <string name="event_detail_leave">Se désinscrire</string>
+    <string name="event_detail_delete">Supprimer</string>
+    <string name="delete_event_title">Supprimer cet événement ?</string>
+    <string name="delete_event_desc">Cette action est définitive. L\'événement et ses inscriptions seront supprimés.</string>
+    <string name="delete_event_confirm">Supprimer</string>
     <string name="event_detail_join">Enregistrer</string>
     <string name="event_join_toast_title">Inscription réussie !</string>
     <string name="event_join_toast_desc">Vous participez désormais à cet événement</string>
     <string name="event_update_toast_title">Modification réussie !</string>
     <string name="event_update_toast_desc">L\'événement a été mis à jour</string>
+    <string name="event_delete_toast_title">Événement supprimé</string>
+    <string name="event_delete_toast_desc">L\'événement a bien été supprimé</string>
 
     <!-- Création / modification d'événement -->
     <string name="create_event_title">Nouvel événement</string>
@@ -167,8 +173,7 @@
     <string name="update_event_submitting">Modification...</string>
     <string name="event_time_picker_title">Choisir l\'heure</string>
     <string name="event_error_title">Erreur</string>
-    <string name="event_error_must_login_create">Vous devez être connecté pour créer un événement</string>
-    <string name="event_error_must_login_update">Vous devez être connecté pour modifier un événement</string>
+    <string name="event_error_must_login_save">Vous devez être connecté pour enregistrer un événement</string>
     <string name="event_error_generic">Erreur : %1$s</string>
     <string name="event_error_fallback">Une erreur est survenue</string>
 
@@ -222,6 +227,16 @@
     <string name="admin_time_minutes">Il y a %1$d min</string>
     <string name="admin_time_hours">Il y a %1$dh</string>
     <string name="admin_time_days">Il y a %1$dj</string>
+    <string name="admin_activity_user_created">Nouvel utilisateur : %1$s</string>
+    <string name="admin_activity_user_deleted">Compte supprimé : %1$s</string>
+    <string name="admin_activity_role_changed">%1$s est maintenant %2$s</string>
+    <string name="admin_activity_event_created">Événement créé : « %1$s »</string>
+    <string name="admin_activity_event_deleted">Événement supprimé : « %1$s »</string>
+
+    <!-- Statuts d'événement (Tag) -->
+    <string name="tag_status_new">NOUVEAU</string>
+    <string name="tag_status_soon">BIENTÔT</string>
+    <string name="tag_status_done">TERMINÉ</string>
 
     <!-- Cartes d'événement -->
     <string name="event_card_delete">Supprimer</string>

@@ -58,7 +58,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
 
     private suspend fun loadEvents(userId: String) {
         try {
-            val userEvents = databaseService.getAllEvents().filter { it.user_id == userId }
+            val userEvents = databaseService.getAllEvents().filter { it.userId == userId }
             _uiState.value = _uiState.value.copy(events = userEvents)
         } catch (_: Exception) { }
     }

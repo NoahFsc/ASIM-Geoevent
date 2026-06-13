@@ -8,9 +8,6 @@ import android.location.LocationManager
 
 /**
  * Notifie l'activation et la désactivation de la localisation de l'appareil.
- *
- * À enregistrer dynamiquement (PROVIDERS_CHANGED_ACTION est un broadcast
- * implicite, non délivré aux receivers déclarés dans le manifest).
  */
 class LocationReceiver(
     private val onLocationStateChanged: (isEnabled: Boolean) -> Unit,

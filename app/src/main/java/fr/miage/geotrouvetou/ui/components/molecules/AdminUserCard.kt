@@ -138,8 +138,8 @@ fun AdminUserCard(
 private fun AdminUserCardPreview() {
     Box(modifier = Modifier.padding(16.dp)) {
         AdminUserCard(
-            name = "Sarah Jenkins",
-            email = "sarah.j@example.com",
+            name = "Sara",
+            email = "sara.t@gmail.com",
             role = "user",
             isCurrentUser = false,
             onRoleChange = {},

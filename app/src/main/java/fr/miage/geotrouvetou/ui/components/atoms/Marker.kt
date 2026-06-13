@@ -21,9 +21,10 @@ import fr.miage.geotrouvetou.R
 fun MarkerIcon(
     size: Dp,
     borderWidth: Dp,
+    isPrivate: Boolean = false,
 ) {
     MaterialTheme {
-        val bgColor = colorResource(id = R.color.primary_400)
+        val bgColor = colorResource(id = if (isPrivate) R.color.warning_400 else R.color.primary_400)
         val flagColor = colorResource(id = R.color.white)
 
         Box(

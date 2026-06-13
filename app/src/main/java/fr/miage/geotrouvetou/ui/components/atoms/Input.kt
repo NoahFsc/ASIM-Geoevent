@@ -117,11 +117,16 @@ fun Input(
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.White,
                     unfocusedContainerColor = Color.White,
+                    disabledContainerColor = Color.White,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
                     disabledIndicatorColor = Color.Transparent,
                     focusedTextColor = colorResource(id = R.color.text_darker),
                     unfocusedTextColor = colorResource(id = R.color.text_darker),
+                    disabledTextColor = colorResource(id = R.color.text_darker),
+                    disabledPlaceholderColor = colorResource(id = R.color.text_placeholder),
+                    disabledLeadingIconColor = colorResource(id = R.color.text_lighter),
+                    disabledTrailingIconColor = colorResource(id = R.color.text_lighter),
                 ),
                 singleLine = true,
             )

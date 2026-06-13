@@ -38,7 +38,7 @@ class ParamsViewModel(application: Application) : AndroidViewModel(application) 
         return try {
             authService.signOut()
             true
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             _uiState.value = _uiState.value.copy(isLoading = false, error = "Erreur lors de la déconnexion")
             false
         }

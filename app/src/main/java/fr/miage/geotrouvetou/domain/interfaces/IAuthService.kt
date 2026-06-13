@@ -6,12 +6,11 @@ import kotlinx.coroutines.flow.Flow
 data class AuthUser(val id: String, val email: String)
 
 /**
- * Abstraction de l'authentification : isole le reste de l'app du fournisseur
+ * Interface d'authentification : isole le reste de l'app du fournisseur
  * (Supabase aujourd'hui). Permet de changer de backend sans toucher aux ViewModels.
  */
 interface IAuthService {
     suspend fun signIn(email: String, password: String)
-    /** Inscrit l'utilisateur et renvoie son id, ou null si la session n'est pas encore active. */
     suspend fun signUp(email: String, password: String, fullName: String): String?
     suspend fun signOut()
     suspend fun updatePassword(newPassword: String)

@@ -14,7 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.DirectionsWalk
+import androidx.compose.material.icons.automirrored.outlined.DirectionsWalk
 import androidx.compose.material.icons.outlined.Group
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -140,7 +140,7 @@ fun EventCard(
                     )
                     Text(text = "•", fontSize = 14.sp, color = colorResource(R.color.text_lighter))
                     Icon(
-                        imageVector = Icons.Outlined.DirectionsWalk,
+                        imageVector = Icons.AutoMirrored.Outlined.DirectionsWalk,
                         contentDescription = null,
                         tint = colorResource(R.color.text_lighter),
                         modifier = Modifier.size(18.dp),

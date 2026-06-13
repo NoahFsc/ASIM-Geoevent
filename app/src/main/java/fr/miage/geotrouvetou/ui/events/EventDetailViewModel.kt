@@ -9,6 +9,8 @@ import androidx.lifecycle.viewModelScope
 import fr.miage.geotrouvetou.domain.interfaces.IAuthService
 import fr.miage.geotrouvetou.domain.interfaces.IDatabaseService
 import fr.miage.geotrouvetou.domain.models.Evenement
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 class EventDetailViewModel(
@@ -30,8 +32,11 @@ class EventDetailViewModel(
     var participantsCount by mutableIntStateOf(0)
         private set
 
-    var joinToastKey by mutableIntStateOf(0)
-        private set
+    private val _joined = MutableSharedFlow<Boolean>()
+    val joined = _joined.asSharedFlow()
+
+    private val _eventDeleted = MutableSharedFlow<Boolean>()
+    val eventDeleted = _eventDeleted.asSharedFlow()
 
     fun loadEvent(eventId: String) {
         viewModelScope.launch {
@@ -42,11 +47,10 @@ class EventDetailViewModel(
                 val userId = authService.currentUserId()
                 if (userId != null) {
                     isJoined = databaseService.isUserParticipating(eventId, userId)
-                    isOwner = event?.user_id == userId
+                    isOwner = event?.userId == userId
                 }
                 participantsCount = databaseService.getParticipantsCount(eventId)
-            } catch (e: Exception) {
-                // Gérer l'erreur
+            } catch (_: Exception) {
             } finally {
                 isLoading = false
             }
@@ -56,7 +60,7 @@ class EventDetailViewModel(
     fun joinEvent() {
         val currentEvent = event ?: return
         val eventId = currentEvent.id ?: return
-        
+
         viewModelScope.launch {
             try {
                 val userId = authService.currentUserId()
@@ -64,10 +68,40 @@ class EventDetailViewModel(
                     databaseService.joinEvent(eventId, userId)
                     isJoined = true
                     participantsCount++
-                    joinToastKey++
+                    _joined.emit(true)
                 }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 // Échec silencieux (ex : déjà inscrit)
+            }
+        }
+    }
+
+    fun leaveEvent() {
+        val currentEvent = event ?: return
+        val eventId = currentEvent.id ?: return
+
+        viewModelScope.launch {
+            try {
+                val userId = authService.currentUserId()
+                if (userId != null) {
+                    databaseService.leaveEvent(eventId, userId)
+                    isJoined = false
+                    if (participantsCount > 0) participantsCount--
+                }
+            } catch (_: Exception) {
+                // Échec silencieux
+            }
+        }
+    }
+
+    fun deleteEvent() {
+        val eventId = event?.id ?: return
+        viewModelScope.launch {
+            try {
+                databaseService.deleteEvent(eventId)
+                _eventDeleted.emit(true)
+            } catch (_: Exception) {
+                // Échec silencieux
             }
         }
     }

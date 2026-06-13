@@ -13,13 +13,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.outlined.AccessTime
-import androidx.compose.material.icons.outlined.DirectionsWalk
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -39,22 +35,18 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import fr.miage.geotrouvetou.R
-import fr.miage.geotrouvetou.domain.models.Evenement
 import fr.miage.geotrouvetou.ui.components.atoms.SegmentedControl
 import fr.miage.geotrouvetou.ui.components.atoms.StatCard
 import fr.miage.geotrouvetou.ui.components.molecules.ProfileEventItem
-import fr.miage.geotrouvetou.ui.map.modals.EventListModal
 
 @Composable
 fun ProfileScreen(
@@ -233,7 +225,7 @@ fun ProfileContent(
 
             if (uiState.error != null) {
                 Text(
-                    text = uiState.error!!,
+                    text = uiState.error,
                     color = colorResource(R.color.danger_500),
                     fontSize = 14.sp,
                 )
@@ -241,28 +233,4 @@ fun ProfileContent(
         }
     }
 
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ProfileScreenPreview() {
-    ProfileContent(
-        uiState = ProfileUiState(
-            fullName = "Maxime MIAGE",
-            avatarUrl = null,
-            isLoading = false,
-            events = listOf(
-                Evenement(
-                    id = "1",
-                    title = "Randonnée Forêt",
-                    description = "Une petite marche",
-                    latitude = 0.0,
-                    longitude = 0.0
-                )
-            )
-        ),
-        onSettingsClick = {},
-        onTabSelected = {},
-        onEventClick = {}
-    )
 }

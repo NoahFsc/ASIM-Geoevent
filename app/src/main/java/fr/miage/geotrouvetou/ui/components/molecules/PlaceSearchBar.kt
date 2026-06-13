@@ -56,10 +56,10 @@ fun PlaceSearchBar(
         }
         delay(500)
         isSearching = true
-        try {
-            placeResults = geocodingService.search(query)
-        } catch (e: Exception) {
-            placeResults = emptyList()
+        placeResults = try {
+            geocodingService.search(query)
+        } catch (_: Exception) {
+            emptyList()
         } finally {
             isSearching = false
         }

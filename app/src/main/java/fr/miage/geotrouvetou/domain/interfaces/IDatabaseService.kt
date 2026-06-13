@@ -7,19 +7,22 @@ import fr.miage.geotrouvetou.domain.models.User
 import kotlinx.coroutines.flow.Flow
 
 interface IDatabaseService {
+
+    // Événements
     suspend fun addEvent(event: Evenement)
     suspend fun updateEvent(event: Evenement)
     suspend fun getEvent(eventId: String): Evenement?
     suspend fun getAllEvents(): List<Evenement>
-    /** Émet Unit à chaque changement en base. Le caller décide quoi recharger. */
     fun listenToEventsRealtime(): Flow<Unit>
+    suspend fun getEventsByVisibleBounds(minLat: Double, maxLat: Double, minLon: Double, maxLon: Double): List<Evenement>
+
+    // Profil
     suspend fun uploadImage(fileName: String, bytes: ByteArray): String
     suspend fun getProfile(userId: String): User?
     suspend fun createProfile(user: User)
     suspend fun updateProfile(userId: String, fullName: String)
     suspend fun updateAvatar(userId: String, bytes: ByteArray)
     suspend fun deleteProfile(userId: String)
-    suspend fun getEventsByVisibleBounds(minLat: Double, maxLat: Double, minLon: Double, maxLon: Double): List<Evenement>
 
     // Admin — stats & listes
     suspend fun getAdminStats(): AdminStats
@@ -34,6 +37,7 @@ interface IDatabaseService {
 
     // Events - Rejoindre
     suspend fun joinEvent(eventId: String, userId: String)
+    suspend fun leaveEvent(eventId: String, userId: String)
     suspend fun isUserParticipating(eventId: String, userId: String): Boolean
     suspend fun getParticipantsCount(eventId: String): Int
 }

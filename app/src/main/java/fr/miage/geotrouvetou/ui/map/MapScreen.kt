@@ -31,7 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -49,27 +49,23 @@ import fr.miage.geotrouvetou.ui.components.atoms.Toast
 import fr.miage.geotrouvetou.ui.components.organisms.SearchBar
 import fr.miage.geotrouvetou.ui.map.modals.EventListModal
 import fr.miage.geotrouvetou.ui.map.modals.EventDetailModal
-import fr.miage.geotrouvetou.ui.events.EventUpdateScreen
+import fr.miage.geotrouvetou.ui.events.EventFormScreen
 import org.osmdroid.views.MapView
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Suppress("DEPRECATION")
+
 @Composable
 fun MapScreen(
     onLoginClick: () -> Unit = {},
     viewModel: MapViewModel = viewModel(),
 ) {
-    @Suppress("DEPRECATION")
     val context = LocalContext.current
-    @Suppress("DEPRECATION")
     val lifecycleOwner = LocalLifecycleOwner.current
     val uiState by viewModel.uiState.collectAsState()
     val mapService = remember(context) { (context.applicationContext as App).createMapService(context) }
     val mapView = remember(context) { MapView(context) }
 
-    var mapBound by rememberSaveable { mutableStateOf(false) }
     var locationPermissionGranted by rememberSaveable { mutableStateOf(hasLocationPermission(context)) }
-    var locationFlowStarted by rememberSaveable { mutableStateOf(false) }
     var showEventList by remember { mutableStateOf(false) }
     var clusterEvents by remember { mutableStateOf<List<Evenement>?>(null) }
     var selectedEvent by remember { mutableStateOf<Evenement?>(null) }
@@ -102,7 +98,9 @@ fun MapScreen(
             showEventList = false
             clusterEvents = events
         }
-        mapBound = true
+        // Démarre le rendu des tuiles dès qu'une (nouvelle) MapView est liée — indispensable au
+        // retour sur la carte, où l'événement de cycle de vie ON_RESUME peut ne pas se redéclencher.
+        mapService.onResume()
         onDispose {
             mapService.setOnEventClickListener(null)
             mapService.setOnClusterClickListener(null)
@@ -139,15 +137,23 @@ fun MapScreen(
         }
     }
 
-    LaunchedEffect(mapBound, locationPermissionGranted) {
-        if (mapBound && locationPermissionGranted && !locationFlowStarted) {
-            locationFlowStarted = true
-            mapService.enableMyLocation { point ->
-                val defaultZoom = mapService.getZoomForWidth(20.0, point.latitude)
-                mapService.centerOn(point.latitude, point.longitude, defaultZoom)
+    // Clé sur mapView : rejoué pour chaque (nouvelle) MapView, donc aussi au retour sur la carte.
+    LaunchedEffect(mapView, locationPermissionGranted) {
+        if (!locationPermissionGranted) return@LaunchedEffect
+        val knownLocation = viewModel.uiState.value.currentLocation
+        // Position déjà connue (retour sur la carte) : recadrage immédiat, sans réattendre le GPS.
+        mapService.enableMyLocation(
+            onFirstFix = if (knownLocation != null) null else { point ->
+                val zoom = mapService.getZoomForWidth(20.0, point.latitude)
+                mapService.centerOn(point.latitude, point.longitude, zoom)
                 mapService.setMinimumZoomForWidth(20.0)
                 viewModel.onFirstLocationFound(point.latitude, point.longitude)
             }
+        )
+        if (knownLocation != null) {
+            val zoom = mapService.getZoomForWidth(20.0, knownLocation.first)
+            mapService.centerOn(knownLocation.first, knownLocation.second, zoom)
+            mapService.setMinimumZoomForWidth(20.0)
         }
     }
 
@@ -250,13 +256,21 @@ fun MapScreen(
                 key = uiState.updateToastKey
             )
         }
+
+        if (uiState.deleteToastKey > 0) {
+            Toast(
+                title = stringResource(R.string.event_delete_toast_title),
+                description = stringResource(R.string.event_delete_toast_desc),
+                key = uiState.deleteToastKey
+            )
+        }
     }
 
     when {
-        editingEvent != null -> EventUpdateScreen(
+        editingEvent != null -> EventFormScreen(
             event = editingEvent!!,
-            onBackClick = { editingEvent = null },
-            onEventUpdated = { 
+            onBack = { editingEvent = null },
+            onSaved = {
                 viewModel.onEventUpdated()
                 viewModel.scheduleRefresh()
                 editingEvent = null
@@ -269,6 +283,11 @@ fun MapScreen(
             onEditClick = {
                 editingEvent = selectedEvent
                 selectedEvent = null
+            },
+            onEventDeleted = {
+                selectedEvent = null
+                viewModel.onEventDeleted()
+                viewModel.scheduleRefresh()
             },
             onLoginClick = onLoginClick
         )

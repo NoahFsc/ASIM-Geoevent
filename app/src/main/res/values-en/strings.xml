@@ -138,12 +138,18 @@
     <string name="event_detail_coordinates">Lat: %1$s, Lon: %2$s</string>
     <string name="event_detail_not_found">Event not found</string>
     <string name="event_detail_edit">Edit</string>
-    <string name="event_detail_joined">Already joined</string>
+    <string name="event_detail_leave">Leave event</string>
+    <string name="event_detail_delete">Delete</string>
+    <string name="delete_event_title">Delete this event?</string>
+    <string name="delete_event_desc">This action is permanent. The event and its registrations will be removed.</string>
+    <string name="delete_event_confirm">Delete</string>
     <string name="event_detail_join">Join</string>
     <string name="event_join_toast_title">Successfully joined!</string>
     <string name="event_join_toast_desc">You are now attending this event</string>
     <string name="event_update_toast_title">Successfully updated!</string>
     <string name="event_update_toast_desc">The event has been updated</string>
+    <string name="event_delete_toast_title">Event deleted</string>
+    <string name="event_delete_toast_desc">The event has been deleted</string>
 
     <!-- Create / update event -->
     <string name="create_event_title">New event</string>
@@ -167,8 +173,7 @@
     <string name="update_event_submitting">Updating...</string>
     <string name="event_time_picker_title">Choose the time</string>
     <string name="event_error_title">Error</string>
-    <string name="event_error_must_login_create">You must be signed in to create an event</string>
-    <string name="event_error_must_login_update">You must be signed in to edit an event</string>
+    <string name="event_error_must_login_save">You must be signed in to save an event</string>
     <string name="event_error_generic">Error: %1$s</string>
     <string name="event_error_fallback">An error occurred</string>
 
@@ -222,6 +227,16 @@
     <string name="admin_time_minutes">%1$d min ago</string>
     <string name="admin_time_hours">%1$dh ago</string>
     <string name="admin_time_days">%1$dd ago</string>
+    <string name="admin_activity_user_created">New user: %1$s</string>
+    <string name="admin_activity_user_deleted">Account deleted: %1$s</string>
+    <string name="admin_activity_role_changed">%1$s is now %2$s</string>
+    <string name="admin_activity_event_created">Event created: "%1$s"</string>
+    <string name="admin_activity_event_deleted">Event deleted: "%1$s"</string>
+
+    <!-- Event status tags -->
+    <string name="tag_status_new">NEW</string>
+    <string name="tag_status_soon">SOON</string>
+    <string name="tag_status_done">DONE</string>
 
     <!-- Event cards -->
     <string name="event_card_delete">Delete</string>

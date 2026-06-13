@@ -190,13 +190,13 @@ private data class ActionStyle(val icon: ImageVector, val colorRes: Int, val lab
 @Composable
 private fun ActivityRow(entry: AuditLogEntry) {
     val name = entry.targetName.orEmpty().ifEmpty { "—" }
-    val newRole = entry.metadata?.get("new_role")?.toString()?.trim('"')
+    val newRole = entry.metadata?.get("new_role")?.toString()?.trim('"') ?: "?"
     val style = when (entry.action) {
-        "user_created"  -> ActionStyle(Icons.Filled.PersonAdd,   R.color.success_400, "Nouvel utilisateur : $name")
-        "user_deleted"  -> ActionStyle(Icons.Outlined.PersonOff, R.color.danger_400,  "Compte supprimé : $name")
-        "role_changed"  -> ActionStyle(Icons.Filled.Shield,      R.color.primary_400, "$name est maintenant ${newRole ?: "?"}")
-        "event_created" -> ActionStyle(Icons.Filled.Flag,        R.color.primary_400, "Événement créé : « $name »")
-        "event_deleted" -> ActionStyle(Icons.Outlined.Flag,      R.color.warning_400, "Événement supprimé : « $name »")
+        "user_created"  -> ActionStyle(Icons.Filled.PersonAdd,   R.color.success_400, stringResource(R.string.admin_activity_user_created, name))
+        "user_deleted"  -> ActionStyle(Icons.Outlined.PersonOff, R.color.danger_400,  stringResource(R.string.admin_activity_user_deleted, name))
+        "role_changed"  -> ActionStyle(Icons.Filled.Shield,      R.color.primary_400, stringResource(R.string.admin_activity_role_changed, name, newRole))
+        "event_created" -> ActionStyle(Icons.Filled.Flag,        R.color.primary_400, stringResource(R.string.admin_activity_event_created, name))
+        "event_deleted" -> ActionStyle(Icons.Outlined.Flag,      R.color.warning_400, stringResource(R.string.admin_activity_event_deleted, name))
         else            -> ActionStyle(Icons.Filled.Flag,        R.color.text_lighter, entry.action)
     }
 

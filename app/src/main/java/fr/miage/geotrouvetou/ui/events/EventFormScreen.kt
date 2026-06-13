@@ -14,6 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,7 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.miage.geotrouvetou.R
 import fr.miage.geotrouvetou.domain.models.Evenement
-import fr.miage.geotrouvetou.ui.appViewModelFactory
+import fr.miage.geotrouvetou.ui.utils.appViewModelFactory
 import fr.miage.geotrouvetou.ui.components.atoms.Button
 import fr.miage.geotrouvetou.ui.components.atoms.ImageUploader
 import fr.miage.geotrouvetou.ui.components.atoms.Input
@@ -47,21 +48,25 @@ import fr.miage.geotrouvetou.ui.components.atoms.Toast
 import fr.miage.geotrouvetou.ui.components.molecules.PlaceSearchBar
 import kotlinx.coroutines.delay
 
+/**
+ * Formulaire d'événement partagé. [event] null = création, sinon édition.
+ * [onBack] est null en création (la navigation est gérée en amont).
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EventUpdateScreen(
-    event: Evenement,
-    onBackClick: () -> Unit,
-    onEventUpdated: () -> Unit
+fun EventFormScreen(
+    onSaved: () -> Unit,
+    event: Evenement? = null,
+    onBack: (() -> Unit)? = null,
 ) {
     val context = LocalContext.current
-    val viewModel: EventUpdateViewModel = viewModel(
-        key = event.id,
+    val viewModel: EventFormViewModel = viewModel(
+        key = event?.id,
         factory = appViewModelFactory(context),
     )
 
     LaunchedEffect(event) {
-        viewModel.setEvent(event)
+        viewModel.load(event)
     }
 
     var showDatePicker by remember { mutableStateOf(false) }
@@ -95,16 +100,14 @@ fun EventUpdateScreen(
     }
 
     LaunchedEffect(Unit) {
-        viewModel.eventUpdated.collect {
-            onEventUpdated()
-            onBackClick()
+        viewModel.saved.collect {
+            onSaved()
+            onBack?.invoke()
         }
     }
 
     LaunchedEffect(Unit) {
-        viewModel.error.collect { message ->
-            errorMessage = message
-        }
+        viewModel.error.collect { errorMessage = it }
     }
 
     Column(
@@ -115,32 +118,36 @@ fun EventUpdateScreen(
             .verticalScroll(rememberScrollState())
             .padding(bottom = 32.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 16.dp)
-                .clickable { onBackClick() },
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                contentDescription = null,
-                tint = colorResource(R.color.text_light),
-                modifier = Modifier.size(24.dp)
-            )
-            Text(
-                text = stringResource(R.string.action_back),
-                fontSize = 18.sp,
-                color = colorResource(R.color.text_light)
-            )
+        if (onBack != null) {
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 16.dp)
+                    .clickable { onBack() },
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                    contentDescription = null,
+                    tint = colorResource(R.color.text_light),
+                    modifier = Modifier.size(24.dp)
+                )
+                Text(
+                    text = stringResource(R.string.action_back),
+                    fontSize = 18.sp,
+                    color = colorResource(R.color.text_light)
+                )
+            }
         }
 
         Column(
-            modifier = Modifier.padding(horizontal = 24.dp),
+            modifier = Modifier.padding(horizontal = 24.dp, vertical = if (onBack == null) 32.dp else 0.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             Text(
-                text = stringResource(R.string.update_event_title),
+                text = stringResource(
+                    if (viewModel.isEditMode) R.string.update_event_title else R.string.create_event_title
+                ),
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 color = colorResource(R.color.primary_600),
@@ -152,13 +159,13 @@ fun EventUpdateScreen(
                 onImageSelected = { viewModel.imageUri = it },
                 label = stringResource(R.string.event_form_cover_image),
                 required = true,
-                imageUrl = viewModel.currentImageUrl
+                imageUrl = viewModel.currentImageUrl,
             )
 
             Input(
                 value = viewModel.title,
                 onValueChange = { viewModel.title = it },
-                placeholder = stringResource(R.string.event_form_title_label),
+                placeholder = stringResource(R.string.event_form_title_placeholder),
                 label = stringResource(R.string.event_form_title_label),
                 required = true,
             )
@@ -166,7 +173,7 @@ fun EventUpdateScreen(
             TextArea(
                 value = viewModel.description,
                 onValueChange = { viewModel.description = it },
-                placeholder = stringResource(R.string.event_form_description_label),
+                placeholder = stringResource(R.string.event_form_description_placeholder),
                 label = stringResource(R.string.event_form_description_label),
                 maxLength = 500,
                 required = true,
@@ -201,7 +208,7 @@ fun EventUpdateScreen(
             Input(
                 value = viewModel.location,
                 onValueChange = { viewModel.location = it },
-                placeholder = stringResource(R.string.event_form_location_label),
+                placeholder = stringResource(R.string.event_form_search_place),
                 label = stringResource(R.string.event_form_location_label),
                 required = true,
                 leadingIcon = Icons.Default.Search
@@ -232,15 +239,24 @@ fun EventUpdateScreen(
             }
 
             Button(
-                text = if (viewModel.isLoading) stringResource(R.string.update_event_submitting) else stringResource(R.string.update_event_submit),
+                text = when {
+                    viewModel.isLoading && viewModel.isEditMode -> stringResource(R.string.update_event_submitting)
+                    viewModel.isLoading -> stringResource(R.string.create_event_submitting)
+                    viewModel.isEditMode -> stringResource(R.string.update_event_submit)
+                    else -> stringResource(R.string.create_event_submit)
+                },
                 onClick = {
                     val bytes = viewModel.imageUri?.let { uri ->
                         context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
                     }
-                    viewModel.updateEvent(bytes)
+                    viewModel.save(bytes)
                 },
                 enabled = viewModel.isFormValid,
-                leftIcon = if (viewModel.isLoading) null else Icons.Default.Check,
+                leftIcon = when {
+                    viewModel.isLoading -> null
+                    viewModel.isEditMode -> Icons.Default.Check
+                    else -> Icons.Default.Add
+                },
                 modifier = Modifier.fillMaxWidth()
             )
         }

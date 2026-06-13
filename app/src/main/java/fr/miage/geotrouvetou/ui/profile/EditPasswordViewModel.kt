@@ -56,7 +56,7 @@ class EditPasswordViewModel(application: Application) : AndroidViewModel(applica
             authService.updatePassword(state.password)
             _uiState.value = _uiState.value.copy(isSaving = false)
             true
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             _uiState.value = _uiState.value.copy(isSaving = false, error = getApplication<App>().getString(R.string.edit_password_error))
             false
         }

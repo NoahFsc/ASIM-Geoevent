@@ -13,18 +13,18 @@ import kotlin.time.Duration.Companion.hours
 /** Implémentation du stockage d'images via Supabase Storage. Convertit en WebP avant upload. */
 class SupabaseImageService(private val client: SupabaseClient) : IImageService {
 
-    private val bucketName = "EventImages"
-    private val bucketNameAvatar = "avatars"
+    private val eventBucket = "EventImages"
+    private val avatarBucket = "avatars"
 
     override suspend fun uploadAvatarImage(userId: String, bytes: ByteArray): String {
         val path = "avatar_$userId.webp"
         val payload = try { convertToWebp(bytes) } catch (_: Exception) { bytes }
-        client.storage.from(bucketNameAvatar).upload(path, payload) { upsert = true }
+        client.storage.from(avatarBucket).upload(path, payload) { upsert = true }
         return path
     }
 
     override suspend fun getAvatarSignedUrl(path: String): String {
-        return client.storage.from(bucketNameAvatar).createSignedUrl(path, 1.hours)
+        return client.storage.from(avatarBucket).createSignedUrl(path, 1.hours)
     }
 
     override suspend fun uploadEventImage(fileName: String, bytes: ByteArray): String {
@@ -36,7 +36,7 @@ class SupabaseImageService(private val client: SupabaseClient) : IImageService {
             bytes
         }
 
-        val bucket = client.storage.from(bucketName)
+        val bucket = client.storage.from(eventBucket)
         bucket.upload(finalFileName, payload) {
             contentType = ContentType.parse("image/webp")
             upsert = true

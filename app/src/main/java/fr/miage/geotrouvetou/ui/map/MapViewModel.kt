@@ -30,6 +30,7 @@ data class MapUiState(
     val errorMessage: String? = null,
     val joinToastKey: Int = 0,
     val updateToastKey: Int = 0,
+    val deleteToastKey: Int = 0,
 )
 
 @OptIn(FlowPreview::class)
@@ -95,7 +96,7 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
 
         viewModelScope.launch {
             val service = databaseService ?: return@launch
-            // Si les bounds de l'écran sont déjà connues (la map était prête avant le fix GPS),
+            // Si les bounds de l'écran sont déjà connues
             // on charge uniquement les events visibles. Sinon on replie sur le rayon 20km.
             val bounds = _uiState.value.visibleBounds
             if (bounds != null) {
@@ -117,6 +118,10 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
 
     fun onEventUpdated() {
         _uiState.update { it.copy(updateToastKey = it.updateToastKey + 1) }
+    }
+
+    fun onEventDeleted() {
+        _uiState.update { it.copy(deleteToastKey = it.deleteToastKey + 1) }
     }
 
     fun scheduleRefresh() {
@@ -208,11 +213,3 @@ data class Quadruple<A, B, C, D>(
     val third: C,
     val fourth: D
 )
-
-
-
-
-
-
-
-

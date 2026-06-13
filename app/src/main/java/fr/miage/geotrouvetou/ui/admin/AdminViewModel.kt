@@ -51,7 +51,7 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
         loadEvents()
     }
 
-    // ── Stats ─────────────────────────────────────────────────────────────────
+    // ── Stats ──
 
     fun loadStats() {
         viewModelScope.launch {
@@ -59,13 +59,13 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
             try {
                 val stats = databaseService.getAdminStats()
                 _uiState.value = _uiState.value.copy(stats = stats, isLoadingStats = false)
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 _uiState.value = _uiState.value.copy(isLoadingStats = false)
             }
         }
     }
 
-    // ── Activité récente ──────────────────────────────────────────────────────
+    // ── Activité récente ──
 
     fun loadRecentActivity() {
         viewModelScope.launch {
@@ -73,13 +73,13 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
             try {
                 val activity = databaseService.getRecentActivity(limit = 10)
                 _uiState.value = _uiState.value.copy(recentActivity = activity, isLoadingActivity = false)
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 _uiState.value = _uiState.value.copy(isLoadingActivity = false)
             }
         }
     }
 
-    // ── Utilisateurs ─────────────────────────────────────────────────────────
+    // ── Utilisateurs ──
 
     fun loadUsers() {
         usersPage = 0
@@ -88,7 +88,7 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
             try {
                 val page = databaseService.getAdminUsers(page = 0, pageSize = PAGE_SIZE)
                 _uiState.value = _uiState.value.copy(users = page, isLoadingUsers = false, hasMoreUsers = page.size == PAGE_SIZE)
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 _uiState.value = _uiState.value.copy(isLoadingUsers = false)
             }
         }
@@ -106,7 +106,7 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
                     isLoadingUsers = false,
                     hasMoreUsers = page.size == PAGE_SIZE,
                 )
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 usersPage--
                 _uiState.value = _uiState.value.copy(isLoadingUsers = false)
             }
@@ -140,7 +140,7 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    // ── Événements ───────────────────────────────────────────────────────────
+    // ── Événements ──
 
     fun loadEvents() {
         eventsPage = 0
@@ -149,7 +149,7 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
             try {
                 val page = databaseService.getAdminEvents(page = 0, pageSize = PAGE_SIZE)
                 _uiState.value = _uiState.value.copy(events = page, isLoadingEvents = false, hasMoreEvents = page.size == PAGE_SIZE)
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 _uiState.value = _uiState.value.copy(isLoadingEvents = false)
             }
         }
@@ -167,7 +167,7 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
                     isLoadingEvents = false,
                     hasMoreEvents = page.size == PAGE_SIZE,
                 )
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 eventsPage--
                 _uiState.value = _uiState.value.copy(isLoadingEvents = false)
             }
