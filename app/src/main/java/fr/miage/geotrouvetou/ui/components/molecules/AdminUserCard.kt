@@ -56,7 +56,6 @@ fun AdminUserCard(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        // Avatar
         Box(
             modifier = Modifier
                 .size(48.dp)
@@ -72,7 +71,6 @@ fun AdminUserCard(
             )
         }
 
-        // Nom + email
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = name,
@@ -87,7 +85,6 @@ fun AdminUserCard(
             )
         }
 
-        // Badge rôle
         val isAdmin = role == "admin"
         Box(
             modifier = Modifier
@@ -105,7 +102,6 @@ fun AdminUserCard(
             )
         }
 
-        // Menu 3 points
         Box {
             IconButton(
                 onClick = { if (!isCurrentUser) menuExpanded = true },

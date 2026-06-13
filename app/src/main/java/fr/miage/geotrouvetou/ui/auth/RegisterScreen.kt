@@ -63,8 +63,8 @@ fun RegisterScreen(
     var confirmPassword by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmVisible by remember { mutableStateOf(false) }
-    var nom by remember { mutableStateOf("") }
-    var prenom by remember { mutableStateOf("") }
+    var lastName by remember { mutableStateOf("") }
+    var firstName by remember { mutableStateOf("") }
     var showPasswordInfo by remember { mutableStateOf(false) }
 
     LaunchedEffect(uiState.navigateToMain) {
@@ -119,16 +119,16 @@ fun RegisterScreen(
         ) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Input(
-                    value = nom,
-                    onValueChange = { nom = UserFieldValidator.capitalizeFirst(it) },
+                    value = lastName,
+                    onValueChange = { lastName = UserFieldValidator.capitalizeFirst(it) },
                     placeholder = "Dupont",
                     label = "Nom",
                     required = true,
                     modifier = Modifier.weight(1f),
                 )
                 Input(
-                    value = prenom,
-                    onValueChange = { prenom = UserFieldValidator.capitalizeFirst(it) },
+                    value = firstName,
+                    onValueChange = { firstName = UserFieldValidator.capitalizeFirst(it) },
                     placeholder = "Patrick",
                     label = "Prénom",
                     required = true,
@@ -172,7 +172,7 @@ fun RegisterScreen(
                 trailingIcon = if (confirmVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
                 onTrailingIconClick = { confirmVisible = !confirmVisible },
                 visualTransformation = if (confirmVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                erreur = PasswordValidation.confirmError(password, confirmPassword),
+                error = PasswordValidation.confirmError(password, confirmPassword),
             )
             Checkbox(
                 checked = uiState.termsAccepted,
@@ -207,7 +207,7 @@ fun RegisterScreen(
 
         Spacer(modifier = Modifier.height(30.dp))
 
-        val formValid = UserFieldValidator.isNomValid(nom) && UserFieldValidator.isPrenomValid(prenom) &&
+        val formValid = UserFieldValidator.isLastNameValid(lastName) && UserFieldValidator.isFirstNameValid(firstName) &&
             UserFieldValidator.isEmailValid(email) && password.isNotBlank() &&
             PasswordValidation.confirmError(password, confirmPassword) == null &&
             confirmPassword.isNotBlank() && uiState.termsAccepted
@@ -217,7 +217,7 @@ fun RegisterScreen(
         } else {
             Button(
                 text = "S'inscrire",
-                onClick = { viewModel.register(email, password, confirmPassword, nom, prenom) },
+                onClick = { viewModel.register(email, password, confirmPassword, lastName, firstName) },
                 fullWidth = true,
                 enabled = formValid,
             )

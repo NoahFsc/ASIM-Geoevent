@@ -92,7 +92,6 @@ fun EditProfileScreen(
                 .padding(horizontal = 24.dp, vertical = 24.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
-            // Retour
             Row(
                 modifier = Modifier
                     .clickable(
@@ -114,7 +113,6 @@ fun EditProfileScreen(
                 )
             }
 
-            // Titre
             Text(
                 text = "Modifier mon profil",
                 fontSize = 32.sp,
@@ -132,7 +130,6 @@ fun EditProfileScreen(
                 },
             )
 
-            // Carte des informations personnelles
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -161,16 +158,16 @@ fun EditProfileScreen(
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Input(
-                        value = uiState.nom,
-                        onValueChange = viewModel::onNomChange,
+                        value = uiState.lastName,
+                        onValueChange = viewModel::onLastNameChange,
                         placeholder = "Nom",
                         label = "Nom",
                         required = true,
                         modifier = Modifier.weight(1f),
                     )
                     Input(
-                        value = uiState.prenom,
-                        onValueChange = viewModel::onPrenomChange,
+                        value = uiState.firstName,
+                        onValueChange = viewModel::onFirstNameChange,
                         placeholder = "Prénom",
                         label = "Prénom",
                         required = true,
@@ -197,7 +194,6 @@ fun EditProfileScreen(
             }
         }
 
-        // Boutons en bas
         Column(
             modifier = Modifier
                 .padding(horizontal = 24.dp)

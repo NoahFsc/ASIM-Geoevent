@@ -4,11 +4,11 @@ import android.util.Patterns
 
 object UserFieldValidator {
 
-    fun validateNom(nom: String): String? =
-        if (nom.isBlank()) "Le nom est requis" else null
+    fun validateLastName(lastName: String): String? =
+        if (lastName.isBlank()) "Le nom est requis" else null
 
-    fun validatePrenom(prenom: String): String? =
-        if (prenom.isBlank()) "Le prénom est requis" else null
+    fun validateFirstName(firstName: String): String? =
+        if (firstName.isBlank()) "Le prénom est requis" else null
 
     fun validateEmail(email: String): String? = when {
         email.isBlank() -> "L'adresse email est requise"
@@ -16,8 +16,8 @@ object UserFieldValidator {
         else -> null
     }
 
-    fun isNomValid(nom: String) = validateNom(nom) == null
-    fun isPrenomValid(prenom: String) = validatePrenom(prenom) == null
+    fun isLastNameValid(lastName: String) = validateLastName(lastName) == null
+    fun isFirstNameValid(firstName: String) = validateFirstName(firstName) == null
     fun isEmailValid(email: String) = validateEmail(email) == null
 
     fun capitalizeFirst(value: String) = value.replaceFirstChar { it.uppercaseChar() }

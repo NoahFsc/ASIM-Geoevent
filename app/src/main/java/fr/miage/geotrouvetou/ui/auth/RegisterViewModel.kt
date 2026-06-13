@@ -27,7 +27,7 @@ class RegisterViewModel(application: Application) : AndroidViewModel(application
     private val _uiState = MutableStateFlow(RegisterUiState())
     val uiState: StateFlow<RegisterUiState> = _uiState.asStateFlow()
 
-    fun register(email: String, password: String, confirmPassword: String, nom: String, prenom: String) {
+    fun register(email: String, password: String, confirmPassword: String, lastName: String, firstName: String) {
         val error = validateEmail(email) ?: validatePassword(password)
             ?: validateConfirmPassword(password, confirmPassword)
         if (error != null) {
@@ -39,7 +39,7 @@ class RegisterViewModel(application: Application) : AndroidViewModel(application
             return
         }
 
-        val fullName = "$prenom $nom".trim()
+        val fullName = "$firstName $lastName".trim()
 
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)

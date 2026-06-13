@@ -71,7 +71,6 @@ fun ParamsScreen(
             .padding(horizontal = 24.dp, vertical = 24.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
-        // Retour
         Row(
             modifier = Modifier
                 .clickable(
@@ -93,7 +92,6 @@ fun ParamsScreen(
             )
         }
 
-        // Titre
         Text(
             text = "Paramètres",
             fontSize = 32.sp,
@@ -101,7 +99,6 @@ fun ParamsScreen(
             color = colorResource(R.color.text_darker),
         )
 
-        // Section Compte
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(
                 text = "Compte",
@@ -148,7 +145,6 @@ fun ParamsScreen(
             )
         }
 
-        // Déconnexion
         Text(
             text = "Déconnexion",
             fontSize = 16.sp,

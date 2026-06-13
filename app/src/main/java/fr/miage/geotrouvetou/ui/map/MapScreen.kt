@@ -181,7 +181,7 @@ fun MapScreen(
             )
         }
 
-        // Top-left: center on self
+        // Haut-gauche : centrer sur ma position
         Box(
             modifier = Modifier
                 .align(Alignment.TopStart)
@@ -199,7 +199,7 @@ fun MapScreen(
             )
         }
 
-        // Top-right: zoom in / zoom out
+        // Haut-droite : zoom avant / arrière
         Column(
             modifier = Modifier
                 .align(Alignment.TopEnd)
@@ -219,7 +219,7 @@ fun MapScreen(
             )
         }
 
-        // Bottom-center: search bar opening the event list modal
+        // Bas-centre : barre de recherche ouvrant la liste des événements
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)

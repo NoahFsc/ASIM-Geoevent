@@ -69,7 +69,7 @@ fun SearchBar(
                 }
             }
         )
-        // Transparent overlay so the whole pill is tappable when used as a button
+        // Surcouche transparente pour rendre toute la pilule cliquable en mode bouton
         if (onClick != null) {
             Box(
                 modifier = Modifier

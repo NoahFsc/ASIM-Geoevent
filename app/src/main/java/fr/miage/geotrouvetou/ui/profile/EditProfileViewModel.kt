@@ -12,11 +12,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 data class EditProfileUiState(
-    val nom: String = "",
-    val prenom: String = "",
+    val lastName: String = "",
+    val firstName: String = "",
     val email: String = "",
-    val originalNom: String = "",
-    val originalPrenom: String = "",
+    val originalLastName: String = "",
+    val originalFirstName: String = "",
     val avatarUrl: String? = null,
     val isLoading: Boolean = true,
     val isSaving: Boolean = false,
@@ -26,8 +26,8 @@ data class EditProfileUiState(
     val error: String? = null,
     val navigateToLogout: Boolean = false,
 ) {
-    val hasChanges: Boolean get() = nom != originalNom || prenom != originalPrenom
-    val formValid: Boolean get() = UserFieldValidator.isNomValid(nom) && UserFieldValidator.isPrenomValid(prenom)
+    val hasChanges: Boolean get() = lastName != originalLastName || firstName != originalFirstName
+    val formValid: Boolean get() = UserFieldValidator.isLastNameValid(lastName) && UserFieldValidator.isFirstNameValid(firstName)
 }
 
 class EditProfileViewModel(application: Application) : AndroidViewModel(application) {
@@ -51,11 +51,11 @@ class EditProfileViewModel(application: Application) : AndroidViewModel(applicat
             val profile = databaseService.getProfile(userId)
             val fullName = profile?.fullName ?: ""
             val parts = fullName.split(" ", limit = 2)
-            val nom = UserFieldValidator.capitalizeFirst(parts.getOrNull(0) ?: "")
-            val prenom = UserFieldValidator.capitalizeFirst(parts.getOrNull(1) ?: "")
+            val lastName = UserFieldValidator.capitalizeFirst(parts.getOrNull(0) ?: "")
+            val firstName = UserFieldValidator.capitalizeFirst(parts.getOrNull(1) ?: "")
             _uiState.value = _uiState.value.copy(
-                nom = nom, prenom = prenom, email = email,
-                originalNom = nom, originalPrenom = prenom,
+                lastName = lastName, firstName = firstName, email = email,
+                originalLastName = lastName, originalFirstName = firstName,
                 avatarUrl = profile?.avatarUrl,
                 isLoading = false,
             )
@@ -64,16 +64,16 @@ class EditProfileViewModel(application: Application) : AndroidViewModel(applicat
         }
     }
 
-    fun onNomChange(value: String) {
+    fun onLastNameChange(value: String) {
         _uiState.value = _uiState.value.copy(
-            nom = UserFieldValidator.capitalizeFirst(value),
+            lastName = UserFieldValidator.capitalizeFirst(value),
             error = null,
         )
     }
 
-    fun onPrenomChange(value: String) {
+    fun onFirstNameChange(value: String) {
         _uiState.value = _uiState.value.copy(
-            prenom = UserFieldValidator.capitalizeFirst(value),
+            firstName = UserFieldValidator.capitalizeFirst(value),
             error = null,
         )
     }
@@ -85,12 +85,12 @@ class EditProfileViewModel(application: Application) : AndroidViewModel(applicat
             _uiState.value = state.copy(isSaving = true, error = null)
             try {
                 val userId = authService.currentUserId() ?: return@launch
-                val fullName = "${state.nom} ${state.prenom}"
+                val fullName = "${state.lastName} ${state.firstName}"
                 databaseService.updateProfile(userId, fullName)
                 _uiState.value = _uiState.value.copy(
                     isSaving = false,
-                    originalNom = state.nom,
-                    originalPrenom = state.prenom,
+                    originalLastName = state.lastName,
+                    originalFirstName = state.firstName,
                     saveToastKey = _uiState.value.saveToastKey + 1,
                 )
             } catch (_: Exception) {

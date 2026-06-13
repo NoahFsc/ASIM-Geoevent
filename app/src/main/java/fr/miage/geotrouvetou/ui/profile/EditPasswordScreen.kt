@@ -72,7 +72,6 @@ fun EditPasswordScreen(
                 .padding(horizontal = 24.dp, vertical = 24.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
-            // Retour
             Row(
                 modifier = Modifier
                     .clickable(
@@ -94,7 +93,6 @@ fun EditPasswordScreen(
                 )
             }
 
-            // Titre
             Text(
                 text = "Modifier mon mot de passe",
                 fontSize = 32.sp,
@@ -103,7 +101,6 @@ fun EditPasswordScreen(
                 lineHeight = 38.sp,
             )
 
-            // Requirements
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(
                     text = "Votre nouveau mot de passe doit contenir :",
@@ -116,7 +113,6 @@ fun EditPasswordScreen(
                 PasswordRequirement(label = "1 Majuscule", met = uiState.validation.hasUppercase)
             }
 
-            // Fields card
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -144,7 +140,7 @@ fun EditPasswordScreen(
                     visualTransformation = if (uiState.showConfirmPassword) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = if (uiState.showConfirmPassword) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility,
                     onTrailingIconClick = viewModel::toggleShowConfirmPassword,
-                    erreur = PasswordValidation.confirmError(uiState.password, uiState.confirmPassword),
+                    error = PasswordValidation.confirmError(uiState.password, uiState.confirmPassword),
                 )
             }
 
@@ -157,7 +153,6 @@ fun EditPasswordScreen(
             }
         }
 
-        // Bouton en bas
         Button(
             text = "Modifier le mot de passe",
             onClick = {

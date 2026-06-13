@@ -62,9 +62,6 @@ class SupabaseDatabaseService(
         }.decodeSingleOrNull<Evenement>()
     }
 
-    /**
-     * Utilise le helper dédié pour uploader une image et récupérer son lien public.
-     */
     override suspend fun uploadImage(fileName: String, bytes: ByteArray): String {
         return imageService.uploadEventImage(fileName, bytes)
     }

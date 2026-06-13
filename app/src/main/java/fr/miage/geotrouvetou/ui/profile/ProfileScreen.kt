@@ -111,7 +111,6 @@ fun ProfileContent(
                 .padding(horizontal = 24.dp, vertical = 32.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
-            // Header
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -133,7 +132,6 @@ fun ProfileContent(
                 )
             }
 
-            // User info
             Row(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.Top,
@@ -170,7 +168,6 @@ fun ProfileContent(
                 )
             }
 
-            // Stats
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 StatCard(
                     value = "${uiState.events.size}",
@@ -184,14 +181,12 @@ fun ProfileContent(
                 )
             }
 
-            // Tab toggle
             SegmentedControl(
                 tabs = listOf("Mes événements", "Mes participations"),
                 selectedIndex = uiState.selectedTab.ordinal,
                 onTabSelected = { onTabSelected(ProfileTab.entries[it]) },
             )
 
-            // Content
             if (uiState.isLoading) {
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(color = colorResource(R.color.primary_500))

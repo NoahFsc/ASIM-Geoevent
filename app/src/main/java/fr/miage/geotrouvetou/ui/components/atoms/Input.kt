@@ -52,7 +52,7 @@ fun Input(
     onTrailingIconClick: (() -> Unit)? = null,
     label: String? = null,
     required: Boolean = false,
-    erreur: String? = null,
+    error: String? = null,
     labelTrailingContent: (@Composable () -> Unit)? = null,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     suggestions: List<String> = emptyList(),
@@ -113,7 +113,7 @@ fun Input(
                     .fillMaxWidth()
                     .border(
                         1.dp,
-                        colorResource(id = if (erreur != null) R.color.danger_500 else R.color.text_lighter),
+                        colorResource(id = if (error != null) R.color.danger_500 else R.color.text_lighter),
                         RoundedCornerShape(8.dp),
                     ),
                 shape = RoundedCornerShape(8.dp),
@@ -149,10 +149,10 @@ fun Input(
                 }
             }
         }
-        if (erreur != null) {
+        if (error != null) {
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = erreur,
+                text = error,
                 fontSize = 16.sp,
                 color = colorResource(id = R.color.danger_500),
             )
@@ -284,7 +284,7 @@ private fun FillWithErrorPreview() {
             placeholder = "Rechercher un événement",
             label = "Titre de l'événement",
             required = true,
-            erreur = "Ce champ est requis"
+            error = "Ce champ est requis"
         )
     }
 }
