@@ -9,4 +9,6 @@ data class Place(
     val mainLine: String,
     /** Code postal, département, pays, ex. "75001, Paris, France". */
     val countryLine: String,
+    /** Adresse concise : rue, ville, code postal, ex. "10 Rue de la Paix, Paris, 75001". */
+    val shortAddress: String,
 )

@@ -108,7 +108,7 @@ fun CreateEventScreen(
         onPlaceSelected = { place ->
             viewModel.latitude = place.latitude
             viewModel.longitude = place.longitude
-            viewModel.location = place.displayName
+            viewModel.location = place.shortAddress
         },
         isPrivate = viewModel.isPrivate,
         onPrivateChange = { viewModel.isPrivate = it },

@@ -1,7 +1,6 @@
 package fr.miage.geotrouvetou.ui.components.atoms
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
@@ -13,7 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -113,43 +111,10 @@ fun Button(
     }
 }
 
+@Preview
 @Composable
-private fun PreviewWrapper(content: @Composable () -> Unit) {
-    Box(modifier = Modifier.background(colorResource(R.color.background)).padding(16.dp)) { content() }
-}
-
-@Preview(name = "Fill – Default")
-@Composable
-private fun FillDefaultPreview() {
-    PreviewWrapper { Button(text = "Button", onClick = {}) }
-}
-
-@Preview(name = "Fill – Disabled")
-@Composable
-private fun FillDisabledPreview() {
-    PreviewWrapper { Button(text = "Button", onClick = {}, enabled = false) }
-}
-
-@Preview(name = "Ghost – Default")
-@Composable
-private fun GhostDefaultPreview() {
-    PreviewWrapper { Button(text = "Button", onClick = {}, variant = ButtonVariant.Ghost) }
-}
-
-@Preview(name = "Ghost – Disabled")
-@Composable
-private fun GhostDisabledPreview() {
-    PreviewWrapper { Button(text = "Button", onClick = {}, variant = ButtonVariant.Ghost, enabled = false) }
-}
-
-@Preview(name = "Fill – Left icon")
-@Composable
-private fun FillLeftIconPreview() {
-    PreviewWrapper { Button(text = "Button", onClick = {}, leftIcon = Icons.Filled.Add) }
-}
-
-@Preview(name = "Fill – Right icon")
-@Composable
-private fun FillRightIconPreview() {
-    PreviewWrapper { Button(text = "Button", onClick = {}, rightIcon = Icons.AutoMirrored.Filled.ArrowForward) }
+private fun ButtonPreview() {
+    Box(modifier = Modifier.padding(16.dp)) {
+        Button(text = "Button", onClick = {}, leftIcon = Icons.Filled.Add)
+    }
 }

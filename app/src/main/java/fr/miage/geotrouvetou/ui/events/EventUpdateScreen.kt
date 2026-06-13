@@ -212,7 +212,7 @@ fun EventUpdateScreen(
                 onPlaceSelected = { place ->
                     viewModel.latitude = place.latitude
                     viewModel.longitude = place.longitude
-                    viewModel.location = place.displayName
+                    viewModel.location = place.shortAddress
                 },
                 modifier = Modifier.fillMaxWidth()
             )

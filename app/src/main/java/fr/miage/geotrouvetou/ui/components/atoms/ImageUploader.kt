@@ -158,35 +158,15 @@ fun ImageUploader(
     }
 }
 
+@Preview
 @Composable
-private fun PreviewWrapper(content: @Composable () -> Unit) {
-    Box(
-        modifier = Modifier
-            .background(colorResource(R.color.background))
-            .padding(16.dp)
-    ) { content() }
-}
-
-@Preview(name = "ImageUploader – Empty")
-@Composable
-private fun ImageUploaderEmptyPreview() {
-    PreviewWrapper {
+private fun ImageUploaderPreview() {
+    Box(modifier = Modifier.padding(16.dp)) {
         ImageUploader(
             imageUri = null,
             onImageSelected = {},
             label = "Image de couverture",
             required = true,
-        )
-    }
-}
-
-@Preview(name = "ImageUploader – No Label")
-@Composable
-private fun ImageUploaderNoLabelPreview() {
-    PreviewWrapper {
-        ImageUploader(
-            imageUri = null,
-            onImageSelected = {},
         )
     }
 }

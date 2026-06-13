@@ -80,34 +80,10 @@ fun SearchBar(
     }
 }
 
-@Preview(name = "SearchBar – Empty")
+@Preview
 @Composable
-private fun SearchBarEmptyPreview() {
-    Box(
-        modifier = Modifier
-            .background(colorResource(R.color.background))
-            .padding(16.dp)
-    ) {
-        SearchBar(
-            value = "",
-            onValueChange = {},
-            placeholder = "Choisir votre lieu de randonnée",
-        )
-    }
-}
-
-@Preview(name = "SearchBar – With Text")
-@Composable
-private fun SearchBarWithTextPreview() {
-    Box(
-        modifier = Modifier
-            .background(colorResource(R.color.background))
-            .padding(16.dp)
-    ) {
-        SearchBar(
-            value = "Paris",
-            onValueChange = {},
-            placeholder = "Choisir votre lieu de randonnée",
-        )
+private fun SearchBarPreview() {
+    Box(modifier = Modifier.padding(16.dp)) {
+        SearchBar(value = "", onValueChange = {}, placeholder = "Choisir votre lieu de randonnée")
     }
 }

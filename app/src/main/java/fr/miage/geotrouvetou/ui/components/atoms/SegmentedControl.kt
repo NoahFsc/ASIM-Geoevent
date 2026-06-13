@@ -66,25 +66,13 @@ fun SegmentedControl(
     }
 }
 
-@Preview(name = "SegmentedControl – First selected")
+@Preview
 @Composable
-private fun SegmentedControlFirstPreview() {
-    Box(modifier = Modifier.background(colorResource(R.color.background)).padding(16.dp)) {
+private fun SegmentedControlPreview() {
+    Box(modifier = Modifier.padding(16.dp)) {
         SegmentedControl(
             tabs = listOf("Mes événements", "Mes participations"),
             selectedIndex = 0,
-            onTabSelected = {},
-        )
-    }
-}
-
-@Preview(name = "SegmentedControl – Second selected")
-@Composable
-private fun SegmentedControlSecondPreview() {
-    Box(modifier = Modifier.background(colorResource(R.color.background)).padding(16.dp)) {
-        SegmentedControl(
-            tabs = listOf("Mes événements", "Mes participations"),
-            selectedIndex = 1,
             onTabSelected = {},
         )
     }

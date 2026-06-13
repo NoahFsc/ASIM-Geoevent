@@ -56,20 +56,8 @@ fun NavBar(
     }
 }
 
-@Preview(name = "NavBar – Carte active")
+@Preview
 @Composable
-private fun NavBarCartePreview() {
+private fun NavBarPreview() {
     NavBar(selectedTab = NavTab.Carte, onTabSelected = {})
-}
-
-@Preview(name = "NavBar – Ajouter active")
-@Composable
-private fun NavBarAjouterPreview() {
-    NavBar(selectedTab = NavTab.Ajouter, onTabSelected = {})
-}
-
-@Preview(name = "NavBar – Profil active")
-@Composable
-private fun NavBarProfilPreview() {
-    NavBar(selectedTab = NavTab.Profil, onTabSelected = {})
 }

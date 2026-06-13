@@ -1,6 +1,7 @@
 package fr.miage.geotrouvetou.ui.admin
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import fr.miage.geotrouvetou.App
@@ -25,7 +26,6 @@ data class AdminUiState(
     val isLoadingActivity: Boolean = false,
     val hasMoreUsers: Boolean = true,
     val hasMoreEvents: Boolean = true,
-    val error: String? = null,
 )
 
 class AdminViewModel(application: Application) : AndroidViewModel(application) {
@@ -55,12 +55,12 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
 
     fun loadStats() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoadingStats = true, error = null)
+            _uiState.value = _uiState.value.copy(isLoadingStats = true)
             try {
                 val stats = databaseService.getAdminStats()
                 _uiState.value = _uiState.value.copy(stats = stats, isLoadingStats = false)
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(isLoadingStats = false, error = "Erreur stats : ${e.message}")
+                _uiState.value = _uiState.value.copy(isLoadingStats = false)
             }
         }
     }
@@ -89,7 +89,7 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
                 val page = databaseService.getAdminUsers(page = 0, pageSize = PAGE_SIZE)
                 _uiState.value = _uiState.value.copy(users = page, isLoadingUsers = false, hasMoreUsers = page.size == PAGE_SIZE)
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(isLoadingUsers = false, error = "Erreur utilisateurs : ${e.message}")
+                _uiState.value = _uiState.value.copy(isLoadingUsers = false)
             }
         }
     }
@@ -108,7 +108,7 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
                 )
             } catch (e: Exception) {
                 usersPage--
-                _uiState.value = _uiState.value.copy(isLoadingUsers = false, error = "Erreur utilisateurs : ${e.message}")
+                _uiState.value = _uiState.value.copy(isLoadingUsers = false)
             }
         }
     }
@@ -121,7 +121,7 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
                     users = _uiState.value.users.map { if (it.id == userId) it.copy(role = newRole) else it },
                 )
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(error = "Erreur mise à jour rôle : ${e.message}")
+                Log.e("AdminViewModel", "Échec mise à jour rôle", e)
             }
         }
     }
@@ -135,7 +135,7 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
                     stats = _uiState.value.stats.copy(userCount = (_uiState.value.stats.userCount - 1).coerceAtLeast(0)),
                 )
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(error = "Erreur suppression : ${e.message}")
+                Log.e("AdminViewModel", "Échec suppression utilisateur", e)
             }
         }
     }
@@ -150,7 +150,7 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
                 val page = databaseService.getAdminEvents(page = 0, pageSize = PAGE_SIZE)
                 _uiState.value = _uiState.value.copy(events = page, isLoadingEvents = false, hasMoreEvents = page.size == PAGE_SIZE)
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(isLoadingEvents = false, error = "Erreur événements : ${e.message}")
+                _uiState.value = _uiState.value.copy(isLoadingEvents = false)
             }
         }
     }
@@ -169,7 +169,7 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
                 )
             } catch (e: Exception) {
                 eventsPage--
-                _uiState.value = _uiState.value.copy(isLoadingEvents = false, error = "Erreur événements : ${e.message}")
+                _uiState.value = _uiState.value.copy(isLoadingEvents = false)
             }
         }
     }
@@ -183,7 +183,7 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
                     stats = _uiState.value.stats.copy(eventCount = (_uiState.value.stats.eventCount - 1).coerceAtLeast(0)),
                 )
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(error = "Erreur suppression événement : ${e.message}")
+                Log.e("AdminViewModel", "Échec suppression événement", e)
             }
         }
     }

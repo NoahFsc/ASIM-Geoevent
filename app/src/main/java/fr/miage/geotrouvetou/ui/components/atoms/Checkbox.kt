@@ -7,7 +7,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -105,30 +104,10 @@ fun Checkbox(
     }
 }
 
+@Preview
 @Composable
-private fun PreviewWrapper(content: @Composable () -> Unit) {
-    Box(
-        modifier = Modifier
-            .background(colorResource(R.color.background))
-            .padding(16.dp)
-    ) { content() }
-}
-
-@Preview(name = "Checkbox – Unchecked")
-@Composable
-private fun CheckboxUncheckedPreview() {
-    PreviewWrapper {
-        Checkbox(checked = false, onCheckedChange = {}, label = "Texte")
-    }
-}
-
-@Preview(name = "Checkbox – Checked")
-@Composable
-private fun CheckboxCheckedPreview() {
-    PreviewWrapper {
-        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            Checkbox(checked = false, onCheckedChange = {}, label = "Texte")
-            Checkbox(checked = true, onCheckedChange = {}, label = "Texte")
-        }
+private fun CheckboxPreview() {
+    Box(modifier = Modifier.padding(16.dp)) {
+        Checkbox(checked = true, onCheckedChange = {}, label = "Texte")
     }
 }

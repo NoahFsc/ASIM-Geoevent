@@ -151,9 +151,9 @@ fun EventCard(
     }
 }
 
-@Preview(name = "EventCard – Recommandé")
+@Preview
 @Composable
-private fun EventCardRecommendedPreview() {
+private fun EventCardPreview() {
     Box(modifier = Modifier.background(colorResource(R.color.text_darker)).padding(16.dp)) {
         EventCard(
             tag = TagStatus.NEW,
@@ -163,21 +163,6 @@ private fun EventCardRecommendedPreview() {
             isRecommended = true,
             attendance = "Faible",
             onClick = {},
-        )
-    }
-}
-
-@Preview(name = "EventCard – Supprimable")
-@Composable
-private fun EventCardDeletablePreview() {
-    Box(modifier = Modifier.background(colorResource(R.color.text_darker)).padding(16.dp)) {
-        EventCard(
-            tag = TagStatus.NEW,
-            title = "Forêt d'Ornans",
-            date = "28/04",
-            time = "09:00",
-            onClick = {},
-            onDelete = {},
         )
     }
 }

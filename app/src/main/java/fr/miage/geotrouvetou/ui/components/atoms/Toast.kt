@@ -165,20 +165,8 @@ fun Toast(
     }
 }
 
-@Preview(name = "Toast 0% (Début)", showBackground = true)
+@Preview(showBackground = true)
 @Composable
-fun ToastPreview0() {
-    Toast(title = "Succès !", description = "Voici la notif toast", duration = 0, initialProgress = 0f, modifier = Modifier.padding(16.dp))
-}
-
-@Preview(name = "Toast Animé (3s)", showBackground = true)
-@Composable
-fun ToastPreviewAnimated() {
-    Toast(title = "Succès !", description = "Voici la notif toast", duration = 3000, modifier = Modifier.padding(16.dp))
-}
-
-@Preview(name = "Toast Warning", showBackground = true)
-@Composable
-fun ToastPreviewWarning() {
-    Toast(title = "Connexion perdue", description = "Vérifiez votre connexion internet", type = ToastType.Warning, duration = 0, modifier = Modifier.padding(16.dp))
+private fun ToastPreview() {
+    Toast(title = "Succès !", description = "Voici la notif toast", duration = 0, modifier = Modifier.padding(16.dp))
 }

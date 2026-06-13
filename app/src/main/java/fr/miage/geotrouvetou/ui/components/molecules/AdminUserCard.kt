@@ -133,30 +133,15 @@ fun AdminUserCard(
     }
 }
 
-@Preview(name = "AdminUserCard – User")
+@Preview
 @Composable
-private fun AdminUserCardUserPreview() {
-    Box(modifier = Modifier.background(colorResource(R.color.background)).padding(16.dp)) {
+private fun AdminUserCardPreview() {
+    Box(modifier = Modifier.padding(16.dp)) {
         AdminUserCard(
             name = "Sarah Jenkins",
             email = "sarah.j@example.com",
             role = "user",
             isCurrentUser = false,
-            onRoleChange = {},
-            onDelete = {},
-        )
-    }
-}
-
-@Preview(name = "AdminUserCard – Admin (moi)")
-@Composable
-private fun AdminUserCardAdminPreview() {
-    Box(modifier = Modifier.background(colorResource(R.color.background)).padding(16.dp)) {
-        AdminUserCard(
-            name = "Noah Fsc",
-            email = "noah@admin.com",
-            role = "admin",
-            isCurrentUser = true,
             onRoleChange = {},
             onDelete = {},
         )

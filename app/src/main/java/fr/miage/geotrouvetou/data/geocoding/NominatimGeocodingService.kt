@@ -34,21 +34,29 @@ private data class NominatimPlace(
     val lon: String,
     val address: NominatimAddress? = null,
 ) {
-    private val mainLine: String get() {
-        val a = address ?: return displayName
-        val locality = a.city ?: a.town ?: a.village ?: a.municipality
-        val street = when {
+    private val street: String? get() {
+        val a = address ?: return null
+        return when {
             a.houseNumber != null && a.road != null -> "${a.houseNumber} ${a.road}"
             a.road != null -> a.road
             else -> null
         }
-        return listOfNotNull(street, locality).joinToString(", ").ifBlank { displayName }
     }
+
+    private val locality: String? get() =
+        address?.let { it.city ?: it.town ?: it.village ?: it.municipality }
+
+    private val mainLine: String get() =
+        listOfNotNull(street, locality).joinToString(", ").ifBlank { displayName }
 
     private val countryLine: String get() {
         val a = address ?: return ""
         return listOfNotNull(a.postcode, a.county, a.country).joinToString(", ")
     }
+
+    /** Rue, ville, code postal — sans quartier ni pays (usage France). */
+    private val shortAddress: String get() =
+        listOfNotNull(street, locality, address?.postcode).joinToString(", ").ifBlank { displayName }
 
     fun toPlace() = Place(
         displayName = displayName,
@@ -56,6 +64,7 @@ private data class NominatimPlace(
         longitude = lon.toDoubleOrNull() ?: 0.0,
         mainLine = mainLine,
         countryLine = countryLine,
+        shortAddress = shortAddress,
     )
 }
 

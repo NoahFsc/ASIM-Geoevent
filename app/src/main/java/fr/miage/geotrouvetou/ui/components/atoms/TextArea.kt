@@ -102,19 +102,10 @@ fun TextArea(
     }
 }
 
+@Preview
 @Composable
-private fun PreviewWrapper(content: @Composable () -> Unit) {
-    Box(
-        modifier = Modifier
-            .background(colorResource(R.color.background))
-            .padding(16.dp)
-    ) { content() }
-}
-
-@Preview(name = "TextArea – Empty Required")
-@Composable
-private fun TextAreaEmptyPreview() {
-    PreviewWrapper {
+private fun TextAreaPreview() {
+    Box(modifier = Modifier.padding(16.dp)) {
         TextArea(
             value = "",
             onValueChange = {},
@@ -122,34 +113,6 @@ private fun TextAreaEmptyPreview() {
             maxLength = 500,
             label = "Description",
             required = true,
-        )
-    }
-}
-
-@Preview(name = "TextArea – With Text")
-@Composable
-private fun TextAreaWithTextPreview() {
-    PreviewWrapper {
-        TextArea(
-            value = "Une belle randonnée en montagne avec des vues magnifiques.",
-            onValueChange = {},
-            placeholder = "Randonnée amateure",
-            maxLength = 500,
-            label = "Description",
-            required = true,
-        )
-    }
-}
-
-@Preview(name = "TextArea – No Label")
-@Composable
-private fun TextAreaNoLabelPreview() {
-    PreviewWrapper {
-        TextArea(
-            value = "",
-            onValueChange = {},
-            placeholder = "Randonnée amateure",
-            maxLength = 200,
         )
     }
 }
