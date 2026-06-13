@@ -1,11 +1,13 @@
 package fr.miage.geotrouvetou.ui.events
 
+import android.app.Application
 import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import fr.miage.geotrouvetou.R
 import fr.miage.geotrouvetou.domain.interfaces.IAuthService
 import fr.miage.geotrouvetou.domain.interfaces.IDatabaseService
 import fr.miage.geotrouvetou.domain.models.Evenement
@@ -15,9 +17,10 @@ import kotlinx.coroutines.launch
 import java.util.UUID
 
 class CreateEventViewModel(
+    application: Application,
     private val databaseService: IDatabaseService,
     private val authService: IAuthService,
-) : ViewModel() {
+) : AndroidViewModel(application) {
 
     var title by mutableStateOf("")
     var description by mutableStateOf("")
@@ -46,7 +49,7 @@ class CreateEventViewModel(
             try {
                 val userId = authService.currentUserId()
                 if (userId == null) {
-                    _error.emit("Vous devez être connecté pour créer un événement")
+                    _error.emit(getApplication<Application>().getString(R.string.event_error_must_login_create))
                     return@launch
                 }
 
@@ -84,7 +87,8 @@ class CreateEventViewModel(
                 databaseService.addEvent(newEvent)
                 _eventCreated.emit(true)
             } catch (e: Exception) {
-                _error.emit("Erreur : ${e.message ?: "Une erreur est survenue"}")
+                val app = getApplication<Application>()
+                _error.emit(app.getString(R.string.event_error_generic, e.message ?: app.getString(R.string.event_error_fallback)))
             } finally {
                 isLoading = false
             }

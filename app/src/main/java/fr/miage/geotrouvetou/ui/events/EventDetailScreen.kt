@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -96,23 +97,23 @@ fun EventDetailScreen(
 
                 if (viewModel.joinToastKey > 0) {
                     Toast(
-                        title = "Inscription réussie !",
-                        description = "Vous participez désormais à cet événement",
+                        title = stringResource(R.string.event_join_toast_title),
+                        description = stringResource(R.string.event_join_toast_desc),
                         key = viewModel.joinToastKey
                     )
                 }
 
                 if (updateToastKey > 0) {
                     Toast(
-                        title = "Modification réussie !",
-                        description = "L'événement a été mis à jour",
+                        title = stringResource(R.string.event_update_toast_title),
+                        description = stringResource(R.string.event_update_toast_desc),
                         key = updateToastKey
                     )
                 }
             }
         } ?: run {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(text = "Événement introuvable")
+                Text(text = stringResource(R.string.event_detail_not_found))
             }
         }
     }
@@ -132,8 +133,9 @@ fun EventDetailContent(
         ?: "https://picsum.photos/seed/${event.title.hashCode()}/800/400"
     val date = event.formattedDateLong()
     val time = event.formattedTime()
-    val locationLabel = event.location ?: "Coordonnées"
-    val locationDetail = if (event.location != null) "" else "Lat: ${event.latitude}, Lon: ${event.longitude}"
+    val locationLabel = event.location ?: stringResource(R.string.event_detail_location_fallback)
+    val locationDetail = if (event.location != null) "" else
+        stringResource(R.string.event_detail_coordinates, event.latitude.toString(), event.longitude.toString())
 
     Column(
         modifier = modifier
@@ -157,7 +159,7 @@ fun EventDetailContent(
                 modifier = Modifier.size(24.dp)
             )
             Text(
-                text = "Retour",
+                text = stringResource(R.string.action_back),
                 fontSize = 18.sp,
                 color = colorResource(R.color.text_light)
             )
@@ -176,7 +178,9 @@ fun EventDetailContent(
             )
 
             Button(
-                text = if (isOwner) "Modifier" else if (isJoined) "Déjà inscrit" else "Enregistrer",
+                text = if (isOwner) stringResource(R.string.event_detail_edit)
+                    else if (isJoined) stringResource(R.string.event_detail_joined)
+                    else stringResource(R.string.event_detail_join),
                 onClick = {
                     if (isOwner) onEditClick()
                     else if (!isJoined) onJoinClick()

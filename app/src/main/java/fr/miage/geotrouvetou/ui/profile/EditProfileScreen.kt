@@ -41,6 +41,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -107,14 +108,14 @@ fun EditProfileScreen(
                     modifier = Modifier.size(20.dp),
                 )
                 Text(
-                    text = "Retour",
+                    text = stringResource(R.string.action_back),
                     fontSize = 16.sp,
                     color = colorResource(R.color.text_darker),
                 )
             }
 
             Text(
-                text = "Modifier mon profil",
+                text = stringResource(R.string.edit_profile_title),
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
                 color = colorResource(R.color.text_darker),
@@ -149,7 +150,7 @@ fun EditProfileScreen(
                         modifier = Modifier.size(22.dp),
                     )
                     Text(
-                        text = "Informations Personnelles",
+                        text = stringResource(R.string.edit_profile_section_personal),
                         fontWeight = FontWeight.Bold,
                         fontSize = 15.sp,
                         color = colorResource(R.color.text_darker),
@@ -160,16 +161,16 @@ fun EditProfileScreen(
                     Input(
                         value = uiState.lastName,
                         onValueChange = viewModel::onLastNameChange,
-                        placeholder = "Nom",
-                        label = "Nom",
+                        placeholder = stringResource(R.string.field_lastname_label),
+                        label = stringResource(R.string.field_lastname_label),
                         required = true,
                         modifier = Modifier.weight(1f),
                     )
                     Input(
                         value = uiState.firstName,
                         onValueChange = viewModel::onFirstNameChange,
-                        placeholder = "Prénom",
-                        label = "Prénom",
+                        placeholder = stringResource(R.string.field_firstname_label),
+                        label = stringResource(R.string.field_firstname_label),
                         required = true,
                         modifier = Modifier.weight(1f),
                     )
@@ -178,8 +179,8 @@ fun EditProfileScreen(
                 Input(
                     value = uiState.email,
                     onValueChange = {},
-                    placeholder = "adresse@email.com",
-                    label = "Adresse email",
+                    placeholder = stringResource(R.string.edit_profile_email_placeholder),
+                    label = stringResource(R.string.field_email_label),
                     required = true,
                     readOnly = true,
                 )
@@ -201,12 +202,12 @@ fun EditProfileScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Button(
-                text = "Supprimer mon compte",
+                text = stringResource(R.string.edit_profile_delete_account),
                 onClick = { showDeleteDialog = true },
                 variant = ButtonVariant.GhostDanger,
             )
             Button(
-                text = "Enregistrer les modifications",
+                text = stringResource(R.string.edit_profile_save),
                 onClick = { viewModel.save() },
                 variant = ButtonVariant.Fill,
                 enabled = uiState.hasChanges && uiState.formValid && !uiState.isSaving,
@@ -217,15 +218,15 @@ fun EditProfileScreen(
 
     if (uiState.saveToastKey > 0) {
         Toast(
-            title = "Profil mis à jour !",
-            description = "Vos informations ont été enregistrées",
+            title = stringResource(R.string.edit_profile_toast_saved_title),
+            description = stringResource(R.string.edit_profile_toast_saved_desc),
             key = uiState.saveToastKey,
         )
     }
     if (uiState.avatarToastKey > 0) {
         Toast(
-            title = "Photo mise à jour !",
-            description = "Votre photo de profil a été modifiée",
+            title = stringResource(R.string.edit_profile_toast_photo_title),
+            description = stringResource(R.string.edit_profile_toast_photo_desc),
             key = uiState.avatarToastKey,
         )
     }

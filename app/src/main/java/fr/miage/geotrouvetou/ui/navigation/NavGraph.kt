@@ -15,6 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -207,36 +208,36 @@ fun NavGraph(navController: NavHostController) {
 
         if (loginToastKey > 0) {
             Toast(
-                title = "Connexion réussie !",
-                description = "Bienvenue sur Geo Trouvetou",
+                title = stringResource(R.string.toast_login_title),
+                description = stringResource(R.string.toast_welcome_desc),
                 key = loginToastKey,
             )
         }
         if (registerToastKey > 0) {
             Toast(
-                title = "Compte créé !",
-                description = "Bienvenue sur Geo Trouvetou",
+                title = stringResource(R.string.toast_register_title),
+                description = stringResource(R.string.toast_welcome_desc),
                 key = registerToastKey,
             )
         }
         if (deleteAccountToastKey > 0) {
             Toast(
-                title = "Compte supprimé",
-                description = "Votre compte a bien été supprimé",
+                title = stringResource(R.string.toast_account_deleted_title),
+                description = stringResource(R.string.toast_account_deleted_desc),
                 key = deleteAccountToastKey,
             )
         }
         if (logoutToastKey > 0) {
             Toast(
-                title = "Déconnexion réussie",
-                description = "À bientôt sur Geo Trouvetou",
+                title = stringResource(R.string.toast_logout_title),
+                description = stringResource(R.string.toast_logout_desc),
                 key = logoutToastKey,
             )
         }
         if (eventCreatedToastKey > 0) {
             Toast(
-                title = "Succès !",
-                description = "L'événement a été créé avec succès",
+                title = stringResource(R.string.toast_event_created_title),
+                description = stringResource(R.string.toast_event_created_desc),
                 key = eventCreatedToastKey,
             )
         }

@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -68,7 +69,7 @@ fun LoginScreen(
         verticalArrangement = Arrangement.spacedBy(0.dp),
     ) {
         Text(
-            text = "Se connecter",
+            text = stringResource(R.string.login_title),
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
             color = colorResource(R.color.text_darker),
@@ -78,12 +79,12 @@ fun LoginScreen(
 
         Row {
             Text(
-                text = "Vous n'avez pas de compte ? ",
+                text = stringResource(R.string.login_no_account),
                 fontSize = 16.sp,
                 color = colorResource(R.color.text_lighter),
             )
             Text(
-                text = "S'inscrire",
+                text = stringResource(R.string.login_signup_link),
                 fontSize = 16.sp,
                 color = colorResource(R.color.primary_500),
                 fontWeight = FontWeight.Medium,
@@ -105,16 +106,16 @@ fun LoginScreen(
             Input(
                 value = email,
                 onValueChange = { email = it },
-                placeholder = "Entrer votre adresse e-mail",
-                label = "Adresse email",
+                placeholder = stringResource(R.string.field_email_placeholder),
+                label = stringResource(R.string.field_email_label),
                 required = true,
             )
 
             Input(
                 value = password,
                 onValueChange = { password = it },
-                placeholder = "Entrer votre mot de passe",
-                label = "Mot de passe",
+                placeholder = stringResource(R.string.field_password_placeholder),
+                label = stringResource(R.string.field_password_label),
                 required = true,
                 trailingIcon = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
                 onTrailingIconClick = { passwordVisible = !passwordVisible },
@@ -137,7 +138,7 @@ fun LoginScreen(
             CircularProgressIndicator(color = colorResource(R.color.primary_500))
         } else {
             Button(
-                text = "Se connecter",
+                text = stringResource(R.string.login_submit),
                 onClick = { viewModel.login(email, password) },
                 fullWidth = true,
                 enabled = email.isNotBlank() && password.isNotBlank(),

@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -66,10 +67,10 @@ fun EventDateTimePickers(
                         onDateSelected(formatter.format(Date(millis)))
                     }
                     onDismissDatePicker()
-                }) { Text("Confirmer") }
+                }) { Text(stringResource(R.string.action_confirm)) }
             },
             dismissButton = {
-                TextButton(onClick = onDismissDatePicker) { Text("Annuler") }
+                TextButton(onClick = onDismissDatePicker) { Text(stringResource(R.string.action_cancel)) }
             }
         ) {
             DatePicker(state = datePickerState)
@@ -86,7 +87,7 @@ fun EventDateTimePickers(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
-                    text = "Choisir l'heure",
+                    text = stringResource(R.string.event_time_picker_title),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = colorResource(R.color.text_darker)
@@ -96,13 +97,13 @@ fun EventDateTimePickers(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    TextButton(onClick = onDismissTimePicker) { Text("Annuler") }
+                    TextButton(onClick = onDismissTimePicker) { Text(stringResource(R.string.action_cancel)) }
                     TextButton(onClick = {
                         val hour = timePickerState.hour.toString().padStart(2, '0')
                         val minute = timePickerState.minute.toString().padStart(2, '0')
                         onTimeSelected("$hour:$minute")
                         onDismissTimePicker()
-                    }) { Text("Confirmer") }
+                    }) { Text(stringResource(R.string.action_confirm)) }
                 }
             }
         }

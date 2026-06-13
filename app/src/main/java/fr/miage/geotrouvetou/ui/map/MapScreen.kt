@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
@@ -82,7 +83,7 @@ fun MapScreen(
         locationPermissionGranted = granted
         viewModel.onLocationPermissionChanged(granted)
         if (!granted) {
-            Toast.makeText(context, "Permission localisation refusée", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.map_location_permission_denied), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -190,7 +191,7 @@ fun MapScreen(
         ) {
             RoundIconButton(
                 icon = Icons.Filled.MyLocation,
-                contentDescription = "Centrer sur ma position",
+                contentDescription = stringResource(R.string.map_center_on_me_cd),
                 onClick = {
                     val loc = uiState.currentLocation ?: return@RoundIconButton
                     val zoom = mapService.getZoomForWidth(20.0, loc.first)
@@ -209,12 +210,12 @@ fun MapScreen(
         ) {
             RoundIconButton(
                 icon = Icons.Filled.Add,
-                contentDescription = "Zoom avant",
+                contentDescription = stringResource(R.string.map_zoom_in_cd),
                 onClick = { mapView.controller.zoomIn() },
             )
             RoundIconButton(
                 icon = Icons.Filled.Remove,
-                contentDescription = "Zoom arrière",
+                contentDescription = stringResource(R.string.map_zoom_out_cd),
                 onClick = { mapView.controller.zoomOut() },
             )
         }
@@ -229,23 +230,23 @@ fun MapScreen(
             SearchBar(
                 value = "",
                 onValueChange = {},
-                placeholder = "Rechercher par lieu",
+                placeholder = stringResource(R.string.map_search_placeholder),
                 onClick = { showEventList = true },
             )
         }
 
         if (uiState.joinToastKey > 0) {
             Toast(
-                title = "Inscription réussie !",
-                description = "Vous participez désormais à cet événement",
+                title = stringResource(R.string.event_join_toast_title),
+                description = stringResource(R.string.event_join_toast_desc),
                 key = uiState.joinToastKey
             )
         }
 
         if (uiState.updateToastKey > 0) {
             Toast(
-                title = "Modification réussie !",
-                description = "L'événement a été mis à jour",
+                title = stringResource(R.string.event_update_toast_title),
+                description = stringResource(R.string.event_update_toast_desc),
                 key = uiState.updateToastKey
             )
         }
@@ -273,7 +274,7 @@ fun MapScreen(
         )
         clusterEvents != null -> EventListModal(
             events = clusterEvents!!,
-            title = "Groupement (${clusterEvents!!.size})",
+            title = stringResource(R.string.event_list_cluster, clusterEvents!!.size),
             onDismissRequest = { clusterEvents = null },
             onEditClick = { event ->
                 editingEvent = event
@@ -282,7 +283,7 @@ fun MapScreen(
         )
         showEventList -> EventListModal(
             events = uiState.events,
-            title = "Propositions (${uiState.events.size})",
+            title = stringResource(R.string.event_list_proposals, uiState.events.size),
             onDismissRequest = { showEventList = false },
             onPlaceSelected = { place ->
                 showEventList = false

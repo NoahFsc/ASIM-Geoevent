@@ -42,6 +42,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -117,14 +118,14 @@ fun ProfileContent(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = "Profil",
+                    text = stringResource(R.string.profile_title),
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,
                     color = colorResource(R.color.text_darker),
                 )
                 Icon(
                     imageVector = Icons.Outlined.Settings,
-                    contentDescription = "Paramètres",
+                    contentDescription = stringResource(R.string.profile_settings_cd),
                     tint = colorResource(R.color.text_darker),
                     modifier = Modifier
                         .size(28.dp)
@@ -171,18 +172,18 @@ fun ProfileContent(
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 StatCard(
                     value = "${uiState.events.size}",
-                    label = "ÉVÉNEMENTS",
+                    label = stringResource(R.string.profile_stat_events),
                     modifier = Modifier.weight(1f),
                 )
                 StatCard(
                     value = "${uiState.joinedEvents.size}",
-                    label = "PARTICIPATIONS",
+                    label = stringResource(R.string.profile_stat_participations),
                     modifier = Modifier.weight(1f),
                 )
             }
 
             SegmentedControl(
-                tabs = listOf("Mes événements", "Mes participations"),
+                tabs = listOf(stringResource(R.string.profile_tab_my_events), stringResource(R.string.profile_tab_my_participations)),
                 selectedIndex = uiState.selectedTab.ordinal,
                 onTabSelected = { onTabSelected(ProfileTab.entries[it]) },
             )
@@ -197,7 +198,7 @@ fun ProfileContent(
                         ProfileTab.MesEvenements -> {
                             if (uiState.events.isEmpty()) {
                                 Text(
-                                    text = "Aucun événement créé",
+                                    text = stringResource(R.string.profile_empty_events),
                                     color = colorResource(R.color.text_lighter),
                                     fontSize = 14.sp,
                                 )
@@ -213,7 +214,7 @@ fun ProfileContent(
                         ProfileTab.MesParticipations -> {
                             if (uiState.joinedEvents.isEmpty()) {
                                 Text(
-                                    text = "Aucune participation",
+                                    text = stringResource(R.string.profile_empty_participations),
                                     color = colorResource(R.color.text_lighter),
                                     fontSize = 14.sp,
                                 )

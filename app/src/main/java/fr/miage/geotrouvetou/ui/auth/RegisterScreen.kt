@@ -32,7 +32,9 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -58,6 +60,7 @@ fun RegisterScreen(
     viewModel: RegisterViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
@@ -83,7 +86,7 @@ fun RegisterScreen(
             .padding(horizontal = 24.dp, vertical = 32.dp),
     ) {
         Text(
-            text = "S'inscrire",
+            text = stringResource(R.string.register_title),
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
             color = colorResource(R.color.text_darker),
@@ -93,12 +96,12 @@ fun RegisterScreen(
 
         Row {
             Text(
-                text = "Vous avez déjà un compte ? ",
+                text = stringResource(R.string.register_have_account),
                 fontSize = 15.sp,
                 color = colorResource(R.color.text_lighter),
             )
             Text(
-                text = "Se connecter",
+                text = stringResource(R.string.register_login_link),
                 fontSize = 15.sp,
                 color = colorResource(R.color.primary_500),
                 fontWeight = FontWeight.Medium,
@@ -121,16 +124,16 @@ fun RegisterScreen(
                 Input(
                     value = lastName,
                     onValueChange = { lastName = UserFieldValidator.capitalizeFirst(it) },
-                    placeholder = "Dupont",
-                    label = "Nom",
+                    placeholder = stringResource(R.string.field_lastname_placeholder),
+                    label = stringResource(R.string.field_lastname_label),
                     required = true,
                     modifier = Modifier.weight(1f),
                 )
                 Input(
                     value = firstName,
                     onValueChange = { firstName = UserFieldValidator.capitalizeFirst(it) },
-                    placeholder = "Patrick",
-                    label = "Prénom",
+                    placeholder = stringResource(R.string.field_firstname_placeholder),
+                    label = stringResource(R.string.field_firstname_label),
                     required = true,
                     modifier = Modifier.weight(1f),
                 )
@@ -138,15 +141,15 @@ fun RegisterScreen(
             Input(
                 value = email,
                 onValueChange = { email = it },
-                placeholder = "Entrer votre adresse e-mail",
-                label = "Adresse email",
+                placeholder = stringResource(R.string.field_email_placeholder),
+                label = stringResource(R.string.field_email_label),
                 required = true,
             )
             Input(
                 value = password,
                 onValueChange = { password = it },
-                placeholder = "Entrer votre mot de passe",
-                label = "Mot de passe",
+                placeholder = stringResource(R.string.field_password_placeholder),
+                label = stringResource(R.string.field_password_label),
                 required = true,
                 trailingIcon = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
                 onTrailingIconClick = { passwordVisible = !passwordVisible },
@@ -154,7 +157,7 @@ fun RegisterScreen(
                 labelTrailingContent = {
                     Icon(
                         imageVector = Icons.Outlined.Info,
-                        contentDescription = "Règles du mot de passe",
+                        contentDescription = stringResource(R.string.password_info_cd),
                         tint = colorResource(R.color.text_lighter),
                         modifier = Modifier
                             .size(20.dp)
@@ -166,13 +169,13 @@ fun RegisterScreen(
             Input(
                 value = confirmPassword,
                 onValueChange = { confirmPassword = it },
-                placeholder = "Confirmer votre mot de passe",
-                label = "Confirmation",
+                placeholder = stringResource(R.string.register_confirm_placeholder),
+                label = stringResource(R.string.register_confirm_label),
                 required = true,
                 trailingIcon = if (confirmVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
                 onTrailingIconClick = { confirmVisible = !confirmVisible },
                 visualTransformation = if (confirmVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                error = PasswordValidation.confirmError(password, confirmPassword),
+                error = PasswordValidation.confirmError(context, password, confirmPassword),
             )
             Checkbox(
                 checked = uiState.termsAccepted,
@@ -181,9 +184,9 @@ fun RegisterScreen(
                 val danger = colorResource(R.color.danger_500)
                 Text(
                     text = buildAnnotatedString {
-                        append("J'accepte les ")
+                        append(stringResource(R.string.register_terms_prefix))
                         withStyle(SpanStyle(textDecoration = TextDecoration.Underline, color = colorResource(R.color.primary_600))) {
-                            append("Conditions d'Utilisations")
+                            append(stringResource(R.string.register_terms_link))
                         }
                         withStyle(SpanStyle(color = danger)) {
                             append("*")
@@ -209,14 +212,13 @@ fun RegisterScreen(
 
         val formValid = UserFieldValidator.isLastNameValid(lastName) && UserFieldValidator.isFirstNameValid(firstName) &&
             UserFieldValidator.isEmailValid(email) && password.isNotBlank() &&
-            PasswordValidation.confirmError(password, confirmPassword) == null &&
-            confirmPassword.isNotBlank() && uiState.termsAccepted
+            PasswordValidation.passwordsMatch(password, confirmPassword) && uiState.termsAccepted
 
         if (uiState.isLoading) {
             CircularProgressIndicator(color = colorResource(R.color.primary_500))
         } else {
             Button(
-                text = "S'inscrire",
+                text = stringResource(R.string.register_submit),
                 onClick = { viewModel.register(email, password, confirmPassword, lastName, firstName) },
                 fullWidth = true,
                 enabled = formValid,

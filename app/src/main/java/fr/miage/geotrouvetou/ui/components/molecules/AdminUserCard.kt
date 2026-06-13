@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -109,7 +110,7 @@ fun AdminUserCard(
             ) {
                 Icon(
                     imageVector = Icons.Filled.MoreVert,
-                    contentDescription = "Menu",
+                    contentDescription = stringResource(R.string.admin_menu_cd),
                     tint = colorResource(if (isCurrentUser) R.color.text_disabled else R.color.text_lighter),
                     modifier = Modifier.size(20.dp),
                 )
@@ -119,12 +120,12 @@ fun AdminUserCard(
                 onDismissRequest = { menuExpanded = false },
             ) {
                 DropdownMenuItem(
-                    text = { Text(text = if (isAdmin) "Passer en User" else "Passer en Admin", fontSize = 14.sp) },
+                    text = { Text(text = if (isAdmin) stringResource(R.string.admin_make_user) else stringResource(R.string.admin_make_admin), fontSize = 14.sp) },
                     onClick = { menuExpanded = false; onRoleChange() },
                 )
                 HorizontalDivider()
                 DropdownMenuItem(
-                    text = { Text(text = "Supprimer le compte", fontSize = 14.sp, color = colorResource(R.color.danger_500)) },
+                    text = { Text(text = stringResource(R.string.admin_delete_user), fontSize = 14.sp, color = colorResource(R.color.danger_500)) },
                     onClick = { menuExpanded = false; onDelete() },
                 )
             }

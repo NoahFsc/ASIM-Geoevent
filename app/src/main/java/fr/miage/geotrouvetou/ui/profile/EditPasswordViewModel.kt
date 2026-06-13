@@ -3,6 +3,7 @@ package fr.miage.geotrouvetou.ui.profile
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import fr.miage.geotrouvetou.App
+import fr.miage.geotrouvetou.R
 import fr.miage.geotrouvetou.utils.PasswordValidation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,7 +18,7 @@ data class EditPasswordUiState(
     val error: String? = null,
     val validation: PasswordValidation = PasswordValidation.EMPTY,
 ) {
-    val formValid: Boolean get() = validation.isValid && PasswordValidation.confirmError(password, confirmPassword) == null && confirmPassword.isNotEmpty()
+    val formValid: Boolean get() = validation.isValid && PasswordValidation.passwordsMatch(password, confirmPassword)
 }
 
 class EditPasswordViewModel(application: Application) : AndroidViewModel(application) {
@@ -56,7 +57,7 @@ class EditPasswordViewModel(application: Application) : AndroidViewModel(applica
             _uiState.value = _uiState.value.copy(isSaving = false)
             true
         } catch (e: Exception) {
-            _uiState.value = _uiState.value.copy(isSaving = false, error = "Erreur lors de la modification du mot de passe")
+            _uiState.value = _uiState.value.copy(isSaving = false, error = getApplication<App>().getString(R.string.edit_password_error))
             false
         }
     }

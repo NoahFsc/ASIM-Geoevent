@@ -34,7 +34,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -55,6 +57,7 @@ fun EditPasswordScreen(
     viewModel: EditPasswordViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var saveToastKey by remember { mutableStateOf(0) }
 
@@ -87,14 +90,14 @@ fun EditPasswordScreen(
                     modifier = Modifier.size(20.dp),
                 )
                 Text(
-                    text = "Retour",
+                    text = stringResource(R.string.action_back),
                     fontSize = 16.sp,
                     color = colorResource(R.color.text_darker),
                 )
             }
 
             Text(
-                text = "Modifier mon mot de passe",
+                text = stringResource(R.string.edit_password_title),
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
                 color = colorResource(R.color.text_darker),
@@ -103,14 +106,14 @@ fun EditPasswordScreen(
 
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(
-                    text = "Votre nouveau mot de passe doit contenir :",
+                    text = stringResource(R.string.password_rules_title_new),
                     fontSize = 14.sp,
                     color = colorResource(R.color.text_lighter),
                 )
-                PasswordRequirement(label = "Minimum 8 caractères", met = uiState.validation.hasMinLength)
-                PasswordRequirement(label = "1 Chiffre", met = uiState.validation.hasDigit)
-                PasswordRequirement(label = "1 Caractère Spécial (ex : @, &,...)", met = uiState.validation.hasSpecial)
-                PasswordRequirement(label = "1 Majuscule", met = uiState.validation.hasUppercase)
+                PasswordRequirement(label = stringResource(R.string.password_rule_min), met = uiState.validation.hasMinLength)
+                PasswordRequirement(label = stringResource(R.string.password_rule_digit), met = uiState.validation.hasDigit)
+                PasswordRequirement(label = stringResource(R.string.password_rule_special), met = uiState.validation.hasSpecial)
+                PasswordRequirement(label = stringResource(R.string.password_rule_uppercase), met = uiState.validation.hasUppercase)
             }
 
             Column(
@@ -125,7 +128,7 @@ fun EditPasswordScreen(
                     value = uiState.password,
                     onValueChange = viewModel::onPasswordChange,
                     placeholder = "••••••••••••",
-                    label = "Nouveau mot de passe",
+                    label = stringResource(R.string.edit_password_new_label),
                     required = true,
                     visualTransformation = if (uiState.showPassword) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = if (uiState.showPassword) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility,
@@ -135,12 +138,12 @@ fun EditPasswordScreen(
                     value = uiState.confirmPassword,
                     onValueChange = viewModel::onConfirmPasswordChange,
                     placeholder = "••••••••••••",
-                    label = "Confirmer le mot de passe",
+                    label = stringResource(R.string.edit_password_confirm_label),
                     required = true,
                     visualTransformation = if (uiState.showConfirmPassword) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = if (uiState.showConfirmPassword) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility,
                     onTrailingIconClick = viewModel::toggleShowConfirmPassword,
-                    error = PasswordValidation.confirmError(uiState.password, uiState.confirmPassword),
+                    error = PasswordValidation.confirmError(context, uiState.password, uiState.confirmPassword),
                 )
             }
 
@@ -154,7 +157,7 @@ fun EditPasswordScreen(
         }
 
         Button(
-            text = "Modifier le mot de passe",
+            text = stringResource(R.string.edit_password_submit),
             onClick = {
                 scope.launch {
                     val success = viewModel.savePassword()
@@ -171,8 +174,8 @@ fun EditPasswordScreen(
 
     if (saveToastKey > 0) {
         Toast(
-            title = "Mot de passe modifié !",
-            description = "Votre mot de passe a bien été mis à jour",
+            title = stringResource(R.string.edit_password_toast_title),
+            description = stringResource(R.string.edit_password_toast_desc),
             key = saveToastKey,
         )
     }

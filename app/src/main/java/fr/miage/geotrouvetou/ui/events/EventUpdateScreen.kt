@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -83,7 +84,7 @@ fun EventUpdateScreen(
 
     if (errorMessage != null) {
         Toast(
-            title = "Erreur",
+            title = stringResource(R.string.event_error_title),
             description = errorMessage!!,
             duration = 3000
         )
@@ -128,7 +129,7 @@ fun EventUpdateScreen(
                 modifier = Modifier.size(24.dp)
             )
             Text(
-                text = "Retour",
+                text = stringResource(R.string.action_back),
                 fontSize = 18.sp,
                 color = colorResource(R.color.text_light)
             )
@@ -139,7 +140,7 @@ fun EventUpdateScreen(
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             Text(
-                text = "Modifier l'événement",
+                text = stringResource(R.string.update_event_title),
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 color = colorResource(R.color.primary_600),
@@ -149,7 +150,7 @@ fun EventUpdateScreen(
             ImageUploader(
                 imageUri = viewModel.imageUri,
                 onImageSelected = { viewModel.imageUri = it },
-                label = "Image de couverture",
+                label = stringResource(R.string.event_form_cover_image),
                 required = true,
                 imageUrl = viewModel.currentImageUrl
             )
@@ -157,16 +158,16 @@ fun EventUpdateScreen(
             Input(
                 value = viewModel.title,
                 onValueChange = { viewModel.title = it },
-                placeholder = "Titre",
-                label = "Titre",
+                placeholder = stringResource(R.string.event_form_title_label),
+                label = stringResource(R.string.event_form_title_label),
                 required = true,
             )
 
             TextArea(
                 value = viewModel.description,
                 onValueChange = { viewModel.description = it },
-                placeholder = "Description",
-                label = "Description",
+                placeholder = stringResource(R.string.event_form_description_label),
+                label = stringResource(R.string.event_form_description_label),
                 maxLength = 500,
                 required = true,
             )
@@ -178,8 +179,8 @@ fun EventUpdateScreen(
                 Input(
                     value = viewModel.date,
                     onValueChange = {},
-                    placeholder = "dd/mm/yyyy",
-                    label = "Date",
+                    placeholder = stringResource(R.string.event_form_date_placeholder),
+                    label = stringResource(R.string.event_form_date_label),
                     required = true,
                     modifier = Modifier.weight(1f),
                     onClick = { showDatePicker = true },
@@ -188,8 +189,8 @@ fun EventUpdateScreen(
                 Input(
                     value = viewModel.time,
                     onValueChange = {},
-                    placeholder = "HH:mm",
-                    label = "Heure",
+                    placeholder = stringResource(R.string.event_form_time_placeholder),
+                    label = stringResource(R.string.event_form_time_label),
                     required = true,
                     modifier = Modifier.weight(1f),
                     onClick = { showTimePicker = true },
@@ -200,8 +201,8 @@ fun EventUpdateScreen(
             Input(
                 value = viewModel.location,
                 onValueChange = { viewModel.location = it },
-                placeholder = "Localisation",
-                label = "Localisation",
+                placeholder = stringResource(R.string.event_form_location_label),
+                label = stringResource(R.string.event_form_location_label),
                 required = true,
                 leadingIcon = Icons.Default.Search
             )
@@ -218,7 +219,7 @@ fun EventUpdateScreen(
 
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text = "Type d'événement",
+                    text = stringResource(R.string.event_form_type),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = colorResource(R.color.text_darker),
@@ -226,12 +227,12 @@ fun EventUpdateScreen(
                 Switch(
                     checked = viewModel.isPrivate,
                     onCheckedChange = { viewModel.isPrivate = it },
-                    label = "Rendre l'événement privé"
+                    label = stringResource(R.string.event_form_make_private)
                 )
             }
 
             Button(
-                text = if (viewModel.isLoading) "Modification..." else "Enregistrer les modifications",
+                text = if (viewModel.isLoading) stringResource(R.string.update_event_submitting) else stringResource(R.string.update_event_submit),
                 onClick = {
                     val bytes = viewModel.imageUri?.let { uri ->
                         context.contentResolver.openInputStream(uri)?.use { it.readBytes() }

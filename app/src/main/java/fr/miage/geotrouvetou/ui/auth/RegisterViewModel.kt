@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import fr.miage.geotrouvetou.App
+import fr.miage.geotrouvetou.R
 import fr.miage.geotrouvetou.domain.models.User
 import fr.miage.geotrouvetou.utils.PasswordValidation
 import fr.miage.geotrouvetou.utils.UserFieldValidator
@@ -35,7 +36,7 @@ class RegisterViewModel(application: Application) : AndroidViewModel(application
             return
         }
         if (!_uiState.value.termsAccepted) {
-            _uiState.value = _uiState.value.copy(error = "Vous devez accepter les conditions d'utilisation")
+            _uiState.value = _uiState.value.copy(error = getApplication<App>().getString(R.string.register_terms_required))
             return
         }
 
@@ -46,7 +47,7 @@ class RegisterViewModel(application: Application) : AndroidViewModel(application
             val userId = try {
                 authService.signUp(email, password, fullName)
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(isLoading = false, error = AuthErrorTranslator.translate(e.message))
+                _uiState.value = _uiState.value.copy(isLoading = false, error = AuthErrorTranslator.translate(getApplication(), e.message))
                 return@launch
             }
 
@@ -68,13 +69,14 @@ class RegisterViewModel(application: Application) : AndroidViewModel(application
         _uiState.value = _uiState.value.copy(termsAccepted = value)
     }
 
-    fun validateEmail(email: String): String? = UserFieldValidator.validateEmail(email)
+    fun validateEmail(email: String): String? =
+        UserFieldValidator.validateEmail(getApplication(), email)
 
     fun validatePassword(password: String): String? {
-        if (password.isBlank()) return "Le mot de passe est requis"
-        return PasswordValidation.of(password).firstError()
+        if (password.isBlank()) return getApplication<App>().getString(R.string.validation_password_required)
+        return PasswordValidation.of(password).firstError(getApplication())
     }
 
     fun validateConfirmPassword(password: String, confirm: String): String? =
-        PasswordValidation.confirmError(password, confirm)
+        PasswordValidation.confirmError(getApplication(), password, confirm)
 }

@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -86,14 +87,14 @@ fun ParamsScreen(
                 modifier = Modifier.size(20.dp),
             )
             Text(
-                text = "Retour",
+                text = stringResource(R.string.action_back),
                 fontSize = 16.sp,
                 color = colorResource(R.color.text_darker),
             )
         }
 
         Text(
-            text = "Paramètres",
+            text = stringResource(R.string.params_title),
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
             color = colorResource(R.color.text_darker),
@@ -101,17 +102,17 @@ fun ParamsScreen(
 
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(
-                text = "Compte",
+                text = stringResource(R.string.params_section_account),
                 fontSize = 14.sp,
                 color = colorResource(R.color.text_lighter),
             )
 
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 val items = buildList {
-                    add(Triple(Icons.Outlined.Edit, "Modifier mon profil", onEditProfileClick))
-                    add(Triple(Icons.Outlined.Key, "Modifier mon mot de passe", onEditPasswordClick))
+                    add(Triple(Icons.Outlined.Edit, stringResource(R.string.params_edit_profile), onEditProfileClick))
+                    add(Triple(Icons.Outlined.Key, stringResource(R.string.params_edit_password), onEditPasswordClick))
                     if (uiState.isAdmin) {
-                        add(Triple(Icons.Outlined.Build, "Administration", onAdminClick))
+                        add(Triple(Icons.Outlined.Build, stringResource(R.string.params_admin), onAdminClick))
                     }
                 }
                 items.forEach { (icon, label, action) ->
@@ -146,7 +147,7 @@ fun ParamsScreen(
         }
 
         Text(
-            text = "Déconnexion",
+            text = stringResource(R.string.params_logout),
             fontSize = 16.sp,
             fontWeight = FontWeight.SemiBold,
             color = colorResource(R.color.danger_500),
@@ -170,7 +171,7 @@ fun ParamsScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
-                    text = "Souhaitez-vous vraiment vous déconnecter ?",
+                    text = stringResource(R.string.params_logout_confirm_title),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = colorResource(R.color.text_darker),
@@ -178,7 +179,7 @@ fun ParamsScreen(
                     lineHeight = 26.sp,
                 )
                 Text(
-                    text = "Vous reviendrez à l'accueil et vous ne pourrez plus voir vos trajets.",
+                    text = stringResource(R.string.params_logout_confirm_desc),
                     fontSize = 14.sp,
                     color = colorResource(R.color.text_lighter),
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
@@ -186,7 +187,7 @@ fun ParamsScreen(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Button(
-                    text = "Se déconnecter",
+                    text = stringResource(R.string.params_logout_confirm),
                     onClick = {
                         showLogoutDialog = false
                         isSigningOut = true
@@ -200,7 +201,7 @@ fun ParamsScreen(
                     variant = ButtonVariant.Fill,
                 )
                 Text(
-                    text = "Retour",
+                    text = stringResource(R.string.action_back),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = colorResource(R.color.text_darker),

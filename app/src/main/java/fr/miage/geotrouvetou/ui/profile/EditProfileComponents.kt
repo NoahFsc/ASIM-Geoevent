@@ -29,6 +29,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -93,7 +94,7 @@ fun ProfileAvatarSection(
             ) {
                 Icon(
                     imageVector = Icons.Outlined.Edit,
-                    contentDescription = "Modifier la photo",
+                    contentDescription = stringResource(R.string.edit_profile_photo_cd),
                     tint = colorResource(R.color.text_darker),
                     modifier = Modifier.size(16.dp),
                 )
@@ -101,7 +102,7 @@ fun ProfileAvatarSection(
         }
 
         Text(
-            text = "Mettez à jour vos informations personnelles et gérez vos préférences de confidentialité.",
+            text = stringResource(R.string.edit_profile_intro),
             fontSize = 13.sp,
             color = colorResource(R.color.text_lighter),
             lineHeight = 18.sp,
@@ -127,7 +128,7 @@ fun DeleteAccountDialog(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = "Souhaitez-vous vraiment supprimer votre compte ?",
+                text = stringResource(R.string.delete_account_title),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = colorResource(R.color.text_darker),
@@ -135,7 +136,7 @@ fun DeleteAccountDialog(
                 lineHeight = 26.sp,
             )
             Text(
-                text = "Vous reviendrez à l'accueil et vous ne pourrez plus jamais voir vos trajets.",
+                text = stringResource(R.string.delete_account_desc),
                 fontSize = 14.sp,
                 color = colorResource(R.color.text_lighter),
                 textAlign = TextAlign.Center,
@@ -143,12 +144,12 @@ fun DeleteAccountDialog(
             )
             Spacer(modifier = Modifier.height(4.dp))
             Button(
-                text = "Supprimer mon compte",
+                text = stringResource(R.string.delete_account_confirm),
                 onClick = onConfirm,
                 variant = ButtonVariant.FillDanger,
             )
             Text(
-                text = "Retour",
+                text = stringResource(R.string.action_back),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = colorResource(R.color.text_darker),

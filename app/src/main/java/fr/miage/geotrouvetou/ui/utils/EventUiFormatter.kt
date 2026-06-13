@@ -35,7 +35,7 @@ fun Evenement.formattedDateLong(): String {
     val dateStr = event_date ?: return "—"
     return try {
         val dt = LocalDateTime.parse(dateStr.take(19), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"))
-        dt.format(DateTimeFormatter.ofPattern("EEEE, dd MMMM", Locale.FRANCE))
+        dt.format(DateTimeFormatter.ofPattern("EEEE, dd MMMM", Locale.getDefault()))
             .replaceFirstChar { it.uppercase() }
     } catch (e: Exception) {
         "—"

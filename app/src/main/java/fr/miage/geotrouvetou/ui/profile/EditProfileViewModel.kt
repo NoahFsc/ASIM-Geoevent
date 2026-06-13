@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import fr.miage.geotrouvetou.App
+import fr.miage.geotrouvetou.R
 import fr.miage.geotrouvetou.utils.UserFieldValidator
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -94,7 +95,7 @@ class EditProfileViewModel(application: Application) : AndroidViewModel(applicat
                     saveToastKey = _uiState.value.saveToastKey + 1,
                 )
             } catch (_: Exception) {
-                _uiState.value = _uiState.value.copy(isSaving = false, error = "Erreur lors de la sauvegarde")
+                _uiState.value = _uiState.value.copy(isSaving = false, error = getApplication<App>().getString(R.string.edit_profile_save_error))
             }
         }
     }
@@ -115,7 +116,7 @@ class EditProfileViewModel(application: Application) : AndroidViewModel(applicat
                 Log.e("EditProfile", "updateAvatar failed", e)
                 _uiState.value = _uiState.value.copy(
                     isUploadingAvatar = false,
-                    error = "Erreur lors de la mise à jour de la photo",
+                    error = getApplication<App>().getString(R.string.edit_profile_photo_error),
                 )
             }
         }
@@ -129,7 +130,7 @@ class EditProfileViewModel(application: Application) : AndroidViewModel(applicat
                 authService.signOut()
                 _uiState.value = _uiState.value.copy(navigateToLogout = true)
             } catch (_: Exception) {
-                _uiState.value = _uiState.value.copy(error = "Erreur lors de la suppression du compte")
+                _uiState.value = _uiState.value.copy(error = getApplication<App>().getString(R.string.edit_profile_delete_error))
             }
         }
     }

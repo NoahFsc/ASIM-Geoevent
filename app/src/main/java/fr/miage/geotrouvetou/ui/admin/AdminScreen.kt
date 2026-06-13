@@ -23,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -61,18 +62,22 @@ fun AdminScreen(
                     tint = colorResource(R.color.text_darker),
                     modifier = Modifier.size(20.dp),
                 )
-                Text(text = "Retour", fontSize = 16.sp, color = colorResource(R.color.text_darker))
+                Text(text = stringResource(R.string.action_back), fontSize = 16.sp, color = colorResource(R.color.text_darker))
             }
 
             Text(
-                text = "Administration",
+                text = stringResource(R.string.admin_title),
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
                 color = colorResource(R.color.text_darker),
             )
 
             SegmentedControl(
-                tabs = listOf("Aperçu", "Utilisateurs", "Événements"),
+                tabs = listOf(
+                    stringResource(R.string.admin_tab_overview),
+                    stringResource(R.string.admin_tab_users),
+                    stringResource(R.string.admin_tab_events),
+                ),
                 selectedIndex = selectedTab,
                 onTabSelected = { selectedTab = it },
             )

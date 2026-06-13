@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -94,7 +95,7 @@ fun EventListContent(
         SearchBar(
             value = searchQuery,
             onValueChange = { searchQuery = it },
-            placeholder = "Rechercher un lieu"
+            placeholder = stringResource(R.string.event_list_search_placeholder)
         )
 
         if (isPlaceSearch) {
@@ -112,7 +113,7 @@ fun EventListContent(
 
             if (events.isEmpty()) {
                 Text(
-                    text = "Aucun événement dans cette zone",
+                    text = stringResource(R.string.event_list_empty),
                     fontSize = 14.sp,
                     color = colorResource(R.color.text_light)
                 )

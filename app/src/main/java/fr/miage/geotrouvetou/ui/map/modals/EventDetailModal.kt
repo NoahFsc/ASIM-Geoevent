@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -127,8 +128,12 @@ fun EventDetailModalContent(
     val time = event.formattedTime()
     val imageUrl = event.image_url
         ?: "https://picsum.photos/seed/${event.title.hashCode()}/800/400"
-    val locationLabel = event.location ?: "Coordonnées"
-    val locationDetail = if (event.location != null) "" else "Lat: %.4f, Lon: %.4f".format(event.latitude, event.longitude)
+    val locationLabel = event.location ?: stringResource(R.string.event_detail_location_fallback)
+    val locationDetail = if (event.location != null) "" else stringResource(
+        R.string.event_detail_coordinates,
+        "%.4f".format(event.latitude),
+        "%.4f".format(event.longitude),
+    )
 
     Column(
         modifier = modifier
@@ -155,7 +160,7 @@ fun EventDetailModalContent(
                         modifier = Modifier.size(24.dp)
                     )
                     Text(
-                        text = "Retour",
+                        text = stringResource(R.string.action_back),
                         fontSize = 16.sp,
                         color = colorResource(R.color.text_darker)
                     )
@@ -165,7 +170,9 @@ fun EventDetailModalContent(
             }
 
             Button(
-                text = if (isOwner) "Modifier" else if (isJoined) "Déjà inscrit" else "Enregistrer",
+                text = if (isOwner) stringResource(R.string.event_detail_edit)
+                    else if (isJoined) stringResource(R.string.event_detail_joined)
+                    else stringResource(R.string.event_detail_join),
                 onClick = {
                     if (isOwner) onEditClick?.invoke()
                     else if (!isJoined) onJoinClick()

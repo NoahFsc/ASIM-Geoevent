@@ -25,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -71,7 +72,7 @@ fun CreateEventScreen(
 
     if (errorMessage != null) {
         Toast(
-            title = "Erreur",
+            title = stringResource(R.string.event_error_title),
             description = errorMessage!!,
             duration = 3000
         )
@@ -155,7 +156,7 @@ fun CreateEventContent(
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         Text(
-            text = "Nouvel événement",
+            text = stringResource(R.string.create_event_title),
             fontSize = 32.sp,
             fontWeight = FontWeight.ExtraBold,
             color = colorResource(R.color.text_darker),
@@ -164,23 +165,23 @@ fun CreateEventContent(
         ImageUploader(
             imageUri = imageUri,
             onImageSelected = onImageSelected,
-            label = "Image de couverture",
+            label = stringResource(R.string.event_form_cover_image),
             required = true,
         )
 
         Input(
             value = title,
             onValueChange = onTitleChange,
-            placeholder = "Randonnée pour amateurs",
-            label = "Titre",
+            placeholder = stringResource(R.string.event_form_title_placeholder),
+            label = stringResource(R.string.event_form_title_label),
             required = true,
         )
 
         TextArea(
             value = description,
             onValueChange = onDescriptionChange,
-            placeholder = "Randonnée pour amateurs",
-            label = "Description",
+            placeholder = stringResource(R.string.event_form_description_placeholder),
+            label = stringResource(R.string.event_form_description_label),
             maxLength = 500,
             required = true,
         )
@@ -192,8 +193,8 @@ fun CreateEventContent(
             Input(
                 value = date,
                 onValueChange = {},
-                placeholder = "dd/mm/yyyy",
-                label = "Date",
+                placeholder = stringResource(R.string.event_form_date_placeholder),
+                label = stringResource(R.string.event_form_date_label),
                 required = true,
                 modifier = Modifier.weight(1f),
                 onClick = onDateClick,
@@ -202,8 +203,8 @@ fun CreateEventContent(
             Input(
                 value = time,
                 onValueChange = {},
-                placeholder = "HH:mm",
-                label = "Heure",
+                placeholder = stringResource(R.string.event_form_time_placeholder),
+                label = stringResource(R.string.event_form_time_label),
                 required = true,
                 modifier = Modifier.weight(1f),
                 onClick = onTimeClick,
@@ -214,7 +215,7 @@ fun CreateEventContent(
         SearchBar(
             value = location,
             onValueChange = onLocationChange,
-            placeholder = "Rechercher un lieu",
+            placeholder = stringResource(R.string.event_form_search_place),
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -226,7 +227,7 @@ fun CreateEventContent(
 
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(
-                text = "Type d'événement",
+                text = stringResource(R.string.event_form_type),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 color = colorResource(R.color.text_darker),
@@ -234,12 +235,12 @@ fun CreateEventContent(
             Switch(
                 checked = isPrivate,
                 onCheckedChange = onPrivateChange,
-                label = "Rendre l'événement privé"
+                label = stringResource(R.string.event_form_make_private)
             )
         }
 
         Button(
-            text = if (isLoading) "Création..." else "Créer l'événement",
+            text = if (isLoading) stringResource(R.string.create_event_submitting) else stringResource(R.string.create_event_submit),
             onClick = onCreateEvent,
             enabled = isFormValid,
             leftIcon = if (isLoading) null else Icons.Default.Add

@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -68,7 +69,7 @@ fun PlaceSearchBar(
 
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Text(
-            text = "Lieux",
+            text = stringResource(R.string.place_search_title),
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = colorResource(R.color.text_darker)
@@ -83,7 +84,7 @@ fun PlaceSearchBar(
             }
         } else if (placeResults.isEmpty()) {
             Text(
-                text = "Aucun lieu trouvé",
+                text = stringResource(R.string.place_search_empty),
                 fontSize = 14.sp,
                 color = colorResource(R.color.text_light)
             )

@@ -84,31 +84,31 @@ private fun SystemStatusToasts(isConnected: Boolean?, isLocationEnabled: Boolean
 
     if (networkLostToastKey > 0) {
         Toast(
-            title = stringResource(R.string.toast_connexion_perdue_titre),
-            description = stringResource(R.string.toast_connexion_perdue_desc),
+            title = stringResource(R.string.toast_network_lost_title),
+            description = stringResource(R.string.toast_network_lost_desc),
             type = ToastType.Warning,
             key = networkLostToastKey,
         )
     }
     if (networkRestoredToastKey > 0) {
         Toast(
-            title = stringResource(R.string.toast_connexion_retablie_titre),
-            description = stringResource(R.string.toast_connexion_retablie_desc),
+            title = stringResource(R.string.toast_network_restored_title),
+            description = stringResource(R.string.toast_network_restored_desc),
             key = networkRestoredToastKey,
         )
     }
     if (locationLostToastKey > 0) {
         Toast(
-            title = stringResource(R.string.toast_localisation_perdue_titre),
-            description = stringResource(R.string.toast_localisation_perdue_desc),
+            title = stringResource(R.string.toast_location_lost_title),
+            description = stringResource(R.string.toast_location_lost_desc),
             type = ToastType.Warning,
             key = locationLostToastKey,
         )
     }
     if (locationRestoredToastKey > 0) {
         Toast(
-            title = stringResource(R.string.toast_localisation_retablie_titre),
-            description = stringResource(R.string.toast_localisation_retablie_desc),
+            title = stringResource(R.string.toast_location_restored_title),
+            description = stringResource(R.string.toast_location_restored_desc),
             key = locationRestoredToastKey,
         )
     }

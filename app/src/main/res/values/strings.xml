@@ -1,41 +1,230 @@
 <resources>
     <string name="app_name">Geo Trouvetou</string>
 
+    <!-- Actions communes -->
+    <string name="action_back">Retour</string>
+    <string name="action_confirm">Confirmer</string>
+    <string name="action_cancel">Annuler</string>
+    <string name="action_refresh">Actualiser</string>
+
+    <!-- Champs de formulaire -->
+    <string name="field_email_label">Adresse email</string>
+    <string name="field_email_placeholder">Entrer votre adresse e-mail</string>
+    <string name="field_password_label">Mot de passe</string>
+    <string name="field_password_placeholder">Entrer votre mot de passe</string>
+    <string name="field_lastname_label">Nom</string>
+    <string name="field_lastname_placeholder">Dupont</string>
+    <string name="field_firstname_label">Prénom</string>
+    <string name="field_firstname_placeholder">Patrick</string>
+
     <!-- Connexion -->
-    <string name="connexion_titre">Connexion</string>
-    <string name="hint_email">Email</string>
-    <string name="hint_mot_de_passe">Mot de passe</string>
-    <string name="btn_connexion">Se connecter</string>
-    <string name="btn_aller_inscription">Pas encore de compte ? S\'inscrire</string>
+    <string name="login_title">Se connecter</string>
+    <string name="login_no_account">Vous n\'avez pas de compte ? </string>
+    <string name="login_signup_link">S\'inscrire</string>
+    <string name="login_submit">Se connecter</string>
 
     <!-- Inscription -->
-    <string name="inscription_titre">Créer un compte</string>
-    <string name="hint_confirmer_mot_de_passe">Confirmer le mot de passe</string>
-    <string name="btn_inscription">S\'inscrire</string>
-    <string name="btn_retour_connexion">Déjà un compte ? Se connecter</string>
+    <string name="register_title">S\'inscrire</string>
+    <string name="register_have_account">Vous avez déjà un compte ? </string>
+    <string name="register_login_link">Se connecter</string>
+    <string name="register_confirm_label">Confirmation</string>
+    <string name="register_confirm_placeholder">Confirmer votre mot de passe</string>
+    <string name="register_terms_prefix">J\'accepte les </string>
+    <string name="register_terms_link">Conditions d\'Utilisations</string>
+    <string name="register_submit">S\'inscrire</string>
+    <string name="register_terms_required">Vous devez accepter les conditions d\'utilisation</string>
+
+    <!-- Règles du mot de passe -->
+    <string name="password_info_cd">Règles du mot de passe</string>
+    <string name="password_rules_title">Votre mot de passe doit contenir :</string>
+    <string name="password_rules_title_new">Votre nouveau mot de passe doit contenir :</string>
+    <string name="password_rule_min">Minimum 8 caractères</string>
+    <string name="password_rule_digit">1 Chiffre</string>
+    <string name="password_rule_special">1 Caractère Spécial (ex : @, &amp;,...)</string>
+    <string name="password_rule_uppercase">1 Majuscule</string>
+
+    <!-- Erreurs d'authentification -->
+    <string name="auth_error_unexpected">Une erreur inattendue s\'est produite</string>
+    <string name="auth_error_invalid_credentials">Email ou mot de passe incorrect</string>
+    <string name="auth_error_email_not_confirmed">Veuillez confirmer votre email avant de vous connecter</string>
+    <string name="auth_error_user_exists">Un compte existe déjà avec cette adresse email</string>
+    <string name="auth_error_password_too_short">Le mot de passe doit contenir au moins 6 caractères</string>
+    <string name="auth_error_rate_limit">Trop de tentatives. Réessayez dans quelques minutes.</string>
+    <string name="auth_error_network">Erreur de connexion réseau. Vérifiez votre connexion internet.</string>
+    <string name="auth_error_generic">Une erreur est survenue. Réessayez.</string>
+
+    <!-- Validation des champs -->
+    <string name="validation_email_required">L\'adresse email est requise</string>
+    <string name="validation_email_invalid">Format d\'email invalide</string>
+    <string name="validation_password_required">Le mot de passe est requis</string>
+    <string name="validation_lastname_required">Le nom est requis</string>
+    <string name="validation_firstname_required">Le prénom est requis</string>
+    <string name="validation_password_min">Le mot de passe doit contenir au moins 8 caractères</string>
+    <string name="validation_password_digit">Le mot de passe doit contenir au moins 1 chiffre</string>
+    <string name="validation_password_uppercase">Le mot de passe doit contenir au moins 1 majuscule</string>
+    <string name="validation_password_special">Le mot de passe doit contenir au moins 1 caractère spécial</string>
+    <string name="validation_passwords_mismatch">Les mots de passe ne correspondent pas</string>
 
     <!-- Profil -->
-    <string name="btn_profil">Mon Profil</string>
-    <string name="btn_deconnexion">Se déconnecter</string>
-    <string name="btn_supprimer_compte">Supprimer le compte</string>
+    <string name="profile_title">Profil</string>
+    <string name="profile_settings_cd">Paramètres</string>
+    <string name="profile_stat_events">ÉVÉNEMENTS</string>
+    <string name="profile_stat_participations">PARTICIPATIONS</string>
+    <string name="profile_tab_my_events">Mes événements</string>
+    <string name="profile_tab_my_participations">Mes participations</string>
+    <string name="profile_empty_events">Aucun événement créé</string>
+    <string name="profile_empty_participations">Aucune participation</string>
 
+    <!-- Édition du profil -->
+    <string name="edit_profile_title">Modifier mon profil</string>
+    <string name="edit_profile_intro">Mettez à jour vos informations personnelles et gérez vos préférences de confidentialité.</string>
+    <string name="edit_profile_section_personal">Informations Personnelles</string>
+    <string name="edit_profile_email_placeholder">adresse@email.com</string>
+    <string name="edit_profile_photo_cd">Modifier la photo</string>
+    <string name="edit_profile_delete_account">Supprimer mon compte</string>
+    <string name="edit_profile_save">Enregistrer les modifications</string>
+    <string name="edit_profile_save_error">Erreur lors de la sauvegarde</string>
+    <string name="edit_profile_photo_error">Erreur lors de la mise à jour de la photo</string>
+    <string name="edit_profile_delete_error">Erreur lors de la suppression du compte</string>
+    <string name="edit_profile_toast_saved_title">Profil mis à jour !</string>
+    <string name="edit_profile_toast_saved_desc">Vos informations ont été enregistrées</string>
+    <string name="edit_profile_toast_photo_title">Photo mise à jour !</string>
+    <string name="edit_profile_toast_photo_desc">Votre photo de profil a été modifiée</string>
 
-    <!-- Réseau / Localisation -->
-    <string name="toast_connexion_perdue_titre">Connexion perdue</string>
-    <string name="toast_connexion_perdue_desc">Vérifiez votre connexion internet</string>
-    <string name="toast_connexion_retablie_titre">Connexion rétablie</string>
-    <string name="toast_connexion_retablie_desc">Vous êtes de nouveau en ligne</string>
-    <string name="toast_localisation_perdue_titre">Localisation désactivée</string>
-    <string name="toast_localisation_perdue_desc">Activez la localisation pour profiter de la carte</string>
-    <string name="toast_localisation_retablie_titre">Localisation activée</string>
-    <string name="toast_localisation_retablie_desc">Votre position est de nouveau disponible</string>
+    <!-- Suppression de compte -->
+    <string name="delete_account_title">Souhaitez-vous vraiment supprimer votre compte ?</string>
+    <string name="delete_account_desc">Vous reviendrez à l\'accueil et vous ne pourrez plus jamais voir vos trajets.</string>
+    <string name="delete_account_confirm">Supprimer mon compte</string>
 
-    <!-- Erreurs -->
-    <string name="erreur_email_requis">L\'email est requis</string>
-    <string name="erreur_email_format">Adresse email invalide (ex: nom@exemple.com)</string>
-    <string name="erreur_mot_de_passe_requis">Le mot de passe est requis</string>
-    <string name="erreur_mot_de_passe_trop_court">Le mot de passe doit contenir au moins 6 caractères</string>
-    <string name="erreur_mots_de_passe_differents">Les mots de passe ne correspondent pas</string>
-    <string name="erreur_connexion">Connexion échouée. Vérifiez vos identifiants.</string>
-    <string name="erreur_inscription">Inscription échouée. Réessayez.</string>
+    <!-- Mot de passe -->
+    <string name="edit_password_title">Modifier mon mot de passe</string>
+    <string name="edit_password_new_label">Nouveau mot de passe</string>
+    <string name="edit_password_confirm_label">Confirmer le mot de passe</string>
+    <string name="edit_password_submit">Modifier le mot de passe</string>
+    <string name="edit_password_error">Erreur lors de la modification du mot de passe</string>
+    <string name="edit_password_toast_title">Mot de passe modifié !</string>
+    <string name="edit_password_toast_desc">Votre mot de passe a bien été mis à jour</string>
+
+    <!-- Paramètres -->
+    <string name="params_title">Paramètres</string>
+    <string name="params_section_account">Compte</string>
+    <string name="params_edit_profile">Modifier mon profil</string>
+    <string name="params_edit_password">Modifier mon mot de passe</string>
+    <string name="params_admin">Administration</string>
+    <string name="params_logout">Déconnexion</string>
+    <string name="params_logout_confirm_title">Souhaitez-vous vraiment vous déconnecter ?</string>
+    <string name="params_logout_confirm_desc">Vous reviendrez à l\'accueil et vous ne pourrez plus voir vos trajets.</string>
+    <string name="params_logout_confirm">Se déconnecter</string>
+
+    <!-- Carte -->
+    <string name="map_center_on_me_cd">Centrer sur ma position</string>
+    <string name="map_zoom_in_cd">Zoom avant</string>
+    <string name="map_zoom_out_cd">Zoom arrière</string>
+    <string name="map_search_placeholder">Rechercher par lieu</string>
+    <string name="map_location_permission_denied">Permission localisation refusée</string>
+
+    <!-- Liste / recherche d'événements -->
+    <string name="event_list_default_title">Propositions</string>
+    <string name="event_list_search_placeholder">Rechercher un lieu</string>
+    <string name="event_list_empty">Aucun événement dans cette zone</string>
+    <string name="event_list_proposals">Propositions (%1$d)</string>
+    <string name="event_list_cluster">Groupement (%1$d)</string>
+    <string name="place_search_title">Lieux</string>
+    <string name="place_search_empty">Aucun lieu trouvé</string>
+
+    <!-- Détail d'un événement -->
+    <string name="event_detail_about">A propos de l\'événement</string>
+    <string name="event_detail_location_fallback">Coordonnées</string>
+    <string name="event_detail_coordinates">Lat: %1$s, Lon: %2$s</string>
+    <string name="event_detail_not_found">Événement introuvable</string>
+    <string name="event_detail_edit">Modifier</string>
+    <string name="event_detail_joined">Déjà inscrit</string>
+    <string name="event_detail_join">Enregistrer</string>
+    <string name="event_join_toast_title">Inscription réussie !</string>
+    <string name="event_join_toast_desc">Vous participez désormais à cet événement</string>
+    <string name="event_update_toast_title">Modification réussie !</string>
+    <string name="event_update_toast_desc">L\'événement a été mis à jour</string>
+
+    <!-- Création / modification d'événement -->
+    <string name="create_event_title">Nouvel événement</string>
+    <string name="update_event_title">Modifier l\'événement</string>
+    <string name="event_form_cover_image">Image de couverture</string>
+    <string name="event_form_title_label">Titre</string>
+    <string name="event_form_title_placeholder">Randonnée pour amateurs</string>
+    <string name="event_form_description_label">Description</string>
+    <string name="event_form_description_placeholder">Randonnée pour amateurs</string>
+    <string name="event_form_date_label">Date</string>
+    <string name="event_form_date_placeholder">dd/mm/yyyy</string>
+    <string name="event_form_time_label">Heure</string>
+    <string name="event_form_time_placeholder">HH:mm</string>
+    <string name="event_form_location_label">Localisation</string>
+    <string name="event_form_search_place">Rechercher un lieu</string>
+    <string name="event_form_type">Type d\'événement</string>
+    <string name="event_form_make_private">Rendre l\'événement privé</string>
+    <string name="create_event_submit">Créer l\'événement</string>
+    <string name="create_event_submitting">Création...</string>
+    <string name="update_event_submit">Enregistrer les modifications</string>
+    <string name="update_event_submitting">Modification...</string>
+    <string name="event_time_picker_title">Choisir l\'heure</string>
+    <string name="event_error_title">Erreur</string>
+    <string name="event_error_must_login_create">Vous devez être connecté pour créer un événement</string>
+    <string name="event_error_must_login_update">Vous devez être connecté pour modifier un événement</string>
+    <string name="event_error_generic">Erreur : %1$s</string>
+    <string name="event_error_fallback">Une erreur est survenue</string>
+
+    <!-- Image -->
+    <string name="image_uploader_add">Ajouter une image</string>
+
+    <!-- Navigation -->
+    <string name="nav_map">Carte</string>
+    <string name="nav_add">Ajouter</string>
+    <string name="nav_profile">Profil</string>
+
+    <!-- Toasts de navigation -->
+    <string name="toast_login_title">Connexion réussie !</string>
+    <string name="toast_welcome_desc">Bienvenue sur Geo Trouvetou</string>
+    <string name="toast_register_title">Compte créé !</string>
+    <string name="toast_account_deleted_title">Compte supprimé</string>
+    <string name="toast_account_deleted_desc">Votre compte a bien été supprimé</string>
+    <string name="toast_logout_title">Déconnexion réussie</string>
+    <string name="toast_logout_desc">À bientôt sur Geo Trouvetou</string>
+    <string name="toast_event_created_title">Succès !</string>
+    <string name="toast_event_created_desc">L\'événement a été créé avec succès</string>
+
+    <!-- Réseau / localisation -->
+    <string name="toast_network_lost_title">Connexion perdue</string>
+    <string name="toast_network_lost_desc">Vérifiez votre connexion internet</string>
+    <string name="toast_network_restored_title">Connexion rétablie</string>
+    <string name="toast_network_restored_desc">Vous êtes de nouveau en ligne</string>
+    <string name="toast_location_lost_title">Localisation désactivée</string>
+    <string name="toast_location_lost_desc">Activez la localisation pour profiter de la carte</string>
+    <string name="toast_location_restored_title">Localisation activée</string>
+    <string name="toast_location_restored_desc">Votre position est de nouveau disponible</string>
+
+    <!-- Administration -->
+    <string name="admin_title">Administration</string>
+    <string name="admin_tab_overview">Aperçu</string>
+    <string name="admin_tab_users">Utilisateurs</string>
+    <string name="admin_tab_events">Événements</string>
+    <string name="admin_stat_users">UTILISATEURS</string>
+    <string name="admin_stat_events">ÉVÉNEMENTS</string>
+    <string name="admin_recent_activity">Activité récente</string>
+    <string name="admin_no_activity">Aucune activité récente</string>
+    <string name="admin_search_event">Rechercher un événement</string>
+    <string name="admin_search_user">Rechercher un utilisateur</string>
+    <string name="admin_menu_cd">Menu</string>
+    <string name="admin_make_user">Passer en User</string>
+    <string name="admin_make_admin">Passer en Admin</string>
+    <string name="admin_delete_user">Supprimer le compte</string>
+    <string name="admin_event_public">Public</string>
+    <string name="admin_event_private">Privé</string>
+    <string name="admin_time_now">À l\'instant</string>
+    <string name="admin_time_minutes">Il y a %1$d min</string>
+    <string name="admin_time_hours">Il y a %1$dh</string>
+    <string name="admin_time_days">Il y a %1$dj</string>
+
+    <!-- Cartes d'événement -->
+    <string name="event_card_delete">Supprimer</string>
+    <string name="event_card_recommended">Recommandé</string>
+    <string name="event_card_datetime">%1$s  •  %2$s</string>
 </resources>

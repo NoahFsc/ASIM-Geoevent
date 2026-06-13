@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -68,14 +69,14 @@ fun EventCard(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
-                            text = "Supprimer",
+                            text = stringResource(R.string.event_card_delete),
                             fontSize = 15.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = colorResource(R.color.text_darker),
                         )
                         Icon(
                             imageVector = Icons.Filled.Close,
-                            contentDescription = "Supprimer",
+                            contentDescription = stringResource(R.string.event_card_delete),
                             tint = colorResource(R.color.text_darker),
                             modifier = Modifier.size(18.dp),
                         )
@@ -93,7 +94,7 @@ fun EventCard(
                             modifier = Modifier.size(18.dp),
                         )
                         Text(
-                            text = "Recommandé",
+                            text = stringResource(R.string.event_card_recommended),
                             fontSize = 15.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = colorResource(R.color.primary_500),
@@ -116,7 +117,7 @@ fun EventCard(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = "$date  •  $time",
+                text = stringResource(R.string.event_card_datetime, date, time),
                 fontSize = 14.sp,
                 color = colorResource(R.color.text_lighter),
             )

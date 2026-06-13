@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import fr.miage.geotrouvetou.App
+import fr.miage.geotrouvetou.R
 import fr.miage.geotrouvetou.utils.UserFieldValidator
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -43,7 +44,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                 authService.signIn(email, password)
                 _uiState.value = LoginUiState(navigateToMain = true)
             } catch (e: Exception) {
-                _uiState.value = LoginUiState(error = AuthErrorTranslator.translate(e.message))
+                _uiState.value = LoginUiState(error = AuthErrorTranslator.translate(getApplication(), e.message))
             }
         }
     }
@@ -52,8 +53,9 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         _uiState.value = _uiState.value.copy(navigateToMain = false)
     }
 
-    fun validateEmail(email: String): String? = UserFieldValidator.validateEmail(email)
+    fun validateEmail(email: String): String? =
+        UserFieldValidator.validateEmail(getApplication(), email)
 
     fun validatePassword(password: String): String? =
-        if (password.isBlank()) "Le mot de passe est requis" else null
+        if (password.isBlank()) getApplication<App>().getString(R.string.validation_password_required) else null
 }

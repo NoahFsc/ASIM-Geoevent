@@ -16,8 +16,8 @@ import fr.miage.geotrouvetou.ui.events.EventUpdateViewModel
 fun appViewModelFactory(context: Context): ViewModelProvider.Factory {
     val app = context.applicationContext as App
     return viewModelFactory {
-        initializer { CreateEventViewModel(app.databaseService, app.authService) }
+        initializer { CreateEventViewModel(app, app.databaseService, app.authService) }
         initializer { EventDetailViewModel(app.databaseService, app.authService) }
-        initializer { EventUpdateViewModel(app.databaseService, app.authService) }
+        initializer { EventUpdateViewModel(app, app.databaseService, app.authService) }
     }
 }
