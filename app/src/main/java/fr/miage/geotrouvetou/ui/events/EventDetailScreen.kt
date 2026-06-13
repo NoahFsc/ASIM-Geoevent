@@ -34,14 +34,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.miage.geotrouvetou.App
 import fr.miage.geotrouvetou.R
-import fr.miage.geotrouvetou.data.backend.SupabaseDatabaseService
 import fr.miage.geotrouvetou.domain.models.Evenement
-import io.github.jan.supabase.auth.auth
+import fr.miage.geotrouvetou.ui.appViewModelFactory
 import fr.miage.geotrouvetou.ui.components.atoms.Button
 import fr.miage.geotrouvetou.ui.components.atoms.ButtonVariant
 import fr.miage.geotrouvetou.ui.components.atoms.Toast
@@ -56,16 +53,7 @@ fun EventDetailScreen(
     onLoginClick: () -> Unit,
 ) {
     val context = LocalContext.current
-    val viewModel: EventDetailViewModel = viewModel(
-        factory = object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                val app = context.applicationContext as App
-                val databaseService = SupabaseDatabaseService(app.supabase)
-                @Suppress("UNCHECKED_CAST")
-                return EventDetailViewModel(databaseService, app.supabase) as T
-            }
-        }
-    )
+    val viewModel: EventDetailViewModel = viewModel(factory = appViewModelFactory(context))
 
     var isEditing by remember { mutableStateOf(false) }
     var updateToastKey by remember { mutableStateOf(0) }
@@ -96,9 +84,8 @@ fun EventDetailScreen(
                     onBackClick = onBackClick,
                     isJoined = viewModel.isJoined,
                     isOwner = viewModel.isOwner,
-                    onJoinClick = { 
-                        val user = (context.applicationContext as App).supabase.auth.currentUserOrNull()
-                        if (user != null) {
+                    onJoinClick = {
+                        if ((context.applicationContext as App).authService.isLoggedIn()) {
                             viewModel.joinEvent()
                         } else {
                             onLoginClick()

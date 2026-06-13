@@ -5,8 +5,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import fr.miage.geotrouvetou.App
 import fr.miage.geotrouvetou.domain.models.Evenement
-import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.status.SessionStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,7 +26,7 @@ data class ProfileUiState(
 
 class ProfileViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val supabase get() = getApplication<App>().supabase
+    private val authService get() = getApplication<App>().authService
     private val databaseService get() = getApplication<App>().databaseService
 
     private val _uiState = MutableStateFlow(ProfileUiState())
@@ -36,14 +34,11 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
 
     init {
         viewModelScope.launch {
-            supabase.auth.sessionStatus.collect { status ->
-                if (status is SessionStatus.Authenticated) {
-                    val userId = status.session.user?.id ?: return@collect
-                    _uiState.value = _uiState.value.copy(email = status.session.user?.email ?: "")
-                    loadProfile(userId)
-                    loadEvents(userId)
-                    loadParticipations(userId)
-                }
+            authService.observeAuthenticatedUser().collect { user ->
+                _uiState.value = _uiState.value.copy(email = user.email)
+                loadProfile(user.id)
+                loadEvents(user.id)
+                loadParticipations(user.id)
             }
         }
     }
@@ -80,8 +75,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
 
     fun refresh() {
         viewModelScope.launch {
-            val session = supabase.auth.currentSessionOrNull() ?: return@launch
-            val userId = session.user?.id ?: return@launch
+            val userId = authService.currentUserId() ?: return@launch
             loadProfile(userId)
             loadEvents(userId)
             loadParticipations(userId)

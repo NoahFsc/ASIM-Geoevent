@@ -7,14 +7,10 @@ import fr.miage.geotrouvetou.App
 import fr.miage.geotrouvetou.domain.models.User
 import fr.miage.geotrouvetou.utils.PasswordValidation
 import fr.miage.geotrouvetou.utils.UserFieldValidator
-import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.providers.builtin.Email
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
 
 data class RegisterUiState(
     val isLoading: Boolean = false,
@@ -25,7 +21,7 @@ data class RegisterUiState(
 
 class RegisterViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val supabase get() = getApplication<App>().supabase
+    private val authService get() = getApplication<App>().authService
     private val databaseService get() = getApplication<App>().databaseService
 
     private val _uiState = MutableStateFlow(RegisterUiState())
@@ -47,22 +43,16 @@ class RegisterViewModel(application: Application) : AndroidViewModel(application
 
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
-            try {
-                supabase.auth.signUpWith(Email) {
-                    this.email = email
-                    this.password = password
-                    data = buildJsonObject { put("full_name", fullName) }
-                }
+            val userId = try {
+                authService.signUp(email, password, fullName)
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(isLoading = false, error = translateError(e.message))
+                _uiState.value = _uiState.value.copy(isLoading = false, error = AuthErrorTranslator.translate(e.message))
                 return@launch
             }
 
             try {
-                supabase.auth.currentUserOrNull()?.let { user ->
-                    databaseService.createProfile(
-                        User(id = user.id, email = email, fullName = fullName)
-                    )
+                if (userId != null) {
+                    databaseService.createProfile(User(id = userId, email = email, fullName = fullName))
                 }
             } catch (_: Exception) { }
 
@@ -87,18 +77,4 @@ class RegisterViewModel(application: Application) : AndroidViewModel(application
 
     fun validateConfirmPassword(password: String, confirm: String): String? =
         PasswordValidation.confirmError(password, confirm)
-
-    private fun translateError(message: String?): String = when {
-        message == null -> "Une erreur inattendue s'est produite"
-        message.contains("User already registered", ignoreCase = true) ->
-            "Un compte existe déjà avec cette adresse email"
-        message.contains("Password should be at least", ignoreCase = true) ->
-            "Le mot de passe doit contenir au moins 6 caractères"
-        message.contains("rate limit", ignoreCase = true) ||
-        message.contains("too many requests", ignoreCase = true) ->
-            "Trop de tentatives. Réessayez dans quelques minutes."
-        message.contains("network", ignoreCase = true) ->
-            "Erreur de connexion réseau. Vérifiez votre connexion internet."
-        else -> "Une erreur est survenue. Réessayez."
-    }
 }

@@ -6,15 +6,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import fr.miage.geotrouvetou.domain.interfaces.IAuthService
 import fr.miage.geotrouvetou.domain.interfaces.IDatabaseService
 import fr.miage.geotrouvetou.domain.models.Evenement
-import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.launch
 
 class EventDetailViewModel(
     private val databaseService: IDatabaseService,
-    private val supabase: SupabaseClient
+    private val authService: IAuthService,
 ) : ViewModel() {
 
     var event by mutableStateOf<Evenement?>(null)
@@ -39,11 +38,11 @@ class EventDetailViewModel(
             isLoading = true
             try {
                 event = databaseService.getEvent(eventId)
-                
-                val user = supabase.auth.currentUserOrNull()
-                if (user != null) {
-                    isJoined = databaseService.isUserParticipating(eventId, user.id)
-                    isOwner = event?.user_id == user.id
+
+                val userId = authService.currentUserId()
+                if (userId != null) {
+                    isJoined = databaseService.isUserParticipating(eventId, userId)
+                    isOwner = event?.user_id == userId
                 }
                 participantsCount = databaseService.getParticipantsCount(eventId)
             } catch (e: Exception) {
@@ -60,15 +59,15 @@ class EventDetailViewModel(
         
         viewModelScope.launch {
             try {
-                val user = supabase.auth.currentUserOrNull()
-                if (user != null) {
-                    databaseService.joinEvent(eventId, user.id)
+                val userId = authService.currentUserId()
+                if (userId != null) {
+                    databaseService.joinEvent(eventId, userId)
                     isJoined = true
                     participantsCount++
                     joinToastKey++
                 }
             } catch (e: Exception) {
-                // Gérer l'erreur (ex: déjà inscrit)
+                // Échec silencieux (ex : déjà inscrit)
             }
         }
     }

@@ -38,13 +38,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import fr.miage.geotrouvetou.App
 import fr.miage.geotrouvetou.R
-import fr.miage.geotrouvetou.data.geocoding.NominatimPlace
-import fr.miage.geotrouvetou.data.backend.SupabaseDatabaseService
+import fr.miage.geotrouvetou.domain.models.Place
+import fr.miage.geotrouvetou.ui.appViewModelFactory
 import fr.miage.geotrouvetou.ui.components.atoms.Button
 import fr.miage.geotrouvetou.ui.components.atoms.ImageUploader
 import fr.miage.geotrouvetou.ui.components.atoms.Input
@@ -64,16 +61,7 @@ fun CreateEventScreen(
     onEventCreated: () -> Unit,
 ) {
     val context = LocalContext.current
-    val viewModel: CreateEventViewModel = viewModel(
-        factory = object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                val app = context.applicationContext as App
-                val databaseService = SupabaseDatabaseService(app.supabase)
-                @Suppress("UNCHECKED_CAST")
-                return CreateEventViewModel(databaseService, app.supabase) as T
-            }
-        }
-    )
+    val viewModel: CreateEventViewModel = viewModel(factory = appViewModelFactory(context))
 
     var showDatePicker by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
@@ -209,7 +197,7 @@ fun CreateEventContent(
     onTimeClick: () -> Unit,
     location: String,
     onLocationChange: (String) -> Unit,
-    onPlaceSelected: (NominatimPlace) -> Unit,
+    onPlaceSelected: (Place) -> Unit,
     isPrivate: Boolean,
     onPrivateChange: (Boolean) -> Unit,
     imageUri: Uri?,

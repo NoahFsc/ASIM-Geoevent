@@ -6,9 +6,9 @@ import fr.miage.geotrouvetou.domain.models.AuditLogEntry
 import fr.miage.geotrouvetou.domain.models.Evenement
 import fr.miage.geotrouvetou.domain.models.EventParticipant
 import fr.miage.geotrouvetou.domain.models.User
+import fr.miage.geotrouvetou.domain.interfaces.IImageService
 import io.github.jan.supabase.postgrest.query.Order
 import io.github.jan.supabase.postgrest.query.filter.PostgrestFilterBuilder
-import fr.miage.geotrouvetou.utils.ImageHelper
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.postgrest
@@ -28,10 +28,12 @@ import kotlinx.coroutines.flow.map
  * Implémentation du service de données via Supabase.
  * Gère les interactions avec la base Postgrest, le Storage et le Realtime.
  */
-class SupabaseDatabaseService(private val client: SupabaseClient) : IDatabaseService {
+class SupabaseDatabaseService(
+    private val client: SupabaseClient,
+    private val imageService: IImageService,
+) : IDatabaseService {
 
     private val tableName = "events"
-    private val imageHelper = ImageHelper(client)
     private var eventsChannel: RealtimeChannel? = null
 
     override suspend fun addEvent(event: Evenement) {
@@ -64,7 +66,7 @@ class SupabaseDatabaseService(private val client: SupabaseClient) : IDatabaseSer
      * Utilise le helper dédié pour uploader une image et récupérer son lien public.
      */
     override suspend fun uploadImage(fileName: String, bytes: ByteArray): String {
-        return imageHelper.uploadEventImage(fileName, bytes)
+        return imageService.uploadEventImage(fileName, bytes)
     }
 
     /**
@@ -151,7 +153,7 @@ class SupabaseDatabaseService(private val client: SupabaseClient) : IDatabaseSer
 
         val resolvedAvatarUrl = user.avatarUrl?.let { path ->
             if (path.startsWith("http")) path
-            else try { imageHelper.getAvatarSignedUrl(path) } catch (_: Exception) { null }
+            else try { imageService.getAvatarSignedUrl(path) } catch (_: Exception) { null }
         }
         return user.copy(avatarUrl = resolvedAvatarUrl)
     }
@@ -172,7 +174,7 @@ class SupabaseDatabaseService(private val client: SupabaseClient) : IDatabaseSer
     }
 
     override suspend fun updateAvatar(userId: String, bytes: ByteArray) {
-        val avatarUrl = imageHelper.uploadAvatarImage(userId, bytes)
+        val avatarUrl = imageService.uploadAvatarImage(userId, bytes)
         client.postgrest["profiles"].update({
             set("avatar_url", avatarUrl)
         }) {

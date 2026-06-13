@@ -39,8 +39,8 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
+import fr.miage.geotrouvetou.App
 import fr.miage.geotrouvetou.R
-import fr.miage.geotrouvetou.data.maps.OSMMapService
 import fr.miage.geotrouvetou.domain.interfaces.MapBounds
 import fr.miage.geotrouvetou.domain.models.Evenement
 import fr.miage.geotrouvetou.ui.components.atoms.RoundIconButton
@@ -63,7 +63,7 @@ fun MapScreen(
     @Suppress("DEPRECATION")
     val lifecycleOwner = LocalLifecycleOwner.current
     val uiState by viewModel.uiState.collectAsState()
-    val mapService = remember(context) { OSMMapService(context) }
+    val mapService = remember(context) { (context.applicationContext as App).createMapService(context) }
     val mapView = remember(context) { MapView(context) }
 
     var mapBound by rememberSaveable { mutableStateOf(false) }

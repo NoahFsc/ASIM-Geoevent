@@ -6,10 +6,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import fr.miage.geotrouvetou.domain.interfaces.IAuthService
 import fr.miage.geotrouvetou.domain.interfaces.IDatabaseService
 import fr.miage.geotrouvetou.domain.models.Evenement
-import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
@@ -18,7 +17,7 @@ import java.util.Locale
 
 class EventUpdateViewModel(
     private val databaseService: IDatabaseService,
-    private val supabase: SupabaseClient
+    private val authService: IAuthService,
 ) : ViewModel() {
 
     private var originalEvent: Evenement? = null
@@ -78,8 +77,7 @@ class EventUpdateViewModel(
         viewModelScope.launch {
             isLoading = true
             try {
-                val user = supabase.auth.currentSessionOrNull()?.user
-                if (user == null) {
+                if (authService.currentUserId() == null) {
                     _error.emit("Vous devez être connecté pour modifier un événement")
                     return@launch
                 }

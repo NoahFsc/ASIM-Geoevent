@@ -41,13 +41,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import fr.miage.geotrouvetou.App
 import fr.miage.geotrouvetou.R
-import fr.miage.geotrouvetou.data.backend.SupabaseDatabaseService
 import fr.miage.geotrouvetou.domain.models.Evenement
+import fr.miage.geotrouvetou.ui.appViewModelFactory
 import fr.miage.geotrouvetou.ui.components.atoms.Button
 import fr.miage.geotrouvetou.ui.components.atoms.ImageUploader
 import fr.miage.geotrouvetou.ui.components.atoms.Input
@@ -70,14 +67,7 @@ fun EventUpdateScreen(
     val context = LocalContext.current
     val viewModel: EventUpdateViewModel = viewModel(
         key = event.id,
-        factory = object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                val app = context.applicationContext as App
-                val databaseService = SupabaseDatabaseService(app.supabase)
-                @Suppress("UNCHECKED_CAST")
-                return EventUpdateViewModel(databaseService, app.supabase) as T
-            }
-        }
+        factory = appViewModelFactory(context),
     )
 
     LaunchedEffect(event) {

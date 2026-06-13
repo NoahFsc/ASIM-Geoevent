@@ -4,7 +4,6 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import fr.miage.geotrouvetou.App
-import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,7 +19,7 @@ data class ParamsUiState(
 
 class ParamViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val supabase get() = getApplication<App>().supabase
+    private val authService get() = getApplication<App>().authService
     private val databaseService get() = getApplication<App>().databaseService
 
     private val _uiState = MutableStateFlow(ParamsUiState())
@@ -28,7 +27,7 @@ class ParamViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         viewModelScope.launch {
-            val userId = supabase.auth.currentUserOrNull()?.id ?: return@launch
+            val userId = authService.currentUserId() ?: return@launch
             val profile = runCatching { databaseService.getProfile(userId) }.getOrNull()
             _uiState.value = _uiState.value.copy(isAdmin = profile?.role == "admin")
         }
@@ -37,7 +36,7 @@ class ParamViewModel(application: Application) : AndroidViewModel(application) {
     suspend fun signOut(): Boolean {
         _uiState.value = _uiState.value.copy(isLoading = true)
         return try {
-            supabase.auth.signOut()
+            authService.signOut()
             true
         } catch (e: Exception) {
             _uiState.value = _uiState.value.copy(isLoading = false, error = "Erreur lors de la déconnexion")

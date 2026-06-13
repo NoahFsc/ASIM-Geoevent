@@ -8,7 +8,6 @@ import fr.miage.geotrouvetou.domain.models.AdminStats
 import fr.miage.geotrouvetou.domain.models.AuditLogEntry
 import fr.miage.geotrouvetou.domain.models.Evenement
 import fr.miage.geotrouvetou.domain.models.User
-import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -35,7 +34,7 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
         const val PAGE_SIZE = 20
     }
 
-    private val supabase get() = getApplication<App>().supabase
+    private val authService get() = getApplication<App>().authService
     private val databaseService get() = getApplication<App>().databaseService
 
     private val _uiState = MutableStateFlow(AdminUiState())
@@ -45,10 +44,7 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
     private var eventsPage = 0
 
     init {
-        viewModelScope.launch {
-            val currentId = supabase.auth.currentUserOrNull()?.id ?: ""
-            _uiState.value = _uiState.value.copy(currentUserId = currentId)
-        }
+        _uiState.value = _uiState.value.copy(currentUserId = authService.currentUserId() ?: "")
         loadStats()
         loadRecentActivity()
         loadUsers()

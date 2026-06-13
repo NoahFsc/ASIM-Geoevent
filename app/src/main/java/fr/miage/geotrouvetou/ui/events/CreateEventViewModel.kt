@@ -6,10 +6,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import fr.miage.geotrouvetou.domain.interfaces.IAuthService
 import fr.miage.geotrouvetou.domain.interfaces.IDatabaseService
 import fr.miage.geotrouvetou.domain.models.Evenement
-import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
@@ -17,7 +16,7 @@ import java.util.UUID
 
 class CreateEventViewModel(
     private val databaseService: IDatabaseService,
-    private val supabase: SupabaseClient
+    private val authService: IAuthService,
 ) : ViewModel() {
 
     var title by mutableStateOf("")
@@ -45,8 +44,8 @@ class CreateEventViewModel(
         viewModelScope.launch {
             isLoading = true
             try {
-                val user = supabase.auth.currentSessionOrNull()?.user
-                if (user == null) {
+                val userId = authService.currentUserId()
+                if (userId == null) {
                     _error.emit("Vous devez être connecté pour créer un événement")
                     return@launch
                 }
@@ -77,7 +76,7 @@ class CreateEventViewModel(
                     longitude = longitude ?: 0.0,
                     location = location,
                     image_url = imageUrl,
-                    user_id = user.id,
+                    user_id = userId,
                     visibility = !isPrivate,
                     event_date = formattedDate
                 )

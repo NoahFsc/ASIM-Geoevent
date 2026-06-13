@@ -34,7 +34,6 @@ import fr.miage.geotrouvetou.ui.events.EventDetailScreen
 import fr.miage.geotrouvetou.ui.map.MapScreen
 import fr.miage.geotrouvetou.ui.params.ParamsScreen
 import fr.miage.geotrouvetou.ui.profile.ProfileScreen
-import io.github.jan.supabase.auth.auth
 
 object Routes {
     const val LOGIN = "login"
@@ -66,7 +65,7 @@ fun NavGraph(navController: NavHostController) {
     fun navigateIfLoggedIn(destination: String, tab: NavTab) {
         selectedTab = tab
         val isLoggedIn = runCatching {
-            app?.supabase?.auth?.currentSessionOrNull() != null
+            app?.authService?.isLoggedIn() == true
         }.getOrDefault(false)
 
         if (isLoggedIn) {

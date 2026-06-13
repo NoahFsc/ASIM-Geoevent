@@ -25,8 +25,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.miage.geotrouvetou.R
-import fr.miage.geotrouvetou.data.geocoding.NominatimPlace
 import fr.miage.geotrouvetou.domain.models.Evenement
+import fr.miage.geotrouvetou.domain.models.Place
 import fr.miage.geotrouvetou.ui.components.molecules.EventCard
 import fr.miage.geotrouvetou.ui.components.molecules.PlaceSearchBar
 import fr.miage.geotrouvetou.ui.components.organisms.Modal
@@ -41,7 +41,7 @@ fun EventListModal(
     events: List<Evenement>,
     onDismissRequest: () -> Unit,
     title: String = "Propositions",
-    onPlaceSelected: ((NominatimPlace) -> Unit)? = null,
+    onPlaceSelected: ((Place) -> Unit)? = null,
     onEditClick: ((Evenement) -> Unit)? = null,
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -78,7 +78,7 @@ fun EventListContent(
     events: List<Evenement>,
     onEventClick: (Evenement) -> Unit,
     title: String = "Propositions",
-    onPlaceSelected: ((NominatimPlace) -> Unit)? = null,
+    onPlaceSelected: ((Place) -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     var searchQuery by remember { mutableStateOf("") }

@@ -26,23 +26,25 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import fr.miage.geotrouvetou.App
 import fr.miage.geotrouvetou.R
-import fr.miage.geotrouvetou.data.geocoding.NominatimPlace
-import fr.miage.geotrouvetou.data.geocoding.NominatimService
+import fr.miage.geotrouvetou.domain.models.Place
 import kotlinx.coroutines.delay
 
 @Composable
 fun PlaceSearchBar(
     query: String,
-    onPlaceSelected: (NominatimPlace) -> Unit,
+    onPlaceSelected: (Place) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var placeResults by remember { mutableStateOf<List<NominatimPlace>>(emptyList()) }
+    val geocodingService = (LocalContext.current.applicationContext as App).geocodingService
+    var placeResults by remember { mutableStateOf<List<Place>>(emptyList()) }
     var isSearching by remember { mutableStateOf(false) }
 
     LaunchedEffect(query) {
@@ -54,7 +56,7 @@ fun PlaceSearchBar(
         delay(500)
         isSearching = true
         try {
-            placeResults = NominatimService.search(query)
+            placeResults = geocodingService.search(query)
         } catch (e: Exception) {
             placeResults = emptyList()
         } finally {
@@ -103,7 +105,7 @@ fun PlaceSearchBar(
 
 @Composable
 private fun PlaceResultCard(
-    place: NominatimPlace,
+    place: Place,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
