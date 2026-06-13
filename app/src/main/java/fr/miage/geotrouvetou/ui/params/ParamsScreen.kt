@@ -55,7 +55,7 @@ fun ParamsScreen(
     onAdminClick: () -> Unit = {},
     onEditProfileClick: () -> Unit = {},
     onEditPasswordClick: () -> Unit = {},
-    viewModel: ParamViewModel = viewModel(),
+    viewModel: ParamsViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val scope = rememberCoroutineScope()

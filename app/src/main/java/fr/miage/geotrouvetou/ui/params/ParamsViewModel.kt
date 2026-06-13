@@ -17,7 +17,7 @@ data class ParamsUiState(
     val navigateToLogin: Boolean = false,
 )
 
-class ParamViewModel(application: Application) : AndroidViewModel(application) {
+class ParamsViewModel(application: Application) : AndroidViewModel(application) {
 
     private val authService get() = getApplication<App>().authService
     private val databaseService get() = getApplication<App>().databaseService
