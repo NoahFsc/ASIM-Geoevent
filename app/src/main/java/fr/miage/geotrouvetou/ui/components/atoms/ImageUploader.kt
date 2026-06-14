@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -147,7 +148,7 @@ fun ImageUploader(
                     modifier = Modifier.size(48.dp)
                 )
                 Text(
-                    text = "Ajouter une image",
+                    text = stringResource(R.string.image_uploader_add),
                     color = contentColor,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
@@ -157,35 +158,15 @@ fun ImageUploader(
     }
 }
 
+@Preview
 @Composable
-private fun PreviewWrapper(content: @Composable () -> Unit) {
-    Box(
-        modifier = Modifier
-            .background(colorResource(R.color.background))
-            .padding(16.dp)
-    ) { content() }
-}
-
-@Preview(name = "ImageUploader – Empty")
-@Composable
-private fun ImageUploaderEmptyPreview() {
-    PreviewWrapper {
+private fun ImageUploaderPreview() {
+    Box(modifier = Modifier.padding(16.dp)) {
         ImageUploader(
             imageUri = null,
             onImageSelected = {},
             label = "Image de couverture",
             required = true,
-        )
-    }
-}
-
-@Preview(name = "ImageUploader – No Label")
-@Composable
-private fun ImageUploaderNoLabelPreview() {
-    PreviewWrapper {
-        ImageUploader(
-            imageUri = null,
-            onImageSelected = {},
         )
     }
 }

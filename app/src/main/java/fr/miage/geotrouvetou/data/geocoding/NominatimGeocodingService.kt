@@ -1,5 +1,7 @@
 package fr.miage.geotrouvetou.data.geocoding
 
+import fr.miage.geotrouvetou.domain.interfaces.IGeocodingService
+import fr.miage.geotrouvetou.domain.models.Place
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpTimeout
@@ -12,56 +14,63 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
 @Serializable
-data class NominatimAddress(
+private data class NominatimAddress(
     @SerialName("house_number") val houseNumber: String? = null,
     val road: String? = null,
     val city: String? = null,
     val town: String? = null,
     val village: String? = null,
     val municipality: String? = null,
-    val county: String? = null,   // département (ex: "Oise")
-    val state: String? = null,    // région (ex: "Hauts-de-France")
+    val county: String? = null,
+    val state: String? = null,
     val postcode: String? = null,
     val country: String? = null,
 )
 
 @Serializable
-data class NominatimPlace(
+private data class NominatimPlace(
     @SerialName("display_name") val displayName: String,
     val lat: String,
     val lon: String,
     val address: NominatimAddress? = null,
 ) {
-    val latitude: Double get() = lat.toDoubleOrNull() ?: 0.0
-    val longitude: Double get() = lon.toDoubleOrNull() ?: 0.0
-
-    /** "10 Rue de la Paix, Paris" ou "Paris" si pas de rue */
-    val mainLine: String get() {
-        val a = address ?: return displayName
-        val locality = a.city ?: a.town ?: a.village ?: a.municipality
-        val street = when {
+    private val street: String? get() {
+        val a = address ?: return null
+        return when {
             a.houseNumber != null && a.road != null -> "${a.houseNumber} ${a.road}"
             a.road != null -> a.road
             else -> null
         }
-        return listOfNotNull(street, locality)
-            .joinToString(", ")
-            .ifBlank { displayName }
     }
 
-    /** "75001, Oise, France" */
-    val countryLine: String get() {
+    private val locality: String? get() =
+        address?.let { it.city ?: it.town ?: it.village ?: it.municipality }
+
+    private val mainLine: String get() =
+        listOfNotNull(street, locality).joinToString(", ").ifBlank { displayName }
+
+    private val countryLine: String get() {
         val a = address ?: return ""
-        return listOfNotNull(a.postcode, a.county, a.country)
-            .joinToString(", ")
+        return listOfNotNull(a.postcode, a.county, a.country).joinToString(", ")
     }
+
+    /** Rue, ville, code postal — sans quartier ni pays (usage France). */
+    private val shortAddress: String get() =
+        listOfNotNull(street, locality, address?.postcode).joinToString(", ").ifBlank { displayName }
+
+    fun toPlace() = Place(
+        displayName = displayName,
+        latitude = lat.toDoubleOrNull() ?: 0.0,
+        longitude = lon.toDoubleOrNull() ?: 0.0,
+        mainLine = mainLine,
+        countryLine = countryLine,
+        shortAddress = shortAddress,
+    )
 }
 
-/**
- * Singleton app-scoped : acceptable sur Android car le processus est tué avec l'app.
- * Le pool de connexions OkHttp est borné (5 connexions max par défaut).
- */
-object NominatimService {
+/** Géocodage via l'API Nominatim d'OpenStreetMap. */
+class NominatimGeocodingService : IGeocodingService {
+
     private val client = HttpClient(OkHttp) {
         install(HttpTimeout) {
             requestTimeoutMillis = 8_000
@@ -70,7 +79,7 @@ object NominatimService {
     }
     private val json = Json { ignoreUnknownKeys = true }
 
-    suspend fun search(query: String, limit: Int = 8): List<NominatimPlace> {
+    override suspend fun search(query: String, limit: Int): List<Place> {
         if (query.isBlank()) return emptyList()
         val text = client.get("https://nominatim.openstreetmap.org/search") {
             parameter("q", query)
@@ -81,9 +90,7 @@ object NominatimService {
         }.bodyAsText()
 
         val results: List<NominatimPlace> = json.decodeFromString(text)
-
-        // Déduplique par texte affiché : deux résultats qui produisent
-        // la même ligne principale (même ville + code postal) sont identiques
-        return results.distinctBy { it.mainLine }.take(5)
+        // Déduplique par ligne principale (même ville + code postal = même lieu).
+        return results.distinctBy { it.toPlace().mainLine }.take(5).map { it.toPlace() }
     }
 }

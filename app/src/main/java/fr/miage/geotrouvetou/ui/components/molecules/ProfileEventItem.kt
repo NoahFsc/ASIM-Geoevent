@@ -54,7 +54,7 @@ fun ProfileEventItem(event: Evenement, onClick: () -> Unit) {
     ) {
         AsyncImage(
             model = ImageRequest.Builder(context)
-                .data(event.image_url)
+                .data(event.imageUrl)
                 .addHeader("apikey", BuildConfig.SUPABASE_KEY)
                 .crossfade(true)
                 .build(),
@@ -125,7 +125,7 @@ fun ProfileEventItemPreview() {
             description = "Une petite marche",
             latitude = 0.0,
             longitude = 0.0,
-            event_date = "2024-04-28T09:00:00"
+            eventDate = "2024-04-28T09:00:00"
         ),
         onClick = {}
     )

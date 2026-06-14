@@ -11,21 +11,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TimePicker
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,17 +31,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import fr.miage.geotrouvetou.App
 import fr.miage.geotrouvetou.R
-import fr.miage.geotrouvetou.data.backend.SupabaseDatabaseService
 import fr.miage.geotrouvetou.domain.models.Evenement
+import fr.miage.geotrouvetou.ui.utils.appViewModelFactory
 import fr.miage.geotrouvetou.ui.components.atoms.Button
 import fr.miage.geotrouvetou.ui.components.atoms.ImageUploader
 import fr.miage.geotrouvetou.ui.components.atoms.Input
@@ -56,104 +47,49 @@ import fr.miage.geotrouvetou.ui.components.atoms.TextArea
 import fr.miage.geotrouvetou.ui.components.atoms.Toast
 import fr.miage.geotrouvetou.ui.components.molecules.PlaceSearchBar
 import kotlinx.coroutines.delay
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
+/**
+ * Formulaire d'événement partagé. [event] null = création, sinon édition.
+ * [onBack] est null en création (la navigation est gérée en amont).
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EventUpdateScreen(
-    event: Evenement,
-    onBackClick: () -> Unit,
-    onEventUpdated: () -> Unit
+fun EventFormScreen(
+    onSaved: () -> Unit,
+    event: Evenement? = null,
+    onBack: (() -> Unit)? = null,
 ) {
     val context = LocalContext.current
-    val viewModel: EventUpdateViewModel = viewModel(
-        key = event.id,
-        factory = object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                val app = context.applicationContext as App
-                val databaseService = SupabaseDatabaseService(app.supabase)
-                @Suppress("UNCHECKED_CAST")
-                return EventUpdateViewModel(databaseService, app.supabase) as T
-            }
-        }
+    val viewModel: EventFormViewModel = viewModel(
+        key = event?.id,
+        factory = appViewModelFactory(context),
     )
 
     LaunchedEffect(event) {
-        viewModel.setEvent(event)
+        viewModel.load(event)
     }
 
     var showDatePicker by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    val datePickerState = rememberDatePickerState(
-        selectableDates = object : SelectableDates {
-            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                return utcTimeMillis >= System.currentTimeMillis() - 86400000
-            }
-        }
-    )
-
+    val datePickerState = rememberFutureDatePickerState()
     val timePickerState = rememberTimePickerState()
 
-    if (showDatePicker) {
-        DatePickerDialog(
-            onDismissRequest = { showDatePicker = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    datePickerState.selectedDateMillis?.let {
-                        val date = Date(it)
-                        val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.FRANCE)
-                        viewModel.date = formatter.format(date)
-                    }
-                    showDatePicker = false
-                }) { Text("Confirmer") }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) { Text("Annuler") }
-            }
-        ) {
-            DatePicker(state = datePickerState)
-        }
-    }
-
-    if (showTimePicker) {
-        Dialog(onDismissRequest = { showTimePicker = false }) {
-            Column(
-                modifier = Modifier
-                    .background(colorResource(R.color.white), RoundedCornerShape(16.dp))
-                    .padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Text(
-                    text = "Choisir l'heure",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = colorResource(R.color.text_darker)
-                )
-                TimePicker(state = timePickerState)
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    TextButton(onClick = { showTimePicker = false }) { Text("Annuler") }
-                    TextButton(onClick = {
-                        val hour = timePickerState.hour.toString().padStart(2, '0')
-                        val minute = timePickerState.minute.toString().padStart(2, '0')
-                        viewModel.time = "$hour:$minute"
-                        showTimePicker = false
-                    }) { Text("Confirmer") }
-                }
-            }
-        }
-    }
+    EventDateTimePickers(
+        showDatePicker = showDatePicker,
+        showTimePicker = showTimePicker,
+        datePickerState = datePickerState,
+        timePickerState = timePickerState,
+        onDismissDatePicker = { showDatePicker = false },
+        onDismissTimePicker = { showTimePicker = false },
+        onDateSelected = { viewModel.date = it },
+        onTimeSelected = { viewModel.time = it },
+    )
 
     if (errorMessage != null) {
         Toast(
-            title = "Erreur",
+            title = stringResource(R.string.event_error_title),
             description = errorMessage!!,
             duration = 3000
         )
@@ -164,16 +100,14 @@ fun EventUpdateScreen(
     }
 
     LaunchedEffect(Unit) {
-        viewModel.eventUpdated.collect {
-            onEventUpdated()
-            onBackClick()
+        viewModel.saved.collect {
+            onSaved()
+            onBack?.invoke()
         }
     }
 
     LaunchedEffect(Unit) {
-        viewModel.error.collect { message ->
-            errorMessage = message
-        }
+        viewModel.error.collect { errorMessage = it }
     }
 
     Column(
@@ -184,32 +118,36 @@ fun EventUpdateScreen(
             .verticalScroll(rememberScrollState())
             .padding(bottom = 32.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 16.dp)
-                .clickable { onBackClick() },
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                contentDescription = null,
-                tint = colorResource(R.color.text_light),
-                modifier = Modifier.size(24.dp)
-            )
-            Text(
-                text = "Retour",
-                fontSize = 18.sp,
-                color = colorResource(R.color.text_light)
-            )
+        if (onBack != null) {
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 16.dp)
+                    .clickable { onBack() },
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                    contentDescription = null,
+                    tint = colorResource(R.color.text_light),
+                    modifier = Modifier.size(24.dp)
+                )
+                Text(
+                    text = stringResource(R.string.action_back),
+                    fontSize = 18.sp,
+                    color = colorResource(R.color.text_light)
+                )
+            }
         }
 
         Column(
-            modifier = Modifier.padding(horizontal = 24.dp),
+            modifier = Modifier.padding(horizontal = 24.dp, vertical = if (onBack == null) 32.dp else 0.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             Text(
-                text = "Modifier l'événement",
+                text = stringResource(
+                    if (viewModel.isEditMode) R.string.update_event_title else R.string.create_event_title
+                ),
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 color = colorResource(R.color.primary_600),
@@ -219,24 +157,24 @@ fun EventUpdateScreen(
             ImageUploader(
                 imageUri = viewModel.imageUri,
                 onImageSelected = { viewModel.imageUri = it },
-                label = "Image de couverture",
+                label = stringResource(R.string.event_form_cover_image),
                 required = true,
-                imageUrl = viewModel.currentImageUrl
+                imageUrl = viewModel.currentImageUrl,
             )
 
             Input(
                 value = viewModel.title,
                 onValueChange = { viewModel.title = it },
-                placeholder = "Titre",
-                label = "Titre",
+                placeholder = stringResource(R.string.event_form_title_placeholder),
+                label = stringResource(R.string.event_form_title_label),
                 required = true,
             )
 
             TextArea(
                 value = viewModel.description,
                 onValueChange = { viewModel.description = it },
-                placeholder = "Description",
-                label = "Description",
+                placeholder = stringResource(R.string.event_form_description_placeholder),
+                label = stringResource(R.string.event_form_description_label),
                 maxLength = 500,
                 required = true,
             )
@@ -248,8 +186,8 @@ fun EventUpdateScreen(
                 Input(
                     value = viewModel.date,
                     onValueChange = {},
-                    placeholder = "dd/mm/yyyy",
-                    label = "Date",
+                    placeholder = stringResource(R.string.event_form_date_placeholder),
+                    label = stringResource(R.string.event_form_date_label),
                     required = true,
                     modifier = Modifier.weight(1f),
                     onClick = { showDatePicker = true },
@@ -258,8 +196,8 @@ fun EventUpdateScreen(
                 Input(
                     value = viewModel.time,
                     onValueChange = {},
-                    placeholder = "HH:mm",
-                    label = "Heure",
+                    placeholder = stringResource(R.string.event_form_time_placeholder),
+                    label = stringResource(R.string.event_form_time_label),
                     required = true,
                     modifier = Modifier.weight(1f),
                     onClick = { showTimePicker = true },
@@ -270,8 +208,8 @@ fun EventUpdateScreen(
             Input(
                 value = viewModel.location,
                 onValueChange = { viewModel.location = it },
-                placeholder = "Localisation",
-                label = "Localisation",
+                placeholder = stringResource(R.string.event_form_search_place),
+                label = stringResource(R.string.event_form_location_label),
                 required = true,
                 leadingIcon = Icons.Default.Search
             )
@@ -281,14 +219,14 @@ fun EventUpdateScreen(
                 onPlaceSelected = { place ->
                     viewModel.latitude = place.latitude
                     viewModel.longitude = place.longitude
-                    viewModel.location = place.displayName
+                    viewModel.location = place.shortAddress
                 },
                 modifier = Modifier.fillMaxWidth()
             )
 
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text = "Type d'événement",
+                    text = stringResource(R.string.event_form_type),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = colorResource(R.color.text_darker),
@@ -296,20 +234,29 @@ fun EventUpdateScreen(
                 Switch(
                     checked = viewModel.isPrivate,
                     onCheckedChange = { viewModel.isPrivate = it },
-                    label = "Rendre l'événement privé"
+                    label = stringResource(R.string.event_form_make_private)
                 )
             }
 
             Button(
-                text = if (viewModel.isLoading) "Modification..." else "Enregistrer les modifications",
+                text = when {
+                    viewModel.isLoading && viewModel.isEditMode -> stringResource(R.string.update_event_submitting)
+                    viewModel.isLoading -> stringResource(R.string.create_event_submitting)
+                    viewModel.isEditMode -> stringResource(R.string.update_event_submit)
+                    else -> stringResource(R.string.create_event_submit)
+                },
                 onClick = {
                     val bytes = viewModel.imageUri?.let { uri ->
                         context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
                     }
-                    viewModel.updateEvent(bytes)
+                    viewModel.save(bytes)
                 },
                 enabled = viewModel.isFormValid,
-                leftIcon = if (viewModel.isLoading) null else Icons.Default.Check,
+                leftIcon = when {
+                    viewModel.isLoading -> null
+                    viewModel.isEditMode -> Icons.Default.Check
+                    else -> Icons.Default.Add
+                },
                 modifier = Modifier.fillMaxWidth()
             )
         }

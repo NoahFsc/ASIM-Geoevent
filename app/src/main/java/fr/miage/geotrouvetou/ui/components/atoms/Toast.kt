@@ -35,7 +35,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
@@ -163,22 +162,4 @@ fun Toast(
             }
         }
     }
-}
-
-@Preview(name = "Toast 0% (Début)", showBackground = true)
-@Composable
-fun ToastPreview0() {
-    Toast(title = "Succès !", description = "Voici la notif toast", duration = 0, initialProgress = 0f, modifier = Modifier.padding(16.dp))
-}
-
-@Preview(name = "Toast Animé (3s)", showBackground = true)
-@Composable
-fun ToastPreviewAnimated() {
-    Toast(title = "Succès !", description = "Voici la notif toast", duration = 3000, modifier = Modifier.padding(16.dp))
-}
-
-@Preview(name = "Toast Warning", showBackground = true)
-@Composable
-fun ToastPreviewWarning() {
-    Toast(title = "Connexion perdue", description = "Vérifiez votre connexion internet", type = ToastType.Warning, duration = 0, modifier = Modifier.padding(16.dp))
 }

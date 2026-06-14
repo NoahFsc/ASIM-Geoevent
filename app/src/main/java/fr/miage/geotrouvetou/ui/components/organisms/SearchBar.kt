@@ -5,7 +5,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -69,7 +68,7 @@ fun SearchBar(
                 }
             }
         )
-        // Transparent overlay so the whole pill is tappable when used as a button
+        // Surcouche pour rendre toute la pilule cliquable en mode bouton
         if (onClick != null) {
             Box(
                 modifier = Modifier
@@ -80,34 +79,10 @@ fun SearchBar(
     }
 }
 
-@Preview(name = "SearchBar – Empty")
+@Preview
 @Composable
-private fun SearchBarEmptyPreview() {
-    Box(
-        modifier = Modifier
-            .background(colorResource(R.color.background))
-            .padding(16.dp)
-    ) {
-        SearchBar(
-            value = "",
-            onValueChange = {},
-            placeholder = "Choisir votre lieu de randonnée",
-        )
-    }
-}
-
-@Preview(name = "SearchBar – With Text")
-@Composable
-private fun SearchBarWithTextPreview() {
-    Box(
-        modifier = Modifier
-            .background(colorResource(R.color.background))
-            .padding(16.dp)
-    ) {
-        SearchBar(
-            value = "Paris",
-            onValueChange = {},
-            placeholder = "Choisir votre lieu de randonnée",
-        )
+private fun SearchBarPreview() {
+    Box(modifier = Modifier.padding(16.dp)) {
+        SearchBar(value = "", onValueChange = {}, placeholder = "Choisir votre lieu de recherche")
     }
 }

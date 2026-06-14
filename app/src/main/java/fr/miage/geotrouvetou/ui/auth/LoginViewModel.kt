@@ -1,12 +1,11 @@
 package fr.miage.geotrouvetou.ui.auth
 
 import android.app.Application
-import android.util.Patterns
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import fr.miage.geotrouvetou.App
-import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.providers.builtin.Email
+import fr.miage.geotrouvetou.R
+import fr.miage.geotrouvetou.utils.UserFieldValidator
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,16 +19,14 @@ data class LoginUiState(
 
 class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val supabase get() = getApplication<App>().supabase
+    private val authService get() = getApplication<App>().authService
 
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            if (supabase.auth.currentSessionOrNull() != null) {
-                _uiState.value = LoginUiState(navigateToMain = true)
-            }
+        if (authService.isLoggedIn()) {
+            _uiState.value = LoginUiState(navigateToMain = true)
         }
     }
 
@@ -44,13 +41,10 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             _uiState.value = LoginUiState(isLoading = true)
             try {
-                supabase.auth.signInWith(Email) {
-                    this.email = email
-                    this.password = password
-                }
+                authService.signIn(email, password)
                 _uiState.value = LoginUiState(navigateToMain = true)
             } catch (e: Exception) {
-                _uiState.value = LoginUiState(error = translateError(e.message))
+                _uiState.value = LoginUiState(error = AuthErrorTranslator.translate(getApplication(), e.message))
             }
         }
     }
@@ -59,27 +53,9 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         _uiState.value = _uiState.value.copy(navigateToMain = false)
     }
 
-    fun validateEmail(email: String): String? = when {
-        email.isBlank() -> "L'adresse email est requise"
-        !Patterns.EMAIL_ADDRESS.matcher(email).matches() -> "Format d'email invalide"
-        else -> null
-    }
+    fun validateEmail(email: String): String? =
+        UserFieldValidator.validateEmail(getApplication(), email)
 
     fun validatePassword(password: String): String? =
-        if (password.isBlank()) "Le mot de passe est requis" else null
-
-    private fun translateError(message: String?): String = when {
-        message == null -> "Une erreur inattendue s'est produite"
-        message.contains("Invalid login credentials", ignoreCase = true) ->
-            "Email ou mot de passe incorrect"
-        message.contains("Email not confirmed", ignoreCase = true) ->
-            "Veuillez confirmer votre email avant de vous connecter"
-        message.contains("rate limit", ignoreCase = true) ||
-        message.contains("too many requests", ignoreCase = true) ->
-            "Trop de tentatives. Réessayez dans quelques minutes."
-        message.contains("network", ignoreCase = true) ||
-        message.contains("Unable to connect", ignoreCase = true) ->
-            "Erreur de connexion réseau. Vérifiez votre connexion internet."
-        else -> "Une erreur est survenue. Réessayez."
-    }
+        if (password.isBlank()) getApplication<App>().getString(R.string.validation_password_required) else null
 }

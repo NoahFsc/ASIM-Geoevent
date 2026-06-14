@@ -9,7 +9,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -92,40 +91,10 @@ fun Switch(
     }
 }
 
+@Preview
 @Composable
-private fun PreviewWrapper(content: @Composable () -> Unit) {
-    Box(
-        modifier = Modifier
-            .background(colorResource(R.color.background))
-            .padding(16.dp)
-    ) { content() }
-}
-
-@Preview(name = "Switch – OFF")
-@Composable
-private fun SwitchOffPreview() {
-    PreviewWrapper {
-        Switch(checked = false, onCheckedChange = {})
-    }
-}
-
-@Preview(name = "Switch – ON")
-@Composable
-private fun SwitchOnPreview() {
-    PreviewWrapper {
-        Switch(checked = true, onCheckedChange = {})
-    }
-}
-
-@Preview(name = "Switch – All States")
-@Composable
-private fun SwitchAllStatesPreview() {
-    PreviewWrapper {
-        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            Switch(checked = false, onCheckedChange = {})
-            Switch(checked = true, onCheckedChange = {})
-            Switch(checked = false, onCheckedChange = {}, label = "Notifications")
-            Switch(checked = true, onCheckedChange = {}, label = "Notifications")
-        }
+private fun SwitchPreview() {
+    Box(modifier = Modifier.padding(16.dp)) {
+        Switch(checked = true, onCheckedChange = {}, label = "Notifications")
     }
 }

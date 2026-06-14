@@ -10,28 +10,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.miage.geotrouvetou.R
 
-enum class TagStatus(
-    val label: String,
-    val backgroundColorRes: Int
-) {
-    NEW(
-        label = "NOUVEAU",
-        backgroundColorRes = R.color.success_400
-    ),
-    SOON(
-        label = "BIENTÔT",
-        backgroundColorRes = R.color.warning_400
-    ),
-    DONE(
-        label = "TERMINÉ",
-        backgroundColorRes = R.color.danger_400
-    )
+enum class TagStatus(val backgroundColorRes: Int) {
+    NEW(R.color.success_400),
+    SOON(R.color.warning_400),
+    DONE(R.color.danger_400)
 }
 
 @Composable
@@ -51,8 +40,13 @@ fun StatusTag(
             ),
         contentAlignment = Alignment.Center
     ) {
+        val label = when (status) {
+            TagStatus.NEW  -> stringResource(R.string.tag_status_new)
+            TagStatus.SOON -> stringResource(R.string.tag_status_soon)
+            TagStatus.DONE -> stringResource(R.string.tag_status_done)
+        }
         Text(
-            text = status.label,
+            text = label,
             color = colorResource(id = R.color.text_darker),
             fontSize = 10.sp,
             lineHeight = 16.sp,

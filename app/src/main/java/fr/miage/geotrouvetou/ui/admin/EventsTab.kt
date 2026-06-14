@@ -23,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.miage.geotrouvetou.R
 import fr.miage.geotrouvetou.domain.models.Evenement
@@ -55,7 +56,7 @@ internal fun EventsTab(
         modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        SearchBar(value = query, onValueChange = { query = it }, placeholder = "Rechercher un événement")
+        SearchBar(value = query, onValueChange = { query = it }, placeholder = stringResource(R.string.admin_search_event))
 
         LazyColumn(state = listState, verticalArrangement = Arrangement.spacedBy(8.dp)) {
             items(filtered, key = { it.id ?: it.title }) { event ->

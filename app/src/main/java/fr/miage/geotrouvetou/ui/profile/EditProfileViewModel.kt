@@ -5,20 +5,19 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import fr.miage.geotrouvetou.App
+import fr.miage.geotrouvetou.R
 import fr.miage.geotrouvetou.utils.UserFieldValidator
-import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.status.SessionStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 data class EditProfileUiState(
-    val nom: String = "",
-    val prenom: String = "",
+    val lastName: String = "",
+    val firstName: String = "",
     val email: String = "",
-    val originalNom: String = "",
-    val originalPrenom: String = "",
+    val originalLastName: String = "",
+    val originalFirstName: String = "",
     val avatarUrl: String? = null,
     val isLoading: Boolean = true,
     val isSaving: Boolean = false,
@@ -28,13 +27,13 @@ data class EditProfileUiState(
     val error: String? = null,
     val navigateToLogout: Boolean = false,
 ) {
-    val hasChanges: Boolean get() = nom != originalNom || prenom != originalPrenom
-    val formValid: Boolean get() = UserFieldValidator.isNomValid(nom) && UserFieldValidator.isPrenomValid(prenom)
+    val hasChanges: Boolean get() = lastName != originalLastName || firstName != originalFirstName
+    val formValid: Boolean get() = UserFieldValidator.isLastNameValid(lastName) && UserFieldValidator.isFirstNameValid(firstName)
 }
 
 class EditProfileViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val supabase get() = getApplication<App>().supabase
+    private val authService get() = getApplication<App>().authService
     private val databaseService get() = getApplication<App>().databaseService
 
     private val _uiState = MutableStateFlow(EditProfileUiState())
@@ -42,12 +41,8 @@ class EditProfileViewModel(application: Application) : AndroidViewModel(applicat
 
     init {
         viewModelScope.launch {
-            supabase.auth.sessionStatus.collect { status ->
-                if (status is SessionStatus.Authenticated) {
-                    val userId = status.session.user?.id ?: return@collect
-                    val email = status.session.user?.email ?: ""
-                    loadProfile(userId, email)
-                }
+            authService.observeAuthenticatedUser().collect { user ->
+                loadProfile(user.id, user.email)
             }
         }
     }
@@ -57,11 +52,11 @@ class EditProfileViewModel(application: Application) : AndroidViewModel(applicat
             val profile = databaseService.getProfile(userId)
             val fullName = profile?.fullName ?: ""
             val parts = fullName.split(" ", limit = 2)
-            val nom = UserFieldValidator.capitalizeFirst(parts.getOrNull(0) ?: "")
-            val prenom = UserFieldValidator.capitalizeFirst(parts.getOrNull(1) ?: "")
+            val lastName = UserFieldValidator.capitalizeFirst(parts.getOrNull(0) ?: "")
+            val firstName = UserFieldValidator.capitalizeFirst(parts.getOrNull(1) ?: "")
             _uiState.value = _uiState.value.copy(
-                nom = nom, prenom = prenom, email = email,
-                originalNom = nom, originalPrenom = prenom,
+                lastName = lastName, firstName = firstName, email = email,
+                originalLastName = lastName, originalFirstName = firstName,
                 avatarUrl = profile?.avatarUrl,
                 isLoading = false,
             )
@@ -70,16 +65,16 @@ class EditProfileViewModel(application: Application) : AndroidViewModel(applicat
         }
     }
 
-    fun onNomChange(value: String) {
+    fun onLastNameChange(value: String) {
         _uiState.value = _uiState.value.copy(
-            nom = UserFieldValidator.capitalizeFirst(value),
+            lastName = UserFieldValidator.capitalizeFirst(value),
             error = null,
         )
     }
 
-    fun onPrenomChange(value: String) {
+    fun onFirstNameChange(value: String) {
         _uiState.value = _uiState.value.copy(
-            prenom = UserFieldValidator.capitalizeFirst(value),
+            firstName = UserFieldValidator.capitalizeFirst(value),
             error = null,
         )
     }
@@ -90,17 +85,17 @@ class EditProfileViewModel(application: Application) : AndroidViewModel(applicat
         viewModelScope.launch {
             _uiState.value = state.copy(isSaving = true, error = null)
             try {
-                val userId = supabase.auth.currentSessionOrNull()?.user?.id ?: return@launch
-                val fullName = "${state.nom} ${state.prenom}"
+                val userId = authService.currentUserId() ?: return@launch
+                val fullName = "${state.lastName} ${state.firstName}"
                 databaseService.updateProfile(userId, fullName)
                 _uiState.value = _uiState.value.copy(
                     isSaving = false,
-                    originalNom = state.nom,
-                    originalPrenom = state.prenom,
+                    originalLastName = state.lastName,
+                    originalFirstName = state.firstName,
                     saveToastKey = _uiState.value.saveToastKey + 1,
                 )
             } catch (_: Exception) {
-                _uiState.value = _uiState.value.copy(isSaving = false, error = "Erreur lors de la sauvegarde")
+                _uiState.value = _uiState.value.copy(isSaving = false, error = getApplication<App>().getString(R.string.edit_profile_save_error))
             }
         }
     }
@@ -109,7 +104,7 @@ class EditProfileViewModel(application: Application) : AndroidViewModel(applicat
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isUploadingAvatar = true, error = null)
             try {
-                val userId = supabase.auth.currentSessionOrNull()?.user?.id ?: return@launch
+                val userId = authService.currentUserId() ?: return@launch
                 databaseService.updateAvatar(userId, bytes)
                 val profile = databaseService.getProfile(userId)
                 _uiState.value = _uiState.value.copy(
@@ -121,7 +116,7 @@ class EditProfileViewModel(application: Application) : AndroidViewModel(applicat
                 Log.e("EditProfile", "updateAvatar failed", e)
                 _uiState.value = _uiState.value.copy(
                     isUploadingAvatar = false,
-                    error = "Erreur lors de la mise à jour de la photo",
+                    error = getApplication<App>().getString(R.string.edit_profile_photo_error),
                 )
             }
         }
@@ -130,12 +125,12 @@ class EditProfileViewModel(application: Application) : AndroidViewModel(applicat
     fun deleteAccount() {
         viewModelScope.launch {
             try {
-                val userId = supabase.auth.currentSessionOrNull()?.user?.id ?: return@launch
+                val userId = authService.currentUserId() ?: return@launch
                 databaseService.deleteProfile(userId)
-                supabase.auth.signOut()
+                authService.signOut()
                 _uiState.value = _uiState.value.copy(navigateToLogout = true)
             } catch (_: Exception) {
-                _uiState.value = _uiState.value.copy(error = "Erreur lors de la suppression du compte")
+                _uiState.value = _uiState.value.copy(error = getApplication<App>().getString(R.string.edit_profile_delete_error))
             }
         }
     }

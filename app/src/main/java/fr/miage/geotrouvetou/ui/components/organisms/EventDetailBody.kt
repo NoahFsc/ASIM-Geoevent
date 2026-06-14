@@ -13,6 +13,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -28,9 +29,10 @@ fun EventDetailBody(
     date: String,
     time: String,
     locationName: String,
-    locationDetail: String,
+    locationDetail: String?,
     description: String,
     modifier: Modifier = Modifier,
+    actions: (@Composable () -> Unit)? = null,
 ) {
     val context = LocalContext.current
 
@@ -50,6 +52,8 @@ fun EventDetailBody(
                 .background(colorResource(R.color.text_disabled))
         )
 
+        actions?.invoke()
+
         EventDetailCard(
             date = date,
             time = time,
@@ -59,7 +63,7 @@ fun EventDetailBody(
 
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(
-                text = "A propos de l'événement",
+                text = stringResource(R.string.event_detail_about),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = colorResource(R.color.text_darker)

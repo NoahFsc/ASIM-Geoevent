@@ -16,27 +16,19 @@ import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import androidx.core.content.ContextCompat
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.drawable.BitmapDrawable
-import android.util.TypedValue
-import android.os.Looper
 import android.util.Log
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.unit.dp
-import androidx.core.view.drawToBitmap
-import android.view.ViewGroup
 import fr.miage.geotrouvetou.domain.interfaces.IMapService
 import fr.miage.geotrouvetou.domain.interfaces.MapBounds
 import fr.miage.geotrouvetou.domain.models.Evenement
-import fr.miage.geotrouvetou.ui.components.atoms.MarkerIcon
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer
 import org.osmdroid.bonuspack.clustering.StaticCluster
 import kotlin.math.abs
+import kotlin.math.asin
+import kotlin.math.cos
 import kotlin.math.ln
 import kotlin.math.max
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 class OSMMapService(private val context: Context) : IMapService {
 
@@ -47,8 +39,7 @@ class OSMMapService(private val context: Context) : IMapService {
     private var onEventClick: ((Evenement) -> Unit)? = null
     private var onClusterClick: ((List<Evenement>) -> Unit)? = null
     private var lastDisplayedEvents: List<Evenement> = emptyList()
-    private var cachedMarkerIcon: BitmapDrawable? = null  // invalidé si la taille change
-    private var cachedClusterIcon: Bitmap? = null         // invalidé si la taille change
+    private val iconRenderer = MarkerIconRenderer(context)
     private var onViewBoundsChanged: ((MapBounds) -> Unit)? = null
     private var minimumWidthKm = 20.0
     private var minimumZoomNeedsInitialization = true
@@ -80,7 +71,7 @@ class OSMMapService(private val context: Context) : IMapService {
             isDrawAccuracyEnabled = true
         }
         mapView.overlays.add(myLocationOverlay)
-        mapView.setBuiltInZoomControls(false)
+        mapView.zoomController.setVisibility(org.osmdroid.views.CustomZoomButtonsController.Visibility.NEVER)
 
         mapView.addMapListener(object : MapListener {
             override fun onScroll(event: ScrollEvent?): Boolean {
@@ -206,7 +197,7 @@ class OSMMapService(private val context: Context) : IMapService {
             position = GeoPoint(event.latitude, event.longitude)
             // L'icône est circulaire, donc on la centre pour éviter un décalage visuel sur les bords.
             setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-            icon = getMarkerIcon()
+            icon = iconRenderer.markerIcon(mapView, isPrivate = !event.visibility)
             icon?.let { d ->
                 if (d.intrinsicWidth > 0 && d.intrinsicHeight > 0) {
                     d.setBounds(0, 0, d.intrinsicWidth, d.intrinsicHeight)
@@ -227,7 +218,7 @@ class OSMMapService(private val context: Context) : IMapService {
 
     private fun buildClusterOverlay(): RadiusMarkerClusterer = ClusterMarkerOverlay().apply {
         setRadius(100)
-        setIcon(getClusterIcon())
+        setIcon(iconRenderer.clusterIcon())
     }
 
     private inner class ClusterMarkerOverlay : RadiusMarkerClusterer(context) {
@@ -251,168 +242,17 @@ class OSMMapService(private val context: Context) : IMapService {
         onClusterClick = listener
     }
 
-    private fun getClusterIcon(): Bitmap {
-        cachedClusterIcon?.let { return it }
-        val sizePx = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP, 40f, context.resources.displayMetrics
-        ).toInt()
-        val bitmap = Bitmap.createBitmap(sizePx, sizePx, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-        val center = sizePx / 2f
-        val stroke = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3f, context.resources.displayMetrics)
-        val radius = center - stroke
-        canvas.drawCircle(center, center, radius, Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            style = Paint.Style.FILL
-            color = context.getColor(fr.miage.geotrouvetou.R.color.primary_400)
-        })
-        canvas.drawCircle(center, center, radius, Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            style = Paint.Style.STROKE
-            color = Color.WHITE
-            strokeWidth = stroke
-        })
-        return bitmap.also { cachedClusterIcon = it }
-    }
-
     private fun hasLocationPermission(): Boolean {
         val fine = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
         val coarse = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
         return fine == PackageManager.PERMISSION_GRANTED || coarse == PackageManager.PERMISSION_GRANTED
     }
 
-    private fun getMarkerIcon(): BitmapDrawable {
-        cachedMarkerIcon?.let { return it }
-        val composeIcon = createMarkerIcon()
-        if (composeIcon != null) {
-            cachedMarkerIcon = composeIcon
-            Log.d("OSMMapService", "Marker icon rendered from Compose MarkerIcon")
-            return composeIcon
-        }
-        Log.w("OSMMapService", "Using temporary fallback icon (compose not ready yet)")
-        return createFallbackIcon()
-    }
-
-    // Crée une icône Compose; renvoie null si le rendu Compose n'est pas prêt/possible.
-    private fun createMarkerIcon(): BitmapDrawable? {
-        // Ensure we run UI operations on the main thread
-        if (Looper.myLooper() != Looper.getMainLooper()) {
-            val latch = java.util.concurrent.CountDownLatch(1)
-            var result: BitmapDrawable? = null
-            android.os.Handler(Looper.getMainLooper()).post {
-                try {
-                    result = createMarkerIconInternal()
-                } finally {
-                    latch.countDown()
-                }
-            }
-            latch.await()
-            return result
-        }
-        return createMarkerIconInternal()
-    }
-
-    private fun createMarkerIconInternal(): BitmapDrawable? {
-        val sizeDp = 40
-        val sizePx = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP,
-            sizeDp.toFloat(),
-            context.resources.displayMetrics
-        ).toInt()
-
-        if (!mapView.isAttachedToWindow) {
-            Log.d("OSMMapService", "Compose marker icon skipped: mapView not attached yet")
-            return null
-        }
-
-        return try {
-            val composeView = ComposeView(context).apply {
-                setContent {
-                    MarkerIcon(size = sizeDp.dp, borderWidth = 3.dp)
-                }
-            }
-
-            // Attach temporarily to the same view tree to inherit lifecycle owners used by Compose.
-            val parent = mapView.parent as? ViewGroup
-            if (parent != null) {
-                val lp = ViewGroup.LayoutParams(sizePx, sizePx)
-                parent.addView(composeView, lp)
-            }
-
-            val bitmap = try {
-                val spec = android.view.View.MeasureSpec.makeMeasureSpec(sizePx, android.view.View.MeasureSpec.EXACTLY)
-                composeView.measure(spec, spec)
-                composeView.layout(0, 0, sizePx, sizePx)
-                composeView.drawToBitmap(Bitmap.Config.ARGB_8888)
-            } finally {
-                if (parent != null) {
-                    parent.removeView(composeView)
-                }
-            }
-
-            BitmapDrawable(context.resources, bitmap).also {
-                it.setBounds(0, 0, bitmap.width, bitmap.height)
-            }
-        } catch (t: Throwable) {
-            Log.w("OSMMapService", "Compose icon rendering failed (MarkerIcon)", t)
-            null
-        }
-    }
-
-    private fun createFallbackIcon(): BitmapDrawable {
-        val sizePx = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP,
-            48f,
-            context.resources.displayMetrics
-        ).toInt()
-        val bitmap = Bitmap.createBitmap(sizePx, sizePx, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-        val center = sizePx / 2f
-        val stroke = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3f, context.resources.displayMetrics)
-        val radius = center - stroke
-        val fill = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
-            style = android.graphics.Paint.Style.FILL
-            color = context.getColor(fr.miage.geotrouvetou.R.color.primary_400)
-        }
-        val border = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
-            style = android.graphics.Paint.Style.STROKE
-            color = android.graphics.Color.WHITE
-            strokeWidth = stroke
-        }
-        val flagPaint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
-            style = android.graphics.Paint.Style.FILL
-            color = context.getColor(fr.miage.geotrouvetou.R.color.primary_600)
-        }
-        val flagStemPaint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
-            style = android.graphics.Paint.Style.STROKE
-            color = android.graphics.Color.WHITE
-            strokeWidth = stroke * 0.8f
-            strokeCap = android.graphics.Paint.Cap.ROUND
-        }
-        val flagPath = android.graphics.Path().apply {
-            moveTo(center - sizePx * 0.10f, center - sizePx * 0.18f)
-            lineTo(center + sizePx * 0.12f, center - sizePx * 0.10f)
-            lineTo(center - sizePx * 0.03f, center + sizePx * 0.02f)
-            close()
-        }
-        canvas.drawCircle(center, center, radius, fill)
-        canvas.drawPath(flagPath, flagPaint)
-        canvas.drawLine(
-            center - sizePx * 0.05f,
-            center - sizePx * 0.20f,
-            center - sizePx * 0.05f,
-            center + sizePx * 0.12f,
-            flagStemPaint,
-        )
-        canvas.drawCircle(center, center, radius, border)
-        return BitmapDrawable(context.resources, bitmap).also {
-            it.setBounds(0, 0, bitmap.width, bitmap.height)
-        }
-    }
-
     /**
      * Overlay de localisation qui affiche toujours le bonhomme, même quand le GPS
      * fournit un cap — en remplaçant la flèche de direction par l'icône personnage.
      */
-    private inner class PersonLocationOverlay(
+    private class PersonLocationOverlay(
         provider: IMyLocationProvider,
         mapView: MapView
     ) : MyLocationNewOverlay(provider, mapView) {
@@ -478,7 +318,7 @@ class OSMMapService(private val context: Context) : IMapService {
 
     private fun enforceMinimumZoom() {
         if (!minimumZoomLevel.isFinite() || isAdjustingZoom) return
-        val currentZoom = mapView.zoomLevel.toDouble()
+        val currentZoom = mapView.zoomLevelDouble
         if (currentZoom + 0.0001 < minimumZoomLevel) {
             isAdjustingZoom = true
             try {
@@ -499,7 +339,7 @@ class OSMMapService(private val context: Context) : IMapService {
         val centerLat = (bounds.minLat + bounds.maxLat) / 2.0
         minimumZoomLevel = calculateZoomForWidth(minimumWidthKm, centerLat)
         minimumZoomNeedsInitialization = false
-        val currentZoom = if (this::mapView.isInitialized) mapView.zoomLevel.toDouble() else Double.NaN
+        val currentZoom = if (this::mapView.isInitialized) mapView.zoomLevelDouble else Double.NaN
         Log.d(
             "OSMMapService",
             "refreshMinimumZoomLevel: centerLat=${String.format("%.4f", centerLat)}, widthKm=$minimumWidthKm, minimumZoomLevel=${String.format("%.2f", minimumZoomLevel)}, currentZoom=${String.format("%.2f", currentZoom)}"
@@ -510,7 +350,7 @@ class OSMMapService(private val context: Context) : IMapService {
         val bounds = getVisibleBounds() ?: return
         if (lastNotifiedBounds != null && !hasSignificantBoundsChange(lastNotifiedBounds!!, bounds)) return
         val widthKm = calculateDistanceKm(bounds.minLat, bounds.minLon, bounds.minLat, bounds.maxLon)
-        val currentZoom = mapView.zoomLevel.toDouble()
+        val currentZoom = mapView.zoomLevelDouble
         Log.d("OSMMapService", "notifyBoundsChanged: currentZoom=${String.format("%.2f", currentZoom)}, " +
                 "visibleWidth=${String.format("%.2f", widthKm)}km (min=$minimumWidthKm km), " +
                 "bounds=[${String.format("%.4f", bounds.minLat)}..${String.format("%.4f", bounds.maxLat)}] x " +
@@ -536,17 +376,17 @@ class OSMMapService(private val context: Context) : IMapService {
         val earthRadiusKm = 6371.0
         val dLat = Math.toRadians(lat2 - lat1)
         val dLon = Math.toRadians(lon2 - lon1)
-        val a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
-                Math.sin(dLon / 2) * Math.sin(dLon / 2)
-        val c = 2 * Math.asin(Math.sqrt(a))
+        val a = sin(dLat / 2) * sin(dLat / 2) +
+                cos(Math.toRadians(lat1)) * cos(Math.toRadians(lat2)) *
+                sin(dLon / 2) * sin(dLon / 2)
+        val c = 2 * asin(sqrt(a))
         return earthRadiusKm * c
     }
 
     private fun calculateZoomForWidth(widthKm: Double, centerLat: Double): Double {
         val viewWidthPx = getViewWidthPx().coerceAtLeast(1).toDouble()
         val widthMeters = widthKm * 1000.0
-        val latFactor = abs(Math.cos(Math.toRadians(centerLat))).coerceAtLeast(1e-6)
+        val latFactor = abs(cos(Math.toRadians(centerLat))).coerceAtLeast(1e-6)
         val metersPerPixelAtZoom0 = (2.0 * Math.PI * 6378137.0 * latFactor) / 256.0
         val zoom = ln(viewWidthPx * metersPerPixelAtZoom0 / widthMeters) / ln(2.0)
         Log.d(

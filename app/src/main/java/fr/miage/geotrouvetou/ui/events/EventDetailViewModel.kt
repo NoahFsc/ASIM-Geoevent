@@ -6,15 +6,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import fr.miage.geotrouvetou.domain.interfaces.IAuthService
 import fr.miage.geotrouvetou.domain.interfaces.IDatabaseService
 import fr.miage.geotrouvetou.domain.models.Evenement
-import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.auth.auth
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 class EventDetailViewModel(
     private val databaseService: IDatabaseService,
-    private val supabase: SupabaseClient
+    private val authService: IAuthService,
 ) : ViewModel() {
 
     var event by mutableStateOf<Evenement?>(null)
@@ -31,23 +32,25 @@ class EventDetailViewModel(
     var participantsCount by mutableIntStateOf(0)
         private set
 
-    var joinToastKey by mutableIntStateOf(0)
-        private set
+    private val _joined = MutableSharedFlow<Boolean>()
+    val joined = _joined.asSharedFlow()
+
+    private val _eventDeleted = MutableSharedFlow<Boolean>()
+    val eventDeleted = _eventDeleted.asSharedFlow()
 
     fun loadEvent(eventId: String) {
         viewModelScope.launch {
             isLoading = true
             try {
                 event = databaseService.getEvent(eventId)
-                
-                val user = supabase.auth.currentUserOrNull()
-                if (user != null) {
-                    isJoined = databaseService.isUserParticipating(eventId, user.id)
-                    isOwner = event?.user_id == user.id
+
+                val userId = authService.currentUserId()
+                if (userId != null) {
+                    isJoined = databaseService.isUserParticipating(eventId, userId)
+                    isOwner = event?.userId == userId
                 }
                 participantsCount = databaseService.getParticipantsCount(eventId)
-            } catch (e: Exception) {
-                // Gérer l'erreur
+            } catch (_: Exception) {
             } finally {
                 isLoading = false
             }
@@ -57,18 +60,48 @@ class EventDetailViewModel(
     fun joinEvent() {
         val currentEvent = event ?: return
         val eventId = currentEvent.id ?: return
-        
+
         viewModelScope.launch {
             try {
-                val user = supabase.auth.currentUserOrNull()
-                if (user != null) {
-                    databaseService.joinEvent(eventId, user.id)
+                val userId = authService.currentUserId()
+                if (userId != null) {
+                    databaseService.joinEvent(eventId, userId)
                     isJoined = true
                     participantsCount++
-                    joinToastKey++
+                    _joined.emit(true)
                 }
-            } catch (e: Exception) {
-                // Gérer l'erreur (ex: déjà inscrit)
+            } catch (_: Exception) {
+                // Échec silencieux (ex : déjà inscrit)
+            }
+        }
+    }
+
+    fun leaveEvent() {
+        val currentEvent = event ?: return
+        val eventId = currentEvent.id ?: return
+
+        viewModelScope.launch {
+            try {
+                val userId = authService.currentUserId()
+                if (userId != null) {
+                    databaseService.leaveEvent(eventId, userId)
+                    isJoined = false
+                    if (participantsCount > 0) participantsCount--
+                }
+            } catch (_: Exception) {
+                // Échec silencieux
+            }
+        }
+    }
+
+    fun deleteEvent() {
+        val eventId = event?.id ?: return
+        viewModelScope.launch {
+            try {
+                databaseService.deleteEvent(eventId)
+                _eventDeleted.emit(true)
+            } catch (_: Exception) {
+                // Échec silencieux
             }
         }
     }

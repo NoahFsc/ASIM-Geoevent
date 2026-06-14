@@ -1,0 +1,245 @@
+<resources>
+    <string name="app_name">Geo Trouvetou</string>
+
+    <!-- Common actions -->
+    <string name="action_back">Back</string>
+    <string name="action_confirm">Confirm</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_refresh">Refresh</string>
+
+    <!-- Form fields -->
+    <string name="field_email_label">Email address</string>
+    <string name="field_email_placeholder">Enter your email address</string>
+    <string name="field_password_label">Password</string>
+    <string name="field_password_placeholder">Enter your password</string>
+    <string name="field_lastname_label">Last name</string>
+    <string name="field_lastname_placeholder">Doe</string>
+    <string name="field_firstname_label">First name</string>
+    <string name="field_firstname_placeholder">John</string>
+
+    <!-- Sign in -->
+    <string name="login_title">Sign in</string>
+    <string name="login_no_account">Don\'t have an account? </string>
+    <string name="login_signup_link">Sign up</string>
+    <string name="login_submit">Sign in</string>
+
+    <!-- Sign up -->
+    <string name="register_title">Sign up</string>
+    <string name="register_have_account">Already have an account? </string>
+    <string name="register_login_link">Sign in</string>
+    <string name="register_confirm_label">Confirmation</string>
+    <string name="register_confirm_placeholder">Confirm your password</string>
+    <string name="register_terms_prefix">I accept the </string>
+    <string name="register_terms_link">Terms of Use</string>
+    <string name="register_submit">Sign up</string>
+    <string name="register_terms_required">You must accept the terms of use</string>
+
+    <!-- Password rules -->
+    <string name="password_info_cd">Password rules</string>
+    <string name="password_rules_title">Your password must contain:</string>
+    <string name="password_rules_title_new">Your new password must contain:</string>
+    <string name="password_rule_min">At least 8 characters</string>
+    <string name="password_rule_digit">1 digit</string>
+    <string name="password_rule_special">1 special character (e.g. @, &amp;, ...)</string>
+    <string name="password_rule_uppercase">1 uppercase letter</string>
+
+    <!-- Authentication errors -->
+    <string name="auth_error_unexpected">An unexpected error occurred</string>
+    <string name="auth_error_invalid_credentials">Incorrect email or password</string>
+    <string name="auth_error_email_not_confirmed">Please confirm your email before signing in</string>
+    <string name="auth_error_user_exists">An account already exists with this email</string>
+    <string name="auth_error_password_too_short">Password must be at least 6 characters</string>
+    <string name="auth_error_rate_limit">Too many attempts. Try again in a few minutes.</string>
+    <string name="auth_error_network">Network error. Check your internet connection.</string>
+    <string name="auth_error_generic">An error occurred. Please try again.</string>
+
+    <!-- Field validation -->
+    <string name="validation_email_required">Email address is required</string>
+    <string name="validation_email_invalid">Invalid email format</string>
+    <string name="validation_password_required">Password is required</string>
+    <string name="validation_lastname_required">Last name is required</string>
+    <string name="validation_firstname_required">First name is required</string>
+    <string name="validation_password_min">Password must be at least 8 characters</string>
+    <string name="validation_password_digit">Password must contain at least 1 digit</string>
+    <string name="validation_password_uppercase">Password must contain at least 1 uppercase letter</string>
+    <string name="validation_password_special">Password must contain at least 1 special character</string>
+    <string name="validation_passwords_mismatch">Passwords do not match</string>
+
+    <!-- Profile -->
+    <string name="profile_title">Profile</string>
+    <string name="profile_settings_cd">Settings</string>
+    <string name="profile_stat_events">EVENTS</string>
+    <string name="profile_stat_participations">PARTICIPATIONS</string>
+    <string name="profile_tab_my_events">My events</string>
+    <string name="profile_tab_my_participations">My participations</string>
+    <string name="profile_empty_events">No event created</string>
+    <string name="profile_empty_participations">No participation</string>
+
+    <!-- Edit profile -->
+    <string name="edit_profile_title">Edit my profile</string>
+    <string name="edit_profile_intro">Update your personal information and manage your privacy preferences.</string>
+    <string name="edit_profile_section_personal">Personal Information</string>
+    <string name="edit_profile_email_placeholder">address@email.com</string>
+    <string name="edit_profile_photo_cd">Change photo</string>
+    <string name="edit_profile_delete_account">Delete my account</string>
+    <string name="edit_profile_save">Save changes</string>
+    <string name="edit_profile_save_error">Error while saving</string>
+    <string name="edit_profile_photo_error">Error while updating the photo</string>
+    <string name="edit_profile_delete_error">Error while deleting the account</string>
+    <string name="edit_profile_toast_saved_title">Profile updated!</string>
+    <string name="edit_profile_toast_saved_desc">Your information has been saved</string>
+    <string name="edit_profile_toast_photo_title">Photo updated!</string>
+    <string name="edit_profile_toast_photo_desc">Your profile photo has been changed</string>
+
+    <!-- Delete account -->
+    <string name="delete_account_title">Do you really want to delete your account?</string>
+    <string name="delete_account_desc">You will return to the home screen and will never be able to see your trips again.</string>
+    <string name="delete_account_confirm">Delete my account</string>
+
+    <!-- Password -->
+    <string name="edit_password_title">Change my password</string>
+    <string name="edit_password_new_label">New password</string>
+    <string name="edit_password_confirm_label">Confirm password</string>
+    <string name="edit_password_submit">Change password</string>
+    <string name="edit_password_error">Error while changing the password</string>
+    <string name="edit_password_toast_title">Password changed!</string>
+    <string name="edit_password_toast_desc">Your password has been updated</string>
+
+    <!-- Settings -->
+    <string name="params_title">Settings</string>
+    <string name="params_section_account">Account</string>
+    <string name="params_edit_profile">Edit my profile</string>
+    <string name="params_edit_password">Change my password</string>
+    <string name="params_admin">Administration</string>
+    <string name="params_logout">Log out</string>
+    <string name="params_logout_confirm_title">Do you really want to log out?</string>
+    <string name="params_logout_confirm_desc">You will return to the home screen and won\'t be able to see your trips.</string>
+    <string name="params_logout_confirm">Log out</string>
+
+    <!-- Map -->
+    <string name="map_center_on_me_cd">Center on my location</string>
+    <string name="map_zoom_in_cd">Zoom in</string>
+    <string name="map_zoom_out_cd">Zoom out</string>
+    <string name="map_search_placeholder">Search by place</string>
+    <string name="map_location_permission_denied">Location permission denied</string>
+
+    <!-- Event list / search -->
+    <string name="event_list_default_title">Suggestions</string>
+    <string name="event_list_search_placeholder">Search a place</string>
+    <string name="event_list_empty">No event in this area</string>
+    <string name="event_list_proposals">Suggestions (%1$d)</string>
+    <string name="event_list_cluster">Cluster (%1$d)</string>
+    <string name="place_search_title">Places</string>
+    <string name="place_search_empty">No place found</string>
+
+    <!-- Event detail -->
+    <string name="event_detail_about">About the event</string>
+    <string name="event_detail_location_fallback">Coordinates</string>
+    <string name="event_detail_coordinates">Lat: %1$s, Lon: %2$s</string>
+    <string name="event_detail_not_found">Event not found</string>
+    <string name="event_detail_edit">Edit</string>
+    <string name="event_detail_leave">Leave event</string>
+    <string name="event_detail_delete">Delete</string>
+    <string name="delete_event_title">Delete this event?</string>
+    <string name="delete_event_desc">This action is permanent. The event and its registrations will be removed.</string>
+    <string name="delete_event_confirm">Delete</string>
+    <string name="event_detail_join">Join</string>
+    <string name="event_join_toast_title">Successfully joined!</string>
+    <string name="event_join_toast_desc">You are now attending this event</string>
+    <string name="event_update_toast_title">Successfully updated!</string>
+    <string name="event_update_toast_desc">The event has been updated</string>
+    <string name="event_delete_toast_title">Event deleted</string>
+    <string name="event_delete_toast_desc">The event has been deleted</string>
+
+    <!-- Create / update event -->
+    <string name="create_event_title">New event</string>
+    <string name="update_event_title">Edit event</string>
+    <string name="event_form_cover_image">Cover image</string>
+    <string name="event_form_title_label">Title</string>
+    <string name="event_form_title_placeholder">Hike for beginners</string>
+    <string name="event_form_description_label">Description</string>
+    <string name="event_form_description_placeholder">Hike for beginners</string>
+    <string name="event_form_date_label">Date</string>
+    <string name="event_form_date_placeholder">dd/mm/yyyy</string>
+    <string name="event_form_time_label">Time</string>
+    <string name="event_form_time_placeholder">HH:mm</string>
+    <string name="event_form_location_label">Location</string>
+    <string name="event_form_search_place">Search a place</string>
+    <string name="event_form_type">Event type</string>
+    <string name="event_form_make_private">Make the event private</string>
+    <string name="create_event_submit">Create the event</string>
+    <string name="create_event_submitting">Creating...</string>
+    <string name="update_event_submit">Save changes</string>
+    <string name="update_event_submitting">Updating...</string>
+    <string name="event_time_picker_title">Choose the time</string>
+    <string name="event_error_title">Error</string>
+    <string name="event_error_must_login_save">You must be signed in to save an event</string>
+    <string name="event_error_generic">Error: %1$s</string>
+    <string name="event_error_fallback">An error occurred</string>
+
+    <!-- Image -->
+    <string name="image_uploader_add">Add an image</string>
+
+    <!-- Navigation -->
+    <string name="nav_map">Map</string>
+    <string name="nav_add">Add</string>
+    <string name="nav_profile">Profile</string>
+
+    <!-- Navigation toasts -->
+    <string name="toast_login_title">Signed in!</string>
+    <string name="toast_welcome_desc">Welcome to Geo Trouvetou</string>
+    <string name="toast_register_title">Account created!</string>
+    <string name="toast_account_deleted_title">Account deleted</string>
+    <string name="toast_account_deleted_desc">Your account has been deleted</string>
+    <string name="toast_logout_title">Logged out</string>
+    <string name="toast_logout_desc">See you soon on Geo Trouvetou</string>
+    <string name="toast_event_created_title">Success!</string>
+    <string name="toast_event_created_desc">The event was created successfully</string>
+
+    <!-- Network / location -->
+    <string name="toast_network_lost_title">Connection lost</string>
+    <string name="toast_network_lost_desc">Check your internet connection</string>
+    <string name="toast_network_restored_title">Connection restored</string>
+    <string name="toast_network_restored_desc">You are back online</string>
+    <string name="toast_location_lost_title">Location disabled</string>
+    <string name="toast_location_lost_desc">Enable location to enjoy the map</string>
+    <string name="toast_location_restored_title">Location enabled</string>
+    <string name="toast_location_restored_desc">Your position is available again</string>
+
+    <!-- Administration -->
+    <string name="admin_title">Administration</string>
+    <string name="admin_tab_overview">Overview</string>
+    <string name="admin_tab_users">Users</string>
+    <string name="admin_tab_events">Events</string>
+    <string name="admin_stat_users">USERS</string>
+    <string name="admin_stat_events">EVENTS</string>
+    <string name="admin_recent_activity">Recent activity</string>
+    <string name="admin_no_activity">No recent activity</string>
+    <string name="admin_search_event">Search an event</string>
+    <string name="admin_search_user">Search a user</string>
+    <string name="admin_menu_cd">Menu</string>
+    <string name="admin_make_user">Set as User</string>
+    <string name="admin_make_admin">Set as Admin</string>
+    <string name="admin_delete_user">Delete account</string>
+    <string name="admin_event_public">Public</string>
+    <string name="admin_event_private">Private</string>
+    <string name="admin_time_now">Just now</string>
+    <string name="admin_time_minutes">%1$d min ago</string>
+    <string name="admin_time_hours">%1$dh ago</string>
+    <string name="admin_time_days">%1$dd ago</string>
+    <string name="admin_activity_user_created">New user: %1$s</string>
+    <string name="admin_activity_user_deleted">Account deleted: %1$s</string>
+    <string name="admin_activity_role_changed">%1$s is now %2$s</string>
+    <string name="admin_activity_event_created">Event created: "%1$s"</string>
+    <string name="admin_activity_event_deleted">Event deleted: "%1$s"</string>
+
+    <!-- Event status tags -->
+    <string name="tag_status_new">NEW</string>
+    <string name="tag_status_soon">SOON</string>
+    <string name="tag_status_done">DONE</string>
+
+    <!-- Event cards -->
+    <string name="event_card_delete">Delete</string>
+    <string name="event_card_recommended">Recommended</string>
+    <string name="event_card_datetime">%1$s  •  %2$s</string>
+</resources>

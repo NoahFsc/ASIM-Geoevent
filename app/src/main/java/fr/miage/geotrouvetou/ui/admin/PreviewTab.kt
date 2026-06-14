@@ -36,7 +36,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,7 +49,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
 
-internal fun relativeTime(isoDate: String?): String {
+internal fun relativeTime(context: android.content.Context, isoDate: String?): String {
     if (isoDate.isNullOrBlank()) return ""
     return try {
         val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()).apply {
@@ -56,10 +58,10 @@ internal fun relativeTime(isoDate: String?): String {
         val date = sdf.parse(isoDate.take(19)) ?: return isoDate.take(10)
         val diff = System.currentTimeMillis() - date.time
         when {
-            diff < 60_000L -> "À l'instant"
-            diff < 3_600_000L -> "Il y a ${diff / 60_000} min"
-            diff < 86_400_000L -> "Il y a ${diff / 3_600_000}h"
-            else -> "Il y a ${diff / 86_400_000}j"
+            diff < 60_000L -> context.getString(R.string.admin_time_now)
+            diff < 3_600_000L -> context.getString(R.string.admin_time_minutes, (diff / 60_000).toInt())
+            diff < 86_400_000L -> context.getString(R.string.admin_time_hours, (diff / 3_600_000).toInt())
+            else -> context.getString(R.string.admin_time_days, (diff / 86_400_000).toInt())
         }
     } catch (_: Exception) {
         isoDate.take(10)
@@ -90,13 +92,13 @@ internal fun ApercuTab(
                 StatCard(
                     icon = { Icon(Icons.Outlined.Group, null, tint = colorResource(R.color.primary_600), modifier = Modifier.size(20.dp)) },
                     count = stats.userCount.toString(),
-                    label = "UTILISATEURS",
+                    label = stringResource(R.string.admin_stat_users),
                     modifier = Modifier.weight(1f),
                 )
                 StatCard(
                     icon = { Icon(Icons.Outlined.CalendarMonth, null, tint = colorResource(R.color.primary_600), modifier = Modifier.size(20.dp)) },
                     count = stats.eventCount.toString(),
-                    label = "ÉVÉNEMENTS",
+                    label = stringResource(R.string.admin_stat_events),
                     modifier = Modifier.weight(1f),
                 )
             }
@@ -108,13 +110,13 @@ internal fun ApercuTab(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = "Activité récente",
+                text = stringResource(R.string.admin_recent_activity),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = colorResource(R.color.text_darker),
             )
             Text(
-                text = "Actualiser",
+                text = stringResource(R.string.action_refresh),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 color = colorResource(R.color.primary_500),
@@ -130,7 +132,7 @@ internal fun ApercuTab(
                 CircularProgressIndicator(color = colorResource(R.color.primary_500), modifier = Modifier.size(24.dp))
             }
             recentActivity.isEmpty() -> Text(
-                text = "Aucune activité récente",
+                text = stringResource(R.string.admin_no_activity),
                 fontSize = 14.sp,
                 color = colorResource(R.color.text_lighter),
             )
@@ -188,13 +190,13 @@ private data class ActionStyle(val icon: ImageVector, val colorRes: Int, val lab
 @Composable
 private fun ActivityRow(entry: AuditLogEntry) {
     val name = entry.targetName.orEmpty().ifEmpty { "—" }
-    val newRole = entry.metadata?.get("new_role")?.toString()?.trim('"')
+    val newRole = entry.metadata?.get("new_role")?.toString()?.trim('"') ?: "?"
     val style = when (entry.action) {
-        "user_created"  -> ActionStyle(Icons.Filled.PersonAdd,   R.color.success_400, "Nouvel utilisateur : $name")
-        "user_deleted"  -> ActionStyle(Icons.Outlined.PersonOff, R.color.danger_400,  "Compte supprimé : $name")
-        "role_changed"  -> ActionStyle(Icons.Filled.Shield,      R.color.primary_400, "$name est maintenant ${newRole ?: "?"}")
-        "event_created" -> ActionStyle(Icons.Filled.Flag,        R.color.primary_400, "Événement créé : « $name »")
-        "event_deleted" -> ActionStyle(Icons.Outlined.Flag,      R.color.warning_400, "Événement supprimé : « $name »")
+        "user_created"  -> ActionStyle(Icons.Filled.PersonAdd,   R.color.success_400, stringResource(R.string.admin_activity_user_created, name))
+        "user_deleted"  -> ActionStyle(Icons.Outlined.PersonOff, R.color.danger_400,  stringResource(R.string.admin_activity_user_deleted, name))
+        "role_changed"  -> ActionStyle(Icons.Filled.Shield,      R.color.primary_400, stringResource(R.string.admin_activity_role_changed, name, newRole))
+        "event_created" -> ActionStyle(Icons.Filled.Flag,        R.color.primary_400, stringResource(R.string.admin_activity_event_created, name))
+        "event_deleted" -> ActionStyle(Icons.Outlined.Flag,      R.color.warning_400, stringResource(R.string.admin_activity_event_deleted, name))
         else            -> ActionStyle(Icons.Filled.Flag,        R.color.text_lighter, entry.action)
     }
 
@@ -213,6 +215,6 @@ private fun ActivityRow(entry: AuditLogEntry) {
             Icon(imageVector = style.icon, contentDescription = null, tint = colorResource(style.colorRes), modifier = Modifier.size(18.dp))
         }
         Text(text = style.label, fontSize = 13.sp, color = colorResource(R.color.text_darker), lineHeight = 18.sp, modifier = Modifier.weight(1f))
-        Text(text = relativeTime(entry.createdAt), fontSize = 11.sp, color = colorResource(R.color.text_placeholder))
+        Text(text = relativeTime(LocalContext.current, entry.createdAt), fontSize = 11.sp, color = colorResource(R.color.text_placeholder))
     }
 }

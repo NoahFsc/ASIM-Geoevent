@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -56,7 +57,6 @@ fun AdminUserCard(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        // Avatar
         Box(
             modifier = Modifier
                 .size(48.dp)
@@ -72,7 +72,6 @@ fun AdminUserCard(
             )
         }
 
-        // Nom + email
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = name,
@@ -87,7 +86,6 @@ fun AdminUserCard(
             )
         }
 
-        // Badge rôle
         val isAdmin = role == "admin"
         Box(
             modifier = Modifier
@@ -105,7 +103,6 @@ fun AdminUserCard(
             )
         }
 
-        // Menu 3 points
         Box {
             IconButton(
                 onClick = { if (!isCurrentUser) menuExpanded = true },
@@ -113,7 +110,7 @@ fun AdminUserCard(
             ) {
                 Icon(
                     imageVector = Icons.Filled.MoreVert,
-                    contentDescription = "Menu",
+                    contentDescription = stringResource(R.string.admin_menu_cd),
                     tint = colorResource(if (isCurrentUser) R.color.text_disabled else R.color.text_lighter),
                     modifier = Modifier.size(20.dp),
                 )
@@ -123,12 +120,12 @@ fun AdminUserCard(
                 onDismissRequest = { menuExpanded = false },
             ) {
                 DropdownMenuItem(
-                    text = { Text(text = if (isAdmin) "Passer en User" else "Passer en Admin", fontSize = 14.sp) },
+                    text = { Text(text = if (isAdmin) stringResource(R.string.admin_make_user) else stringResource(R.string.admin_make_admin), fontSize = 14.sp) },
                     onClick = { menuExpanded = false; onRoleChange() },
                 )
                 HorizontalDivider()
                 DropdownMenuItem(
-                    text = { Text(text = "Supprimer le compte", fontSize = 14.sp, color = colorResource(R.color.danger_500)) },
+                    text = { Text(text = stringResource(R.string.admin_delete_user), fontSize = 14.sp, color = colorResource(R.color.danger_500)) },
                     onClick = { menuExpanded = false; onDelete() },
                 )
             }
@@ -136,30 +133,15 @@ fun AdminUserCard(
     }
 }
 
-@Preview(name = "AdminUserCard – User")
+@Preview
 @Composable
-private fun AdminUserCardUserPreview() {
-    Box(modifier = Modifier.background(colorResource(R.color.background)).padding(16.dp)) {
+private fun AdminUserCardPreview() {
+    Box(modifier = Modifier.padding(16.dp)) {
         AdminUserCard(
-            name = "Sarah Jenkins",
-            email = "sarah.j@example.com",
+            name = "Sara",
+            email = "sara.t@gmail.com",
             role = "user",
             isCurrentUser = false,
-            onRoleChange = {},
-            onDelete = {},
-        )
-    }
-}
-
-@Preview(name = "AdminUserCard – Admin (moi)")
-@Composable
-private fun AdminUserCardAdminPreview() {
-    Box(modifier = Modifier.background(colorResource(R.color.background)).padding(16.dp)) {
-        AdminUserCard(
-            name = "Noah Fsc",
-            email = "noah@admin.com",
-            role = "admin",
-            isCurrentUser = true,
             onRoleChange = {},
             onDelete = {},
         )

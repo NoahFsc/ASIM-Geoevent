@@ -1,8 +1,6 @@
 package fr.miage.geotrouvetou.ui.map.modals
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,13 +18,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.miage.geotrouvetou.R
-import fr.miage.geotrouvetou.data.geocoding.NominatimPlace
 import fr.miage.geotrouvetou.domain.models.Evenement
+import fr.miage.geotrouvetou.domain.models.Place
 import fr.miage.geotrouvetou.ui.components.molecules.EventCard
 import fr.miage.geotrouvetou.ui.components.molecules.PlaceSearchBar
 import fr.miage.geotrouvetou.ui.components.organisms.Modal
@@ -41,7 +39,7 @@ fun EventListModal(
     events: List<Evenement>,
     onDismissRequest: () -> Unit,
     title: String = "Propositions",
-    onPlaceSelected: ((NominatimPlace) -> Unit)? = null,
+    onPlaceSelected: ((Place) -> Unit)? = null,
     onEditClick: ((Evenement) -> Unit)? = null,
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -78,7 +76,7 @@ fun EventListContent(
     events: List<Evenement>,
     onEventClick: (Evenement) -> Unit,
     title: String = "Propositions",
-    onPlaceSelected: ((NominatimPlace) -> Unit)? = null,
+    onPlaceSelected: ((Place) -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     var searchQuery by remember { mutableStateOf("") }
@@ -94,7 +92,7 @@ fun EventListContent(
         SearchBar(
             value = searchQuery,
             onValueChange = { searchQuery = it },
-            placeholder = "Rechercher un lieu"
+            placeholder = stringResource(R.string.event_list_search_placeholder)
         )
 
         if (isPlaceSearch) {
@@ -112,7 +110,7 @@ fun EventListContent(
 
             if (events.isEmpty()) {
                 Text(
-                    text = "Aucun événement dans cette zone",
+                    text = stringResource(R.string.event_list_empty),
                     fontSize = 14.sp,
                     color = colorResource(R.color.text_light)
                 )
@@ -135,13 +133,5 @@ fun EventListContent(
                 }
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun EventListContentPreview() {
-    Box(modifier = Modifier.background(colorResource(R.color.background))) {
-        EventListContent(events = emptyList(), onEventClick = {})
     }
 }

@@ -13,9 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -31,7 +29,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -52,7 +49,7 @@ fun Input(
     onTrailingIconClick: (() -> Unit)? = null,
     label: String? = null,
     required: Boolean = false,
-    erreur: String? = null,
+    error: String? = null,
     labelTrailingContent: (@Composable () -> Unit)? = null,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     suggestions: List<String> = emptyList(),
@@ -113,18 +110,23 @@ fun Input(
                     .fillMaxWidth()
                     .border(
                         1.dp,
-                        colorResource(id = if (erreur != null) R.color.danger_500 else R.color.text_lighter),
+                        colorResource(id = if (error != null) R.color.danger_500 else R.color.text_lighter),
                         RoundedCornerShape(8.dp),
                     ),
                 shape = RoundedCornerShape(8.dp),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.White,
                     unfocusedContainerColor = Color.White,
+                    disabledContainerColor = Color.White,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
                     disabledIndicatorColor = Color.Transparent,
                     focusedTextColor = colorResource(id = R.color.text_darker),
                     unfocusedTextColor = colorResource(id = R.color.text_darker),
+                    disabledTextColor = colorResource(id = R.color.text_darker),
+                    disabledPlaceholderColor = colorResource(id = R.color.text_placeholder),
+                    disabledLeadingIconColor = colorResource(id = R.color.text_lighter),
+                    disabledTrailingIconColor = colorResource(id = R.color.text_lighter),
                 ),
                 singleLine = true,
             )
@@ -149,10 +151,10 @@ fun Input(
                 }
             }
         }
-        if (erreur != null) {
+        if (error != null) {
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = erreur,
+                text = error,
                 fontSize = 16.sp,
                 color = colorResource(id = R.color.danger_500),
             )
@@ -160,165 +162,18 @@ fun Input(
     }
 }
 
+@Preview
 @Composable
-private fun PreviewWrapper(content: @Composable () -> Unit) {
-    Box(
-        modifier = Modifier
-            .background(colorResource(R.color.background))
-            .padding(16.dp)
-    ) { content() }
-}
-
-@Preview(name = "Fill – Default")
-@Composable
-private fun FillDefaultPreview() {
-    PreviewWrapper {
-        Input(
-            value = "",
-            onValueChange = {},
-            placeholder = "Rechercher un événement",
-        )
-    }
-}
-
-@Preview(name = "Fill – With Text")
-@Composable
-private fun FillWithTextEmptyPreview() {
-    PreviewWrapper {
-        Input(
-            value = "Fête de la musique",
-            onValueChange = {},
-            placeholder = "Rechercher un événement",
-        )
-    }
-}
-
-@Preview(name = "Fill – With Icons")
-@Composable
-private fun FillWithIconsPreview() {
-    PreviewWrapper {
-        Input(
-            value = "",
-            onValueChange = {},
-            placeholder = "Rechercher un événement",
-            leadingIcon = Icons.Default.Search,
-            trailingIcon = Icons.Default.Clear
-        )
-    }
-}
-
-@Preview(name = "Fill – With Icon Left")
-@Composable
-private fun FillWithIconLeftPreview() {
-    PreviewWrapper {
-        Input(
-            value = "",
-            onValueChange = {},
-            placeholder = "Rechercher un événement",
-            leadingIcon = Icons.Default.Search,
-        )
-    }
-}
-
-@Preview(name = "Fill – With Icon Right")
-@Composable
-private fun FillWithIconRightPreview() {
-    PreviewWrapper {
-        Input(
-            value = "",
-            onValueChange = {},
-            placeholder = "Rechercher un événement",
-            trailingIcon = Icons.Default.Clear
-        )
-    }
-}
-
-@Preview(name = "Fill – With Text")
-@Composable
-private fun FillWithTextPreview() {
-    PreviewWrapper {
-        Input(
-            value = "Fête de la musique",
-            onValueChange = {},
-            placeholder = "Rechercher un événement",
-            leadingIcon = Icons.Default.Search,
-            trailingIcon = Icons.Default.Clear
-        )
-    }
-}
-
-@Preview(name = "Fill – With Label")
-@Composable
-private fun FillWithLabelPreview() {
-    PreviewWrapper {
-        Input(
-            value = "Fête de la musique",
-            onValueChange = {},
-            placeholder = "Rechercher un événement",
-            label = "Titre de l'événement"
-        )
-    }
-}
-
-@Preview(name = "Fill – With Label Required")
-@Composable
-private fun FillWithLabelRequiredPreview() {
-    PreviewWrapper {
-        Input(
-            value = "Fête de la musique",
-            onValueChange = {},
-            placeholder = "Rechercher un événement",
-            label = "Titre de l'événement",
-            required = true
-        )
-    }
-}
-
-@Preview(name = "Fill – With Error")
-@Composable
-private fun FillWithErrorPreview() {
-    PreviewWrapper {
+private fun InputPreview() {
+    Box(modifier = Modifier.padding(16.dp)) {
         Input(
             value = "Fête de la musique",
             onValueChange = {},
             placeholder = "Rechercher un événement",
             label = "Titre de l'événement",
             required = true,
-            erreur = "Ce champ est requis"
-        )
-    }
-}
-
-@Preview(name = "Fill – Password")
-@Composable
-private fun PasswordPreview() {
-    PreviewWrapper {
-        Input(
-            value = "monmotdepasse",
-            onValueChange = {},
-            placeholder = "Mot de passe",
-            label = "Mot de passe",
-            required = true,
-            trailingIcon = Icons.Default.Clear,
-            onTrailingIconClick = {},
-            visualTransformation = PasswordVisualTransformation(),
-        )
-    }
-}
-
-@Preview(name = "Location – With suggestions")
-@Composable
-private fun LocationWithSuggestionsPreview() {
-    PreviewWrapper {
-        Input(
-            value = "Forêt",
-            onValueChange = {},
-            placeholder = "Rechercher un lieu",
-            label = "Localisation",
-            required = true,
-            leadingIcon = Icons.Outlined.LocationOn,
-            suggestions = listOf("Forêt de Chailluz, Besançon", "Forêt d'Ornans", "Forêt de la Joux"),
-            onSuggestionSelected = {},
+            leadingIcon = Icons.Default.Search,
+            error = "Ce champ est requis",
         )
     }
 }

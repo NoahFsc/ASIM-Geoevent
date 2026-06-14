@@ -1,5 +1,7 @@
 package fr.miage.geotrouvetou.ui.navigation
 
+import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
@@ -15,6 +17,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -22,6 +27,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import fr.miage.geotrouvetou.App
 import fr.miage.geotrouvetou.R
 import fr.miage.geotrouvetou.ui.components.atoms.Toast
+import fr.miage.geotrouvetou.ui.components.atoms.ToastType
 import fr.miage.geotrouvetou.ui.auth.LoginScreen
 import fr.miage.geotrouvetou.ui.auth.RegisterScreen
 import fr.miage.geotrouvetou.ui.components.molecules.NavBar
@@ -29,12 +35,11 @@ import fr.miage.geotrouvetou.ui.components.molecules.NavTab
 import fr.miage.geotrouvetou.ui.admin.AdminScreen
 import fr.miage.geotrouvetou.ui.profile.EditPasswordScreen
 import fr.miage.geotrouvetou.ui.profile.EditProfileScreen
-import fr.miage.geotrouvetou.ui.events.CreateEventScreen
+import fr.miage.geotrouvetou.ui.events.EventFormScreen
 import fr.miage.geotrouvetou.ui.events.EventDetailScreen
 import fr.miage.geotrouvetou.ui.map.MapScreen
 import fr.miage.geotrouvetou.ui.params.ParamsScreen
 import fr.miage.geotrouvetou.ui.profile.ProfileScreen
-import io.github.jan.supabase.auth.auth
 
 object Routes {
     const val LOGIN = "login"
@@ -46,34 +51,56 @@ object Routes {
     const val EDIT_PROFILE = "editProfile"
     const val EDIT_PASSWORD = "editPassword"
     const val CREATE_EVENT = "createEvent"
-    const val EVENT_DETAIL = "eventDetail"
+    const val EVENT_DETAIL = "eventDetail/{eventId}"
+
+    fun eventDetail(eventId: String) = "eventDetail/$eventId"
 }
+
+/** Feedback global à afficher une fois (toasts de connexion, suppression, etc.). */
+private data class NavToast(
+    @param:StringRes val title: Int,
+    @param:StringRes val description: Int,
+    val type: ToastType = ToastType.Success,
+)
+
+/** Routes secondaires entrant/sortant par un glissement horizontal. */
+private fun NavGraphBuilder.slideComposable(
+    route: String,
+    content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit,
+) = composable(
+    route = route,
+    enterTransition = { slideInHorizontally { it } },
+    exitTransition = { slideOutHorizontally { -it } },
+    popEnterTransition = { slideInHorizontally { -it } },
+    popExitTransition = { slideOutHorizontally { it } },
+    content = content,
+)
 
 @Composable
 fun NavGraph(navController: NavHostController) {
     val context = LocalContext.current
     val app = context.applicationContext as? App
 
-    var selectedTab by remember { mutableStateOf(NavTab.Carte) }
-    var loginToastKey by remember { mutableIntStateOf(0) }
-    var registerToastKey by remember { mutableIntStateOf(0) }
-    var deleteAccountToastKey by remember { mutableIntStateOf(0) }
-    var logoutToastKey by remember { mutableIntStateOf(0) }
-    var eventCreatedToastKey by remember { mutableIntStateOf(0) }
-    val navBackStackEntryAsState by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntryAsState?.destination?.route
+    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
 
-    fun navigateIfLoggedIn(destination: String, tab: NavTab) {
-        selectedTab = tab
-        val isLoggedIn = runCatching {
-            app?.supabase?.auth?.currentSessionOrNull() != null
-        }.getOrDefault(false)
+    // L'onglet actif est dérivé de la route courante
+    val selectedTab = when (currentRoute) {
+        Routes.PROFILE, Routes.EVENT_DETAIL -> NavTab.Profil
+        Routes.CREATE_EVENT -> NavTab.Ajouter
+        else -> NavTab.Carte
+    }
 
-        if (isLoggedIn) {
-            navController.navigate(destination)
-        } else {
-            navController.navigate(Routes.LOGIN)
-        }
+    // Toast + tick pour rejouer l'animation à chaque déclenchement
+    var toastTick by remember { mutableIntStateOf(0) }
+    var pendingToast by remember { mutableStateOf<NavToast?>(null) }
+    fun showToast(toast: NavToast) {
+        pendingToast = toast
+        toastTick++
+    }
+
+    fun navigateIfLoggedIn(destination: String) {
+        val isLoggedIn = runCatching { app?.authService?.isLoggedIn() == true }.getOrDefault(false)
+        navController.navigate(if (isLoggedIn) destination else Routes.LOGIN)
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -85,11 +112,10 @@ fun NavGraph(navController: NavHostController) {
             composable(Routes.LOGIN) {
                 LoginScreen(
                     onLoginSuccess = {
-                        selectedTab = NavTab.Carte
                         navController.navigate(Routes.MAP) {
                             popUpTo(Routes.LOGIN) { inclusive = true }
                         }
-                        loginToastKey++
+                        showToast(NavToast(R.string.toast_login_title, R.string.toast_welcome_desc))
                     },
                     onRegisterClick = { navController.navigate(Routes.REGISTER) },
                 )
@@ -101,7 +127,7 @@ fun NavGraph(navController: NavHostController) {
                         navController.navigate(Routes.MAP) {
                             popUpTo(Routes.LOGIN) { inclusive = true }
                         }
-                        registerToastKey++
+                        showToast(NavToast(R.string.toast_register_title, R.string.toast_welcome_desc))
                     },
                     onBackClick = { navController.popBackStack() },
                 )
@@ -114,42 +140,35 @@ fun NavGraph(navController: NavHostController) {
             composable(Routes.PROFILE) {
                 ProfileScreen(
                     onLogout = {
-                        selectedTab = NavTab.Carte
                         navController.navigate(Routes.MAP) {
                             popUpTo(Routes.MAP) { inclusive = true }
                         }
                     },
                     onSettingsClick = { navController.navigate(Routes.PARAMS) },
-                    onEventClick = { eventId ->
-                        navController.navigate("${Routes.EVENT_DETAIL}/$eventId")
-                    }
+                    onEventClick = { eventId -> navController.navigate(Routes.eventDetail(eventId)) }
                 )
             }
 
-            composable("${Routes.EVENT_DETAIL}/{eventId}") { backStackEntry ->
-                val eventId = backStackEntry.arguments?.getString("eventId")
+            composable(Routes.EVENT_DETAIL) { backStackEntry ->
                 EventDetailScreen(
-                    eventId = eventId,
+                    eventId = backStackEntry.arguments?.getString("eventId"),
                     onBackClick = { navController.popBackStack() },
-                    onLoginClick = { navController.navigate(Routes.LOGIN) }
+                    onLoginClick = { navController.navigate(Routes.LOGIN) },
+                    onEventDeleted = {
+                        navController.popBackStack()
+                        showToast(NavToast(R.string.event_delete_toast_title, R.string.event_delete_toast_desc))
+                    },
                 )
             }
 
-            composable(
-                route = Routes.PARAMS,
-                enterTransition = { slideInHorizontally { it } },
-                exitTransition = { slideOutHorizontally { -it } },
-                popEnterTransition = { slideInHorizontally { -it } },
-                popExitTransition = { slideOutHorizontally { it } },
-            ) {
+            slideComposable(Routes.PARAMS) {
                 ParamsScreen(
                     onBackClick = { navController.popBackStack() },
                     onLogout = {
-                        selectedTab = NavTab.Carte
                         navController.navigate(Routes.MAP) {
                             popUpTo(0) { inclusive = true }
                         }
-                        logoutToastKey++
+                        showToast(NavToast(R.string.toast_logout_title, R.string.toast_logout_desc))
                     },
                     onEditProfileClick = { navController.navigate(Routes.EDIT_PROFILE) },
                     onEditPasswordClick = { navController.navigate(Routes.EDIT_PASSWORD) },
@@ -157,110 +176,68 @@ fun NavGraph(navController: NavHostController) {
                 )
             }
 
-            composable(Routes.EDIT_PASSWORD,
-                enterTransition = { slideInHorizontally { it } },
-                exitTransition = { slideOutHorizontally { -it } },
-                popEnterTransition = { slideInHorizontally { -it } },
-                popExitTransition = { slideOutHorizontally { it } },) {
+            slideComposable(Routes.EDIT_PASSWORD) {
                 EditPasswordScreen(onBackClick = { navController.popBackStack() })
             }
 
-            composable(Routes.EDIT_PROFILE,
-                enterTransition = { slideInHorizontally { it } },
-                exitTransition = { slideOutHorizontally { -it } },
-                popEnterTransition = { slideInHorizontally { -it } },
-                popExitTransition = { slideOutHorizontally { it } },
-                ) {
+            slideComposable(Routes.EDIT_PROFILE) {
                 EditProfileScreen(
                     onBackClick = { navController.popBackStack() },
                     onAccountDeleted = {
-                        selectedTab = NavTab.Carte
                         navController.navigate(Routes.MAP) {
                             popUpTo(0) { inclusive = true }
                         }
-                        deleteAccountToastKey++
+                        showToast(NavToast(R.string.toast_account_deleted_title, R.string.toast_account_deleted_desc))
                     },
                 )
             }
 
-            composable(
-                route = Routes.ADMIN,
-                enterTransition = { slideInHorizontally { it } },
-                exitTransition = { slideOutHorizontally { -it } },
-                popEnterTransition = { slideInHorizontally { -it } },
-                popExitTransition = { slideOutHorizontally { it } },
-            ) {
+            slideComposable(Routes.ADMIN) {
                 AdminScreen(onBackClick = { navController.popBackStack() })
             }
 
             composable(Routes.CREATE_EVENT) {
-                CreateEventScreen(
-                    onEventCreated = {
-                        selectedTab = NavTab.Carte
+                EventFormScreen(
+                    onSaved = {
+                        // Réutilise l'écran carte existant (et son ViewModel) au lieu d'en recréer un :
+                        // évite le rechargement complet (fix GPS + requête) qui laissait la carte vide.
                         navController.navigate(Routes.MAP) {
-                            popUpTo(Routes.CREATE_EVENT) { inclusive = true }
+                            popUpTo(Routes.MAP) { inclusive = false }
+                            launchSingleTop = true
                         }
-                        eventCreatedToastKey++
+                        showToast(NavToast(R.string.toast_event_created_title, R.string.toast_event_created_desc))
                     },
                 )
             }
         }
 
-        if (loginToastKey > 0) {
+        pendingToast?.let { toast ->
             Toast(
-                title = "Connexion réussie !",
-                description = "Bienvenue sur Geo Trouvetou",
-                key = loginToastKey,
-            )
-        }
-        if (registerToastKey > 0) {
-            Toast(
-                title = "Compte créé !",
-                description = "Bienvenue sur Geo Trouvetou",
-                key = registerToastKey,
-            )
-        }
-        if (deleteAccountToastKey > 0) {
-            Toast(
-                title = "Compte supprimé",
-                description = "Votre compte a bien été supprimé",
-                key = deleteAccountToastKey,
-            )
-        }
-        if (logoutToastKey > 0) {
-            Toast(
-                title = "Déconnexion réussie",
-                description = "À bientôt sur Geo Trouvetou",
-                key = logoutToastKey,
-            )
-        }
-        if (eventCreatedToastKey > 0) {
-            Toast(
-                title = "Succès !",
-                description = "L'événement a été créé avec succès",
-                key = eventCreatedToastKey,
+                title = stringResource(toast.title),
+                description = stringResource(toast.description),
+                type = toast.type,
+                key = toastTick,
             )
         }
 
         val hideNavBar = currentRoute in setOf(Routes.PARAMS, Routes.EDIT_PROFILE, Routes.EDIT_PASSWORD, Routes.ADMIN)
-        if (!hideNavBar) NavBar(
+        if (!hideNavBar) {
+            NavBar(
                 selectedTab = selectedTab,
                 onTabSelected = { tab ->
                     when (tab) {
-                        NavTab.Carte -> {
-                            selectedTab = NavTab.Carte
-                            navController.navigate(Routes.MAP) {
-                                popUpTo(Routes.MAP) { inclusive = false }
-                                launchSingleTop = true
-                            }
+                        NavTab.Carte -> navController.navigate(Routes.MAP) {
+                            popUpTo(Routes.MAP) { inclusive = false }
+                            launchSingleTop = true
                         }
-                        NavTab.Profil -> navigateIfLoggedIn(Routes.PROFILE, NavTab.Profil)
-                        NavTab.Ajouter -> navigateIfLoggedIn(Routes.CREATE_EVENT, NavTab.Ajouter)
+                        NavTab.Profil -> navigateIfLoggedIn(Routes.PROFILE)
+                        NavTab.Ajouter -> navigateIfLoggedIn(Routes.CREATE_EVENT)
                     }
                 },
                 modifier = Modifier
                     .background(colorResource(R.color.white))
                     .navigationBarsPadding(),
             )
+        }
     }
 }

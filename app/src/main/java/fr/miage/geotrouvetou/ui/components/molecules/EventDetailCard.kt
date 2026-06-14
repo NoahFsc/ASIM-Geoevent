@@ -34,7 +34,7 @@ fun EventDetailCard(
     date: String,
     time: String,
     locationName: String,
-    locationDetail: String,
+    locationDetail: String?,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -61,7 +61,7 @@ fun EventDetailCard(
 }
 
 @Composable
-private fun DetailRow(icon: ImageVector, title: String, subtitle: String) {
+private fun DetailRow(icon: ImageVector, title: String, subtitle: String?) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -87,11 +87,13 @@ private fun DetailRow(icon: ImageVector, title: String, subtitle: String) {
                 fontWeight = FontWeight.Bold,
                 color = colorResource(R.color.text_darker),
             )
-            Text(
-                text = subtitle,
-                fontSize = 14.sp,
-                color = colorResource(R.color.text_lighter),
-            )
+            if (!subtitle.isNullOrEmpty()) {
+                Text(
+                    text = subtitle,
+                    fontSize = 14.sp,
+                    color = colorResource(R.color.text_lighter),
+                )
+            }
         }
     }
 }

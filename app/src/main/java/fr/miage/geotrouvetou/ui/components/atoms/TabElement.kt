@@ -1,6 +1,5 @@
 package fr.miage.geotrouvetou.ui.components.atoms
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -60,18 +59,10 @@ fun TabElement(
     }
 }
 
-@Preview(name = "TabElement – Default")
+@Preview
 @Composable
-private fun TabElementDefaultPreview() {
-    Box(modifier = Modifier.background(colorResource(R.color.background)).padding(16.dp)) {
-        TabElement(icon = Icons.Outlined.Home, label = "blabla", selected = false, onClick = {})
-    }
-}
-
-@Preview(name = "TabElement – Active")
-@Composable
-private fun TabElementActivePreview() {
-    Box(modifier = Modifier.background(colorResource(R.color.background)).padding(16.dp)) {
-        TabElement(icon = Icons.Outlined.Home, label = "blabla", selected = true, onClick = {})
+private fun TabElementPreview() {
+    Box(modifier = Modifier.padding(16.dp)) {
+        TabElement(icon = Icons.Outlined.Home, label = "Carte", selected = true, onClick = {})
     }
 }

@@ -3,8 +3,8 @@ package fr.miage.geotrouvetou.ui.profile
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import fr.miage.geotrouvetou.App
+import fr.miage.geotrouvetou.R
 import fr.miage.geotrouvetou.utils.PasswordValidation
-import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,12 +18,12 @@ data class EditPasswordUiState(
     val error: String? = null,
     val validation: PasswordValidation = PasswordValidation.EMPTY,
 ) {
-    val formValid: Boolean get() = validation.isValid && PasswordValidation.confirmError(password, confirmPassword) == null && confirmPassword.isNotEmpty()
+    val formValid: Boolean get() = validation.isValid && PasswordValidation.passwordsMatch(password, confirmPassword)
 }
 
 class EditPasswordViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val supabase get() = getApplication<App>().supabase
+    private val authService get() = getApplication<App>().authService
 
     private val _uiState = MutableStateFlow(EditPasswordUiState())
     val uiState: StateFlow<EditPasswordUiState> = _uiState.asStateFlow()
@@ -53,11 +53,11 @@ class EditPasswordViewModel(application: Application) : AndroidViewModel(applica
         if (!state.formValid) return false
         _uiState.value = state.copy(isSaving = true, error = null)
         return try {
-            supabase.auth.updateUser { password = state.password }
+            authService.updatePassword(state.password)
             _uiState.value = _uiState.value.copy(isSaving = false)
             true
-        } catch (e: Exception) {
-            _uiState.value = _uiState.value.copy(isSaving = false, error = "Erreur lors de la modification du mot de passe")
+        } catch (_: Exception) {
+            _uiState.value = _uiState.value.copy(isSaving = false, error = getApplication<App>().getString(R.string.edit_password_error))
             false
         }
     }

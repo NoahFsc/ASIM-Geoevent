@@ -6,9 +6,9 @@ import fr.miage.geotrouvetou.domain.models.AuditLogEntry
 import fr.miage.geotrouvetou.domain.models.Evenement
 import fr.miage.geotrouvetou.domain.models.EventParticipant
 import fr.miage.geotrouvetou.domain.models.User
+import fr.miage.geotrouvetou.domain.interfaces.IImageService
 import io.github.jan.supabase.postgrest.query.Order
 import io.github.jan.supabase.postgrest.query.filter.PostgrestFilterBuilder
-import fr.miage.geotrouvetou.utils.ImageHelper
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.postgrest
@@ -28,24 +28,26 @@ import kotlinx.coroutines.flow.map
  * Implémentation du service de données via Supabase.
  * Gère les interactions avec la base Postgrest, le Storage et le Realtime.
  */
-class SupabaseDatabaseService(private val client: SupabaseClient) : IDatabaseService {
-
-    private val tableName = "events"
-    private val imageHelper = ImageHelper(client)
+class SupabaseDatabaseService(
+    private val client: SupabaseClient,
+    private val imageService: IImageService,
+) : IDatabaseService {
     private var eventsChannel: RealtimeChannel? = null
 
+    // ── Événements ──
+
     override suspend fun addEvent(event: Evenement) {
-        client.postgrest[tableName].insert(event)
+        client.postgrest["events"].insert(event)
     }
 
     override suspend fun updateEvent(event: Evenement) {
         val eventId = event.id ?: return
-        client.postgrest[tableName].update(buildJsonObject {
+        client.postgrest["events"].update(buildJsonObject {
             put("title", event.title)
             put("description", event.description)
-            put("image_url", event.image_url)
+            put("image_url", event.imageUrl)
             put("visibility", event.visibility)
-            put("event_date", event.event_date)
+            put("event_date", event.eventDate)
             put("latitude", event.latitude)
             put("longitude", event.longitude)
             put("location", event.location)
@@ -55,20 +57,17 @@ class SupabaseDatabaseService(private val client: SupabaseClient) : IDatabaseSer
     }
 
     override suspend fun getEvent(eventId: String): Evenement? {
-        return client.postgrest[tableName].select {
+        return client.postgrest["events"].select {
             filter { eq("id", eventId) }
         }.decodeSingleOrNull<Evenement>()
     }
 
-    /**
-     * Utilise le helper dédié pour uploader une image et récupérer son lien public.
-     */
     override suspend fun uploadImage(fileName: String, bytes: ByteArray): String {
-        return imageHelper.uploadEventImage(fileName, bytes)
+        return imageService.uploadEventImage(fileName, bytes)
     }
 
     /**
-     * Restreint une requête aux events visibles par l'utilisateur courant :
+     * Restreint une requête aux events visibles par l'utilisateur :
      * les events publics, plus ses propres events privés.
      */
     private fun PostgrestFilterBuilder.visibleToCurrentUser() {
@@ -84,7 +83,7 @@ class SupabaseDatabaseService(private val client: SupabaseClient) : IDatabaseSer
     }
 
     override suspend fun getAllEvents(): List<Evenement> {
-        return client.postgrest[tableName]
+        return client.postgrest["events"]
             .select {
                 filter { visibleToCurrentUser() }
             }
@@ -97,12 +96,9 @@ class SupabaseDatabaseService(private val client: SupabaseClient) : IDatabaseSer
         minLon: Double,
         maxLon: Double
     ): List<Evenement> {
-        return client.postgrest[tableName]
+        return client.postgrest["events"]
             .select {
                 filter {
-                    // Les 4 conditions sur 2 colonnes doivent être dans un and {}
-                    // sinon supabase-kt écrase les clés dupliquées dans sa Map de paramètres
-                    // et seule la première condition par colonne (gte) serait envoyée.
                     and {
                         gte("latitude", minLat)
                         lte("latitude", maxLat)
@@ -118,10 +114,7 @@ class SupabaseDatabaseService(private val client: SupabaseClient) : IDatabaseSer
     /**
      * Émet Unit à chaque changement sur la table 'events'.
      * Le caller (MapViewModel) appelle scheduleRefresh() pour recharger
-     * selon les bounds courantes — on n'appelle plus getAllEvents() ici.
-     *
-     * Le flow gère son propre cycle de vie : unsubscribe de l'ancien channel
-     * avant de créer le nouveau, et cleanup via finally à la cancellation.
+     * selon les bordures courantes.
      */
     override fun listenToEventsRealtime(): Flow<Unit> = flow {
         eventsChannel?.unsubscribe()
@@ -131,11 +124,11 @@ class SupabaseDatabaseService(private val client: SupabaseClient) : IDatabaseSer
 
         try {
             val changeFlow = channel.postgresChangeFlow<PostgresAction>(schema = "public") {
-                table = tableName
+                table = "events"
             }.map { Unit }
 
             channel.subscribe()
-            emit(Unit) // premier chargement dès l'abonnement
+            emit(Unit)
 
             changeFlow.collect { emit(it) }
         } finally {
@@ -144,6 +137,8 @@ class SupabaseDatabaseService(private val client: SupabaseClient) : IDatabaseSer
         }
     }
 
+    // ── Profil ──
+
     override suspend fun getProfile(userId: String): User? {
         val user = client.postgrest["profiles"].select {
             filter { eq("id", userId) }
@@ -151,7 +146,7 @@ class SupabaseDatabaseService(private val client: SupabaseClient) : IDatabaseSer
 
         val resolvedAvatarUrl = user.avatarUrl?.let { path ->
             if (path.startsWith("http")) path
-            else try { imageHelper.getAvatarSignedUrl(path) } catch (_: Exception) { null }
+            else try { imageService.getAvatarSignedUrl(path) } catch (_: Exception) { null }
         }
         return user.copy(avatarUrl = resolvedAvatarUrl)
     }
@@ -172,7 +167,7 @@ class SupabaseDatabaseService(private val client: SupabaseClient) : IDatabaseSer
     }
 
     override suspend fun updateAvatar(userId: String, bytes: ByteArray) {
-        val avatarUrl = imageHelper.uploadAvatarImage(userId, bytes)
+        val avatarUrl = imageService.uploadAvatarImage(userId, bytes)
         client.postgrest["profiles"].update({
             set("avatar_url", avatarUrl)
         }) {
@@ -190,8 +185,19 @@ class SupabaseDatabaseService(private val client: SupabaseClient) : IDatabaseSer
         client.postgrest.rpc("delete_own_account")
     }
 
+    // ── Participations ──
+
     override suspend fun joinEvent(eventId: String, userId: String) {
         client.postgrest["event_participants"].insert(EventParticipant(eventId, userId))
+    }
+
+    override suspend fun leaveEvent(eventId: String, userId: String) {
+        client.postgrest["event_participants"].delete {
+            filter {
+                eq("event_id", eventId)
+                eq("profile_id", userId)
+            }
+        }
     }
 
     override suspend fun isUserParticipating(eventId: String, userId: String): Boolean {
@@ -212,11 +218,11 @@ class SupabaseDatabaseService(private val client: SupabaseClient) : IDatabaseSer
         return response.size
     }
 
-    // ── Admin ────────────────────────────────────────────────────────────────
+    // ── Admin ──
 
     override suspend fun getAdminStats(): AdminStats {
         val userCount = client.postgrest["profiles"].select().decodeList<User>().size
-        val eventCount = client.postgrest[tableName].select().decodeList<Evenement>().size
+        val eventCount = client.postgrest["events"].select().decodeList<Evenement>().size
         return AdminStats(userCount = userCount, eventCount = eventCount)
     }
 
@@ -231,7 +237,7 @@ class SupabaseDatabaseService(private val client: SupabaseClient) : IDatabaseSer
     override suspend fun getAdminEvents(page: Int, pageSize: Int): List<Evenement> {
         val from = (page * pageSize).toLong()
         val to = ((page + 1) * pageSize - 1).toLong()
-        return client.postgrest[tableName]
+        return client.postgrest["events"]
             .select {
                 range(from = from, to = to)
                 order(column = "created_at", order = Order.DESCENDING)
@@ -260,7 +266,7 @@ class SupabaseDatabaseService(private val client: SupabaseClient) : IDatabaseSer
     }
 
     override suspend fun deleteEvent(eventId: String) {
-        client.postgrest[tableName].delete {
+        client.postgrest["events"].delete {
             filter { eq("id", eventId) }
         }
     }

@@ -28,6 +28,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -54,7 +55,7 @@ fun AdminEventCard(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         AsyncImage(
-            model = event.image_url,
+            model = event.imageUrl,
             contentDescription = event.title,
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -82,7 +83,7 @@ fun AdminEventCard(
                     .padding(horizontal = 8.dp, vertical = 2.dp),
             ) {
                 Text(
-                    text = if (event.visibility) "Public" else "Privé",
+                    text = if (event.visibility) stringResource(R.string.admin_event_public) else stringResource(R.string.admin_event_private),
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Medium,
                     color = colorResource(R.color.text_darker),
@@ -94,7 +95,7 @@ fun AdminEventCard(
             IconButton(onClick = { menuExpanded = true }, modifier = Modifier.size(32.dp)) {
                 Icon(
                     imageVector = Icons.Filled.MoreVert,
-                    contentDescription = "Menu",
+                    contentDescription = stringResource(R.string.admin_menu_cd),
                     tint = colorResource(R.color.text_lighter),
                     modifier = Modifier.size(20.dp),
                 )

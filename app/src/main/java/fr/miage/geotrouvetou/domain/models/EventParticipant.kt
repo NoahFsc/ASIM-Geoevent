@@ -1,9 +1,10 @@
 package fr.miage.geotrouvetou.domain.models
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class EventParticipant(
-    val event_id: String,
-    val profile_id: String
+    @SerialName("event_id") val eventId: String,
+    @SerialName("profile_id") val profileId: String
 )

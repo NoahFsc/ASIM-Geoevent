@@ -1,5 +1,8 @@
 package fr.miage.geotrouvetou.utils
 
+import android.content.Context
+import fr.miage.geotrouvetou.R
+
 data class PasswordValidation(
     val hasMinLength: Boolean,
     val hasDigit: Boolean,
@@ -8,11 +11,12 @@ data class PasswordValidation(
 ) {
     val isValid: Boolean get() = hasMinLength && hasDigit && hasSpecial && hasUppercase
 
-    fun firstError(): String? = when {
-        !hasMinLength -> "Le mot de passe doit contenir au moins 8 caractères"
-        !hasDigit -> "Le mot de passe doit contenir au moins 1 chiffre"
-        !hasUppercase -> "Le mot de passe doit contenir au moins 1 majuscule"
-        !hasSpecial -> "Le mot de passe doit contenir au moins 1 caractère spécial"
+    /** Premier critère non rempli, traduit, ou null si le mot de passe est valide. */
+    fun firstError(context: Context): String? = when {
+        !hasMinLength -> context.getString(R.string.validation_password_min)
+        !hasDigit -> context.getString(R.string.validation_password_digit)
+        !hasUppercase -> context.getString(R.string.validation_password_uppercase)
+        !hasSpecial -> context.getString(R.string.validation_password_special)
         else -> null
     }
 
@@ -31,7 +35,12 @@ data class PasswordValidation(
             hasUppercase = password.any { it.isUpperCase() },
         )
 
-        fun confirmError(password: String, confirm: String): String? =
-            if (confirm.isNotEmpty() && confirm != password) "Les mots de passe ne correspondent pas" else null
+        /** Vrai si la confirmation est saisie et identique au mot de passe. */
+        fun passwordsMatch(password: String, confirm: String): Boolean =
+            confirm.isNotEmpty() && confirm == password
+
+        fun confirmError(context: Context, password: String, confirm: String): String? =
+            if (confirm.isNotEmpty() && confirm != password)
+                context.getString(R.string.validation_passwords_mismatch) else null
     }
 }

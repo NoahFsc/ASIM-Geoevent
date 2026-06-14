@@ -14,7 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.DirectionsWalk
+import androidx.compose.material.icons.automirrored.outlined.DirectionsWalk
 import androidx.compose.material.icons.outlined.Group
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -68,14 +69,14 @@ fun EventCard(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
-                            text = "Supprimer",
+                            text = stringResource(R.string.event_card_delete),
                             fontSize = 15.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = colorResource(R.color.text_darker),
                         )
                         Icon(
                             imageVector = Icons.Filled.Close,
-                            contentDescription = "Supprimer",
+                            contentDescription = stringResource(R.string.event_card_delete),
                             tint = colorResource(R.color.text_darker),
                             modifier = Modifier.size(18.dp),
                         )
@@ -93,7 +94,7 @@ fun EventCard(
                             modifier = Modifier.size(18.dp),
                         )
                         Text(
-                            text = "Recommandé",
+                            text = stringResource(R.string.event_card_recommended),
                             fontSize = 15.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = colorResource(R.color.primary_500),
@@ -116,7 +117,7 @@ fun EventCard(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = "$date  •  $time",
+                text = stringResource(R.string.event_card_datetime, date, time),
                 fontSize = 14.sp,
                 color = colorResource(R.color.text_lighter),
             )
@@ -139,7 +140,7 @@ fun EventCard(
                     )
                     Text(text = "•", fontSize = 14.sp, color = colorResource(R.color.text_lighter))
                     Icon(
-                        imageVector = Icons.Outlined.DirectionsWalk,
+                        imageVector = Icons.AutoMirrored.Outlined.DirectionsWalk,
                         contentDescription = null,
                         tint = colorResource(R.color.text_lighter),
                         modifier = Modifier.size(18.dp),
@@ -150,9 +151,9 @@ fun EventCard(
     }
 }
 
-@Preview(name = "EventCard – Recommandé")
+@Preview
 @Composable
-private fun EventCardRecommendedPreview() {
+private fun EventCardPreview() {
     Box(modifier = Modifier.background(colorResource(R.color.text_darker)).padding(16.dp)) {
         EventCard(
             tag = TagStatus.NEW,
@@ -162,21 +163,6 @@ private fun EventCardRecommendedPreview() {
             isRecommended = true,
             attendance = "Faible",
             onClick = {},
-        )
-    }
-}
-
-@Preview(name = "EventCard – Supprimable")
-@Composable
-private fun EventCardDeletablePreview() {
-    Box(modifier = Modifier.background(colorResource(R.color.text_darker)).padding(16.dp)) {
-        EventCard(
-            tag = TagStatus.NEW,
-            title = "Forêt d'Ornans",
-            date = "28/04",
-            time = "09:00",
-            onClick = {},
-            onDelete = {},
         )
     }
 }

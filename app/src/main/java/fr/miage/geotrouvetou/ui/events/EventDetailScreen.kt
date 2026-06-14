@@ -16,13 +16,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -30,18 +31,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.miage.geotrouvetou.App
 import fr.miage.geotrouvetou.R
-import fr.miage.geotrouvetou.data.backend.SupabaseDatabaseService
 import fr.miage.geotrouvetou.domain.models.Evenement
-import io.github.jan.supabase.auth.auth
+import fr.miage.geotrouvetou.ui.utils.appViewModelFactory
 import fr.miage.geotrouvetou.ui.components.atoms.Button
 import fr.miage.geotrouvetou.ui.components.atoms.ButtonVariant
 import fr.miage.geotrouvetou.ui.components.atoms.Toast
@@ -54,24 +52,36 @@ fun EventDetailScreen(
     eventId: String?,
     onBackClick: () -> Unit,
     onLoginClick: () -> Unit,
+    onEventDeleted: () -> Unit = onBackClick,
 ) {
     val context = LocalContext.current
-    val viewModel: EventDetailViewModel = viewModel(
-        factory = object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                val app = context.applicationContext as App
-                val databaseService = SupabaseDatabaseService(app.supabase)
-                @Suppress("UNCHECKED_CAST")
-                return EventDetailViewModel(databaseService, app.supabase) as T
-            }
-        }
-    )
+    val viewModel: EventDetailViewModel = viewModel(factory = appViewModelFactory(context))
 
     var isEditing by remember { mutableStateOf(false) }
-    var updateToastKey by remember { mutableStateOf(0) }
+    var updateToastKey by remember { mutableIntStateOf(0) }
+    var joinToastKey by remember { mutableIntStateOf(0) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(eventId) {
         eventId?.let { viewModel.loadEvent(it) }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.eventDeleted.collect { onEventDeleted() }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.joined.collect { joinToastKey++ }
+    }
+
+    if (showDeleteDialog) {
+        DeleteEventDialog(
+            onConfirm = {
+                showDeleteDialog = false
+                viewModel.deleteEvent()
+            },
+            onDismiss = { showDeleteDialog = false },
+        )
     }
 
     if (viewModel.isLoading) {
@@ -81,11 +91,10 @@ fun EventDetailScreen(
     } else {
         viewModel.event?.let { event ->
             if (isEditing) {
-                EventUpdateScreen(
+                EventFormScreen(
                     event = event,
-                    onBackClick = { isEditing = false },
-                    onEventUpdated = { 
-                        isEditing = false
+                    onBack = { isEditing = false },
+                    onSaved = {
                         updateToastKey++
                         eventId?.let { viewModel.loadEvent(it) }
                     }
@@ -96,36 +105,37 @@ fun EventDetailScreen(
                     onBackClick = onBackClick,
                     isJoined = viewModel.isJoined,
                     isOwner = viewModel.isOwner,
-                    onJoinClick = { 
-                        val user = (context.applicationContext as App).supabase.auth.currentUserOrNull()
-                        if (user != null) {
+                    onJoinClick = {
+                        if ((context.applicationContext as App).authService.isLoggedIn()) {
                             viewModel.joinEvent()
                         } else {
                             onLoginClick()
                         }
                     },
-                    onEditClick = { isEditing = true }
+                    onLeaveClick = { viewModel.leaveEvent() },
+                    onEditClick = { isEditing = true },
+                    onDeleteClick = { showDeleteDialog = true },
                 )
 
-                if (viewModel.joinToastKey > 0) {
+                if (joinToastKey > 0) {
                     Toast(
-                        title = "Inscription réussie !",
-                        description = "Vous participez désormais à cet événement",
-                        key = viewModel.joinToastKey
+                        title = stringResource(R.string.event_join_toast_title),
+                        description = stringResource(R.string.event_join_toast_desc),
+                        key = joinToastKey
                     )
                 }
 
                 if (updateToastKey > 0) {
                     Toast(
-                        title = "Modification réussie !",
-                        description = "L'événement a été mis à jour",
+                        title = stringResource(R.string.event_update_toast_title),
+                        description = stringResource(R.string.event_update_toast_desc),
                         key = updateToastKey
                     )
                 }
             }
         } ?: run {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(text = "Événement introuvable")
+                Text(text = stringResource(R.string.event_detail_not_found))
             }
         }
     }
@@ -138,15 +148,23 @@ fun EventDetailContent(
     isJoined: Boolean,
     isOwner: Boolean,
     onJoinClick: () -> Unit,
+    onLeaveClick: () -> Unit,
     onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val imageUrl = event.image_url
+    val imageUrl = event.imageUrl
         ?: "https://picsum.photos/seed/${event.title.hashCode()}/800/400"
     val date = event.formattedDateLong()
     val time = event.formattedTime()
-    val locationLabel = event.location ?: "Coordonnées"
-    val locationDetail = if (event.location != null) "" else "Lat: ${event.latitude}, Lon: ${event.longitude}"
+    val locationParts = event.location?.split(", ") ?: emptyList()
+    val locationLabel = locationParts.firstOrNull()
+        ?: stringResource(R.string.event_detail_location_fallback)
+    val locationDetail: String? = when {
+        locationParts.size > 1 -> locationParts.drop(1).joinToString(", ")
+        event.location == null -> stringResource(R.string.event_detail_coordinates, event.latitude.toString(), event.longitude.toString())
+        else -> null
+    }
 
     Column(
         modifier = modifier
@@ -170,7 +188,7 @@ fun EventDetailContent(
                 modifier = Modifier.size(24.dp)
             )
             Text(
-                text = "Retour",
+                text = stringResource(R.string.action_back),
                 fontSize = 18.sp,
                 color = colorResource(R.color.text_light)
             )
@@ -188,18 +206,6 @@ fun EventDetailContent(
                 lineHeight = 34.sp
             )
 
-            Button(
-                text = if (isOwner) "Modifier" else if (isJoined) "Déjà inscrit" else "Enregistrer",
-                onClick = {
-                    if (isOwner) onEditClick()
-                    else if (!isJoined) onJoinClick()
-                },
-                enabled = isOwner || !isJoined,
-                variant = ButtonVariant.Fill,
-                leftIcon = if (isOwner) Icons.Default.Edit else Icons.Default.Add,
-                modifier = Modifier.fillMaxWidth()
-            )
-
             EventDetailBody(
                 imageUrl = imageUrl,
                 date = date,
@@ -207,27 +213,22 @@ fun EventDetailContent(
                 locationName = locationLabel,
                 locationDetail = locationDetail,
                 description = event.description,
-                modifier = Modifier.padding(bottom = 8.dp)
+                modifier = Modifier.padding(bottom = 8.dp),
+                actions = {
+                    if (isOwner) {
+                        OwnerEventActions(onEdit = onEditClick, onDelete = onDeleteClick)
+                    } else {
+                        Button(
+                            text = if (isJoined) stringResource(R.string.event_detail_leave)
+                                else stringResource(R.string.event_detail_join),
+                            onClick = { if (isJoined) onLeaveClick() else onJoinClick() },
+                            variant = if (isJoined) ButtonVariant.GhostDanger else ButtonVariant.Fill,
+                            leftIcon = if (isJoined) Icons.Default.Close else Icons.Default.Add,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                },
             )
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun EventDetailScreenPreview() {
-    EventDetailContent(
-        event = Evenement(
-            title = "Grande Forêt de Chailluz",
-            description = "Ce parcours accessible aux chiens vous fait découvrir la grande forêt de Chailluz...",
-            latitude = 0.0,
-            longitude = 0.0,
-            event_date = "2024-04-28T09:00:00"
-        ),
-        onBackClick = {},
-        isJoined = false,
-        isOwner = false,
-        onJoinClick = {},
-        onEditClick = {}
-    )
 }
