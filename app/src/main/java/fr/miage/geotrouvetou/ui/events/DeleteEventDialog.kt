@@ -8,7 +8,6 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import fr.miage.geotrouvetou.R
 
-/** Confirmation de suppression d'un événement, partagée entre la page détail et la modale. */
 @Composable
 fun DeleteEventDialog(
     onConfirm: () -> Unit,

@@ -7,7 +7,6 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-/** Dérive le statut d'affichage à partir de la date de l'événement. */
 fun Evenement.tagStatus(): TagStatus {
     val dateStr = eventDate ?: return TagStatus.NEW
     return try {
@@ -23,14 +22,11 @@ fun Evenement.tagStatus(): TagStatus {
     }
 }
 
-/** "2024-04-28" ou "—" si pas de date. */
 fun Evenement.formattedDate(): String = eventDate?.substringBefore('T') ?: "—"
 
-/** "09:00" ou "—" si pas d'heure. */
 fun Evenement.formattedTime(): String =
     eventDate?.let { if ('T' in it) it.substringAfter('T').take(5) else null } ?: "—"
 
-/** "Dimanche, 28 Avril" ou "—" si pas de date. */
 fun Evenement.formattedDateLong(): String {
     val dateStr = eventDate ?: return "—"
     return try {
@@ -42,7 +38,6 @@ fun Evenement.formattedDateLong(): String {
     }
 }
 
-/** "28/04" ou "—" si pas de date. */
 fun Evenement.formattedDateShort(): String {
     val dateStr = eventDate ?: return "—"
     return try {

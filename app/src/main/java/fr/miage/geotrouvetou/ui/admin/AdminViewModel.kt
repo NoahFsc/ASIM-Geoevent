@@ -51,8 +51,6 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
         loadEvents()
     }
 
-    // ── Stats ──
-
     fun loadStats() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoadingStats = true)
@@ -65,8 +63,6 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    // ── Activité récente ──
-
     fun loadRecentActivity() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoadingActivity = true)
@@ -78,8 +74,6 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
     }
-
-    // ── Utilisateurs ──
 
     fun loadUsers() {
         usersPage = 0
@@ -139,8 +133,6 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
     }
-
-    // ── Événements ──
 
     fun loadEvents() {
         eventsPage = 0

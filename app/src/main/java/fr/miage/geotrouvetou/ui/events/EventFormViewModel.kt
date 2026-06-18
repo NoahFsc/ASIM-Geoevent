@@ -18,10 +18,6 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.UUID
 
-/**
- * ViewModel unique du formulaire d'événement : création (load(null)) ou édition (load(event)).
- * Seule la persistance diffère selon le mode, l'état et la validation sont communs.
- */
 class EventFormViewModel(
     application: Application,
     private val databaseService: IDatabaseService,
@@ -56,7 +52,6 @@ class EventFormViewModel(
                 time.isNotBlank() && latitude != null && longitude != null &&
                 (imageUri != null || currentImageUrl != null) && !isLoading
 
-    /** Prépare le formulaire : null pour une création, sinon pré-remplit depuis l'événement. */
     fun load(event: Evenement?) {
         if (event == null || originalEvent != null) return
         originalEvent = event
@@ -77,7 +72,6 @@ class EventFormViewModel(
                     time = SimpleDateFormat("HH:mm", Locale.FRANCE).format(parsed)
                 }
             } catch (_: Exception) {
-                // Format inattendu : on laisse les champs vides plutôt que de planter.
             }
         }
     }
@@ -134,7 +128,6 @@ class EventFormViewModel(
         }
     }
 
-    /** Convertit les champs date (dd/MM/yyyy) et heure (HH:mm) en ISO 8601, ou null si invalide. */
     private fun formatEventDate(): String? = try {
         val dateParts = date.split("/")
         val timeParts = time.split(":")

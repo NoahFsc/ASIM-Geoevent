@@ -1,4 +1,4 @@
-# GeoTrouvetou — Application de partage d'événements géolocalisés
+# GeoTrouvetou : Application de partage d'événements géolocalisés
 
 Application communautaire permettant de créer, découvrir et rejoindre des événements
 géolocalisés en temps réel sur une carte interactive.
@@ -18,7 +18,7 @@ géolocalisés en temps réel sur une carte interactive.
 
 ## Niveau réalisé
 
-**Option 2 — Niveau Intermédiaire**, intégralement couverte (authentification
+**Option 2 (Niveau Intermédiaire)**, intégralement couverte (authentification
 email/mot de passe, rôles utilisateur/administrateur, upload d'image, filtrage par
 distance, temps réel, BroadcastReceiver).
 
@@ -44,7 +44,7 @@ Au-delà du sujet, le projet ajoute les fonctionnalités suivantes :
 - Au lancement, l'app demande la **permission de localisation** puis centre la carte sur votre
   position. Les événements proches sont chargés automatiquement.
 - Les **marqueurs** représentent les événements ; ceux trop proches sont **regroupés en cluster**
-  (un cercle avec un nombre) — toucher un cluster ouvre la liste des événements regroupés.
+  (un cercle avec un nombre) : toucher un cluster ouvre la liste des événements regroupés.
 - Un marqueur **vert** est un événement public ; un marqueur **orange** est un de vos événements
   **privés** (brouillons), visible de vous seul.
 - Boutons flottants : **cible** (recentrer sur ma position), **+ / −** (zoom).
@@ -56,7 +56,7 @@ Au-delà du sujet, le projet ajoute les fonctionnalités suivantes :
   Déplacer ou zoomer la carte met cette liste à jour (chargement par zone visible).
 - **Avec une adresse** : l'autocomplétion (Nominatim/OSM) propose des lieux ; en sélectionner un
   **déplace la carte** sur ce lieu et affiche **tous les événements à proximité**.
-- C'est le moyen rapide d'explorer une autre ville sans faire défiler la carte manuellement.
+- C'est le moyen rapide d'explorer une autre ville sans faire défiler la carte manuellement (méthode de filtrage).
 
 ### Créer / modifier un événement
 - Onglet central **+** : formulaire de création (titre, description, date, heure, lieu, image de
@@ -280,7 +280,7 @@ Sélectionner un émulateur (API 36+) ou un appareil physique, puis exécuter le
 
 ## Comptes de test
 
-Deux comptes sont préprovisionnés pour la démonstration :
+Deux comptes sont fournis pour la démonstration :
 
 | Rôle          | Email                       | Mot de passe                |
 |---------------|-----------------------------|-----------------------------|

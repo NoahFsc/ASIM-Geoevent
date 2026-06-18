@@ -96,8 +96,6 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
 
         viewModelScope.launch {
             val service = databaseService ?: return@launch
-            // Si les bounds de l'écran sont déjà connues
-            // on charge uniquement les events visibles. Sinon on replie sur le rayon 20km.
             val bounds = _uiState.value.visibleBounds
             if (bounds != null) {
                 loadEventsByBounds(service, bounds)
@@ -146,7 +144,6 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
     private suspend fun loadEventsAroundLocation(service: IDatabaseService, latitude: Double, longitude: Double) {
         _uiState.update { it.copy(isLoading = true, errorMessage = null) }
         try {
-            // Calcule une bounding box ~20km autour de la position
             val bounds = buildBoundsAround(latitude, longitude)
             val events = service.getEventsByVisibleBounds(
                 minLat = bounds.first,
@@ -198,15 +195,14 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         return Quadruple(
-            latitude - deltaLat,  // minLat
-            latitude + deltaLat,  // maxLat
-            longitude - deltaLon, // minLon
-            longitude + deltaLon  // maxLon
+            latitude - deltaLat,
+            latitude + deltaLat,
+            longitude - deltaLon,
+            longitude + deltaLon
         )
     }
 }
 
-// Extension pour créer facilement un Quadruple (il n'existe pas dans stdlib)
 data class Quadruple<A, B, C, D>(
     val first: A,
     val second: B,

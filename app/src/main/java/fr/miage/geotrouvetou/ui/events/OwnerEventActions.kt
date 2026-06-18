@@ -14,7 +14,6 @@ import fr.miage.geotrouvetou.R
 import fr.miage.geotrouvetou.ui.components.atoms.Button
 import fr.miage.geotrouvetou.ui.components.atoms.ButtonVariant
 
-/** Actions du propriétaire d'un événement : modifier et supprimer, côte à côte. */
 @Composable
 fun OwnerEventActions(
     onEdit: () -> Unit,

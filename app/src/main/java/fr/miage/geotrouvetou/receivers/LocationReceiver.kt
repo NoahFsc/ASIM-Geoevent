@@ -6,9 +6,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.location.LocationManager
 
-/**
- * Notifie l'activation et la désactivation de la localisation de l'appareil.
- */
 class LocationReceiver(
     private val onLocationStateChanged: (isEnabled: Boolean) -> Unit,
 ) : BroadcastReceiver() {

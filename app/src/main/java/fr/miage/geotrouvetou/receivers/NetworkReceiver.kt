@@ -6,9 +6,6 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 
-/**
- * Notifie la perte et le retour de la connexion internet.
- */
 class NetworkReceiver(
     private val onConnectivityChanged: (isConnected: Boolean) -> Unit,
 ) {

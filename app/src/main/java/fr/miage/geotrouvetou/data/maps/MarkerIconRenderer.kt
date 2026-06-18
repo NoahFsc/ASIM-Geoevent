@@ -23,20 +23,12 @@ import java.util.concurrent.CountDownLatch
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.drawable.toDrawable
 
-/**
- * Génère et met en cache les icônes (marqueur, cluster) de la carte.
- * Isole le rendu graphique du service de carte.
- */
 class MarkerIconRenderer(private val context: Context) {
 
     private var cachedMarkerIcon: BitmapDrawable? = null
     private var cachedPrivateMarkerIcon: BitmapDrawable? = null
     private var cachedClusterIcon: Bitmap? = null
 
-    /**
-     * Icône d'un marqueur : rendu Compose si possible, sinon icône dessinée à la main.
-     * Les événements privés (brouillons) utilisent une couleur distincte.
-     */
     fun markerIcon(mapView: MapView, isPrivate: Boolean = false): BitmapDrawable {
         (if (isPrivate) cachedPrivateMarkerIcon else cachedMarkerIcon)?.let { return it }
         // On ne met en cache que le rendu Compose réussi : le fallback peut être réessayé plus tard.
@@ -68,10 +60,8 @@ class MarkerIconRenderer(private val context: Context) {
         return bitmap.also { cachedClusterIcon = it }
     }
 
-    /** Rend l'icône via Compose, renvoie null si la vue n'est pas encore prête. */
     private fun createComposeMarkerIcon(mapView: MapView, isPrivate: Boolean): BitmapDrawable? {
         if (Looper.myLooper() != Looper.getMainLooper()) {
-            // Le rendu Compose doit s'exécuter sur le thread principal.
             val latch = CountDownLatch(1)
             var result: BitmapDrawable? = null
             Handler(Looper.getMainLooper()).post {
@@ -93,7 +83,6 @@ class MarkerIconRenderer(private val context: Context) {
             val composeView = ComposeView(context).apply {
                 setContent { MarkerIcon(size = sizeDp.dp, borderWidth = 3.dp, isPrivate = isPrivate) }
             }
-            // Attaché temporairement à l'arbre de vues pour hériter des lifecycle owners de Compose.
             val parent = mapView.parent as? ViewGroup
             parent?.addView(composeView, ViewGroup.LayoutParams(sizePx, sizePx))
 
@@ -113,7 +102,6 @@ class MarkerIconRenderer(private val context: Context) {
         }
     }
 
-    /** Icône de secours dessinée (cercle + drapeau) quand Compose n'est pas disponible. */
     private fun createFallbackIcon(isPrivate: Boolean = false): BitmapDrawable {
         val sizePx = dip(48f).toInt()
         val bitmap = createBitmap(sizePx, sizePx)

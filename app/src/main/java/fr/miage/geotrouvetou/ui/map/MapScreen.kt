@@ -98,8 +98,7 @@ fun MapScreen(
             showEventList = false
             clusterEvents = events
         }
-        // Démarre le rendu des tuiles dès qu'une (nouvelle) MapView est liée — indispensable au
-        // retour sur la carte, où l'événement de cycle de vie ON_RESUME peut ne pas se redéclencher.
+
         mapService.onResume()
         onDispose {
             mapService.setOnEventClickListener(null)
@@ -137,11 +136,10 @@ fun MapScreen(
         }
     }
 
-    // Clé sur mapView : rejoué pour chaque (nouvelle) MapView, donc aussi au retour sur la carte.
     LaunchedEffect(mapView, locationPermissionGranted) {
         if (!locationPermissionGranted) return@LaunchedEffect
         val knownLocation = viewModel.uiState.value.currentLocation
-        // Position déjà connue (retour sur la carte) : recadrage immédiat, sans réattendre le GPS.
+
         mapService.enableMyLocation(
             onFirstFix = if (knownLocation != null) null else { point ->
                 val zoom = mapService.getZoomForWidth(20.0, point.latitude)
@@ -188,7 +186,6 @@ fun MapScreen(
             )
         }
 
-        // Haut-gauche : centrer sur ma position
         Box(
             modifier = Modifier
                 .align(Alignment.TopStart)
@@ -206,7 +203,6 @@ fun MapScreen(
             )
         }
 
-        // Haut-droite : zoom avant / arrière
         Column(
             modifier = Modifier
                 .align(Alignment.TopEnd)
@@ -226,7 +222,6 @@ fun MapScreen(
             )
         }
 
-        // Bas-centre : barre de recherche ouvrant la liste des événements
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)

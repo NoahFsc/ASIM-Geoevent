@@ -56,14 +56,12 @@ object Routes {
     fun eventDetail(eventId: String) = "eventDetail/$eventId"
 }
 
-/** Feedback global à afficher une fois (toasts de connexion, suppression, etc.). */
 private data class NavToast(
     @param:StringRes val title: Int,
     @param:StringRes val description: Int,
     val type: ToastType = ToastType.Success,
 )
 
-/** Routes secondaires entrant/sortant par un glissement horizontal. */
 private fun NavGraphBuilder.slideComposable(
     route: String,
     content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit,
@@ -83,14 +81,12 @@ fun NavGraph(navController: NavHostController) {
 
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
 
-    // L'onglet actif est dérivé de la route courante
     val selectedTab = when (currentRoute) {
         Routes.PROFILE, Routes.EVENT_DETAIL -> NavTab.Profil
         Routes.CREATE_EVENT -> NavTab.Ajouter
         else -> NavTab.Carte
     }
 
-    // Toast + tick pour rejouer l'animation à chaque déclenchement
     var toastTick by remember { mutableIntStateOf(0) }
     var pendingToast by remember { mutableStateOf<NavToast?>(null) }
     fun showToast(toast: NavToast) {
@@ -199,8 +195,6 @@ fun NavGraph(navController: NavHostController) {
             composable(Routes.CREATE_EVENT) {
                 EventFormScreen(
                     onSaved = {
-                        // Réutilise l'écran carte existant (et son ViewModel) au lieu d'en recréer un :
-                        // évite le rechargement complet (fix GPS + requête) qui laissait la carte vide.
                         navController.navigate(Routes.MAP) {
                             popUpTo(Routes.MAP) { inclusive = false }
                             launchSingleTop = true

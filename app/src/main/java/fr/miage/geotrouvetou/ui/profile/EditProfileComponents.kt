@@ -40,7 +40,6 @@ import fr.miage.geotrouvetou.ui.components.atoms.Button
 import fr.miage.geotrouvetou.ui.components.atoms.ButtonVariant
 import fr.miage.geotrouvetou.ui.components.organisms.Modal
 
-/** Avatar éditable + texte d'introduction de l'écran de profil. */
 @Composable
 fun ProfileAvatarSection(
     avatarUrl: String?,
@@ -111,7 +110,6 @@ fun ProfileAvatarSection(
     }
 }
 
-/** Modal de confirmation de suppression de compte. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DeleteAccountDialog(

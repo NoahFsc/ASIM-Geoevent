@@ -3,7 +3,6 @@ package fr.miage.geotrouvetou.ui.auth
 import android.content.Context
 import fr.miage.geotrouvetou.R
 
-/** Traduit les messages d'erreur du fournisseur d'auth en messages utilisateur localisés. */
 object AuthErrorTranslator {
 
     fun translate(context: Context, message: String?): String {

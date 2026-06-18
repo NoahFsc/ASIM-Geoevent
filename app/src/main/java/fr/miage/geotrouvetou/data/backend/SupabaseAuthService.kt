@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
-/** Implémentation de l'authentification via Supabase Auth. */
 class SupabaseAuthService(private val client: SupabaseClient) : IAuthService {
 
     override suspend fun signIn(email: String, password: String) {

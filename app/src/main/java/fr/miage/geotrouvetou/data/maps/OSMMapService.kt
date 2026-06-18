@@ -93,9 +93,6 @@ class OSMMapService(private val context: Context) : IMapService {
             enforceMinimumZoom()
             notifyBoundsChanged()
         }
-
-        // Ne pas pré-générer ici: si la vue n'est pas encore attachée, Compose peut échouer
-        // et mettre en cache un fallback sans drapeau.
     }
 
     override fun onResume() {
@@ -169,7 +166,6 @@ class OSMMapService(private val context: Context) : IMapService {
         if (!this::mapView.isInitialized) return
         val snapshot = events.toList()
 
-        // Court-circuit : si la liste d'events n'a pas changé (data class comparison), pas besoin de reconstruire le cluster
         if (snapshot == lastDisplayedEvents) return
         lastDisplayedEvents = snapshot
 
@@ -177,14 +173,12 @@ class OSMMapService(private val context: Context) : IMapService {
         mapView.post {
             if (generation != displayGeneration) return@post
 
-            // Remplace le cluster overlay existant par un nouveau (osmbonuspack n'expose pas de clear())
             mapView.overlays.removeAll { it is RadiusMarkerClusterer }
             val newCluster = buildClusterOverlay()
             clusterOverlay = newCluster
 
             snapshot.forEach { event -> addMarkerInternal(event) }
 
-            // Insérer à l'index 0 pour que myLocationOverlay reste au-dessus
             mapView.overlays.add(0, newCluster)
             newCluster.invalidate()
             mapView.invalidate()
@@ -195,9 +189,9 @@ class OSMMapService(private val context: Context) : IMapService {
         val cluster = clusterOverlay ?: return
         val marker = Marker(mapView).apply {
             position = GeoPoint(event.latitude, event.longitude)
-            // L'icône est circulaire, donc on la centre pour éviter un décalage visuel sur les bords.
             setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
             icon = iconRenderer.markerIcon(mapView, isPrivate = !event.visibility)
+
             icon?.let { d ->
                 if (d.intrinsicWidth > 0 && d.intrinsicHeight > 0) {
                     d.setBounds(0, 0, d.intrinsicWidth, d.intrinsicHeight)
@@ -248,17 +242,11 @@ class OSMMapService(private val context: Context) : IMapService {
         return fine == PackageManager.PERMISSION_GRANTED || coarse == PackageManager.PERMISSION_GRANTED
     }
 
-    /**
-     * Overlay de localisation qui affiche toujours le bonhomme, même quand le GPS
-     * fournit un cap — en remplaçant la flèche de direction par l'icône personnage.
-     */
     private class PersonLocationOverlay(
         provider: IMyLocationProvider,
         mapView: MapView
     ) : MyLocationNewOverlay(provider, mapView) {
         init {
-            // mDirectionArrowBitmap est protected dans MyLocationNewOverlay ;
-            // on le remplace par mPersonBitmap pour ne jamais afficher la flèche blanche.
             mDirectionArrowBitmap = mPersonBitmap
         }
     }
@@ -274,7 +262,6 @@ class OSMMapService(private val context: Context) : IMapService {
             return null
         }
 
-        // Convertir les quatre coins de l'écran en coordonnées géographiques
         val topLeftGeo = mapView.projection.fromPixels(0, 0) as? GeoPoint
         val topRightGeo = mapView.projection.fromPixels(width, 0) as? GeoPoint
         val bottomLeftGeo = mapView.projection.fromPixels(0, height) as? GeoPoint
@@ -285,7 +272,6 @@ class OSMMapService(private val context: Context) : IMapService {
             return null
         }
 
-        // Extraire les limites lat/lon des quatre coins
         val latitudes = listOf(topLeftGeo.latitude, topRightGeo.latitude, bottomLeftGeo.latitude, bottomRightGeo.latitude)
         val longitudes = listOf(topLeftGeo.longitude, topRightGeo.longitude, bottomLeftGeo.longitude, bottomRightGeo.longitude)
 
@@ -362,9 +348,6 @@ class OSMMapService(private val context: Context) : IMapService {
     }
 
     private fun hasSignificantBoundsChange(previous: MapBounds, current: MapBounds): Boolean {
-        // Seuil minimal pour filtrer le bruit de flottant uniquement.
-        // Le vrai rate-limiting est assuré par le debounce(250ms) dans le ViewModel —
-        // un seuil plus large causait des non-unload sur les bords droit/haut.
         val epsilon = 1e-6
         return abs(previous.minLat - current.minLat) > epsilon ||
                 abs(previous.maxLat - current.maxLat) > epsilon ||

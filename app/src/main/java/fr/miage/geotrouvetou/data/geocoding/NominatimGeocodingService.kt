@@ -54,7 +54,6 @@ private data class NominatimPlace(
         return listOfNotNull(a.postcode, a.county, a.country).joinToString(", ")
     }
 
-    /** Rue, ville, code postal — sans quartier ni pays (usage France). */
     private val shortAddress: String get() =
         listOfNotNull(street, locality, address?.postcode).joinToString(", ").ifBlank { displayName }
 
@@ -68,7 +67,6 @@ private data class NominatimPlace(
     )
 }
 
-/** Géocodage via l'API Nominatim d'OpenStreetMap. */
 class NominatimGeocodingService : IGeocodingService {
 
     private val client = HttpClient(OkHttp) {
@@ -90,7 +88,6 @@ class NominatimGeocodingService : IGeocodingService {
         }.bodyAsText()
 
         val results: List<NominatimPlace> = json.decodeFromString(text)
-        // Déduplique par ligne principale (même ville + code postal = même lieu).
         return results.distinctBy { it.toPlace().mainLine }.take(5).map { it.toPlace() }
     }
 }

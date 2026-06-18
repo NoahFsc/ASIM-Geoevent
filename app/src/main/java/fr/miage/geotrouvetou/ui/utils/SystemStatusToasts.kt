@@ -24,10 +24,6 @@ private data class StatusToast(
     val type: ToastType = ToastType.Success,
 )
 
-/**
- * Surveille la connectivité réseau et l'état du GPS via deux receivers liés au cycle de vie
- * de la composition (actifs entre ON_START et ON_STOP), et affiche un toast à chaque transition.
- */
 @Composable
 fun SystemStatusToasts() {
     val context = LocalContext.current

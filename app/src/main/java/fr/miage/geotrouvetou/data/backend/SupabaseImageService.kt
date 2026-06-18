@@ -10,7 +10,6 @@ import io.ktor.http.ContentType
 import java.io.ByteArrayOutputStream
 import kotlin.time.Duration.Companion.hours
 
-/** Implémentation du stockage d'images via Supabase Storage. Convertit en WebP avant upload. */
 class SupabaseImageService(private val client: SupabaseClient) : IImageService {
 
     private val eventBucket = "EventImages"
@@ -44,7 +43,6 @@ class SupabaseImageService(private val client: SupabaseClient) : IImageService {
         return bucket.publicUrl(finalFileName)
     }
 
-    /** Compresse l'image au format WebP (qualité 80 %), bon ratio poids/qualité. */
     private fun convertToWebp(bytes: ByteArray): ByteArray {
         val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
             ?: throw IllegalArgumentException("Impossible de décoder l'image en bitmap.")

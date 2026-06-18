@@ -31,7 +31,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-/** État de sélection de date n'autorisant que les dates à venir (tolérance d'un jour). */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun rememberFutureDatePickerState(): DatePickerState = rememberDatePickerState(
@@ -41,10 +40,6 @@ fun rememberFutureDatePickerState(): DatePickerState = rememberDatePickerState(
     }
 )
 
-/**
- * Dialogues de sélection de date et d'heure d'un événement, partagés entre la création
- * et la modification. Renvoie la date formatée (dd/MM/yyyy) et l'heure (HH:mm).
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventDateTimePickers(

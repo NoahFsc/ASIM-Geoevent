@@ -48,10 +48,6 @@ import fr.miage.geotrouvetou.ui.components.atoms.Toast
 import fr.miage.geotrouvetou.ui.components.molecules.PlaceSearchBar
 import kotlinx.coroutines.delay
 
-/**
- * Formulaire d'événement partagé. [event] null = création, sinon édition.
- * [onBack] est null en création (la navigation est gérée en amont).
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventFormScreen(

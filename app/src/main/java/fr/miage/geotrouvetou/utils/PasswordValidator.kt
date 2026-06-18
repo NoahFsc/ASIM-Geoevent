@@ -11,7 +11,6 @@ data class PasswordValidation(
 ) {
     val isValid: Boolean get() = hasMinLength && hasDigit && hasSpecial && hasUppercase
 
-    /** Premier critère non rempli, traduit, ou null si le mot de passe est valide. */
     fun firstError(context: Context): String? = when {
         !hasMinLength -> context.getString(R.string.validation_password_min)
         !hasDigit -> context.getString(R.string.validation_password_digit)
@@ -35,7 +34,6 @@ data class PasswordValidation(
             hasUppercase = password.any { it.isUpperCase() },
         )
 
-        /** Vrai si la confirmation est saisie et identique au mot de passe. */
         fun passwordsMatch(password: String, confirm: String): Boolean =
             confirm.isNotEmpty() && confirm == password
 

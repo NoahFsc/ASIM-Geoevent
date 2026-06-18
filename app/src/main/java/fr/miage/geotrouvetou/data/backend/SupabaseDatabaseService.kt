@@ -24,17 +24,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 
-/**
- * Implémentation du service de données via Supabase.
- * Gère les interactions avec la base Postgrest, le Storage et le Realtime.
- */
 class SupabaseDatabaseService(
     private val client: SupabaseClient,
     private val imageService: IImageService,
 ) : IDatabaseService {
     private var eventsChannel: RealtimeChannel? = null
-
-    // ── Événements ──
 
     override suspend fun addEvent(event: Evenement) {
         client.postgrest["events"].insert(event)
@@ -66,10 +60,6 @@ class SupabaseDatabaseService(
         return imageService.uploadEventImage(fileName, bytes)
     }
 
-    /**
-     * Restreint une requête aux events visibles par l'utilisateur :
-     * les events publics, plus ses propres events privés.
-     */
     private fun PostgrestFilterBuilder.visibleToCurrentUser() {
         val userId = client.auth.currentUserOrNull()?.id
         if (userId != null) {
@@ -111,11 +101,6 @@ class SupabaseDatabaseService(
             .decodeList<Evenement>()
     }
 
-    /**
-     * Émet Unit à chaque changement sur la table 'events'.
-     * Le caller (MapViewModel) appelle scheduleRefresh() pour recharger
-     * selon les bordures courantes.
-     */
     override fun listenToEventsRealtime(): Flow<Unit> = flow {
         eventsChannel?.unsubscribe()
 
@@ -136,8 +121,6 @@ class SupabaseDatabaseService(
             eventsChannel = null
         }
     }
-
-    // ── Profil ──
 
     override suspend fun getProfile(userId: String): User? {
         val user = client.postgrest["profiles"].select {
@@ -181,11 +164,8 @@ class SupabaseDatabaseService(
                 eq("id", userId)
             }
         }
-        // Supprime le compte dans auth.users via une fonction SQL (security definer)
         client.postgrest.rpc("delete_own_account")
     }
-
-    // ── Participations ──
 
     override suspend fun joinEvent(eventId: String, userId: String) {
         client.postgrest["event_participants"].insert(EventParticipant(eventId, userId))
@@ -217,8 +197,6 @@ class SupabaseDatabaseService(
         }.decodeList<EventParticipant>()
         return response.size
     }
-
-    // ── Admin ──
 
     override suspend fun getAdminStats(): AdminStats {
         val userCount = client.postgrest["profiles"].select().decodeList<User>().size

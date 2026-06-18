@@ -71,7 +71,6 @@ class EventDetailViewModel(
                     _joined.emit(true)
                 }
             } catch (_: Exception) {
-                // Échec silencieux (ex : déjà inscrit)
             }
         }
     }
@@ -89,7 +88,6 @@ class EventDetailViewModel(
                     if (participantsCount > 0) participantsCount--
                 }
             } catch (_: Exception) {
-                // Échec silencieux
             }
         }
     }
@@ -101,7 +99,6 @@ class EventDetailViewModel(
                 databaseService.deleteEvent(eventId)
                 _eventDeleted.emit(true)
             } catch (_: Exception) {
-                // Échec silencieux
             }
         }
     }
