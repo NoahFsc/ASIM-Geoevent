@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface IDatabaseService {
 
-    // Événements
     suspend fun addEvent(event: Evenement)
     suspend fun updateEvent(event: Evenement)
     suspend fun getEvent(eventId: String): Evenement?

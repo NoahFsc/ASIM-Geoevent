@@ -31,7 +31,6 @@ class MarkerIconRenderer(private val context: Context) {
 
     fun markerIcon(mapView: MapView, isPrivate: Boolean = false): BitmapDrawable {
         (if (isPrivate) cachedPrivateMarkerIcon else cachedMarkerIcon)?.let { return it }
-        // On ne met en cache que le rendu Compose réussi : le fallback peut être réessayé plus tard.
         val composeIcon = createComposeMarkerIcon(mapView, isPrivate)
         if (composeIcon != null) {
             if (isPrivate) cachedPrivateMarkerIcon = composeIcon else cachedMarkerIcon = composeIcon

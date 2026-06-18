@@ -68,7 +68,6 @@ fun SearchBar(
                 }
             }
         )
-        // Surcouche pour rendre toute la pilule cliquable en mode bouton
         if (onClick != null) {
             Box(
                 modifier = Modifier
