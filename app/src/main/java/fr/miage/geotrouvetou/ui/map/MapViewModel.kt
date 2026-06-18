@@ -11,6 +11,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
@@ -28,10 +29,9 @@ data class MapUiState(
     val hasLocationFix: Boolean = false,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
-    val joinToastKey: Int = 0,
-    val updateToastKey: Int = 0,
-    val deleteToastKey: Int = 0,
 )
+
+enum class MapToast { Joined, Updated, Deleted }
 
 @OptIn(FlowPreview::class)
 class MapViewModel(application: Application) : AndroidViewModel(application) {
@@ -47,6 +47,9 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
 
     private val refreshRequests = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     private var realtimeJob: Job? = null
+
+    private val _toasts = MutableSharedFlow<MapToast>()
+    val toasts = _toasts.asSharedFlow()
 
     init {
         if (databaseService == null) {
@@ -111,15 +114,15 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun onEventJoined() {
-        _uiState.update { it.copy(joinToastKey = it.joinToastKey + 1) }
+        viewModelScope.launch { _toasts.emit(MapToast.Joined) }
     }
 
     fun onEventUpdated() {
-        _uiState.update { it.copy(updateToastKey = it.updateToastKey + 1) }
+        viewModelScope.launch { _toasts.emit(MapToast.Updated) }
     }
 
     fun onEventDeleted() {
-        _uiState.update { it.copy(deleteToastKey = it.deleteToastKey + 1) }
+        viewModelScope.launch { _toasts.emit(MapToast.Deleted) }
     }
 
     fun scheduleRefresh() {

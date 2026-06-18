@@ -24,6 +24,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -70,6 +71,20 @@ fun MapScreen(
     var clusterEvents by remember { mutableStateOf<List<Evenement>?>(null) }
     var selectedEvent by remember { mutableStateOf<Evenement?>(null) }
     var editingEvent by remember { mutableStateOf<Evenement?>(null) }
+
+    var joinToastKey by remember { mutableIntStateOf(0) }
+    var updateToastKey by remember { mutableIntStateOf(0) }
+    var deleteToastKey by remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(Unit) {
+        viewModel.toasts.collect { toast ->
+            when (toast) {
+                MapToast.Joined -> joinToastKey++
+                MapToast.Updated -> updateToastKey++
+                MapToast.Deleted -> deleteToastKey++
+            }
+        }
+    }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions(),
@@ -236,27 +251,27 @@ fun MapScreen(
             )
         }
 
-        if (uiState.joinToastKey > 0) {
+        if (joinToastKey > 0) {
             Toast(
                 title = stringResource(R.string.event_join_toast_title),
                 description = stringResource(R.string.event_join_toast_desc),
-                key = uiState.joinToastKey
+                key = joinToastKey
             )
         }
 
-        if (uiState.updateToastKey > 0) {
+        if (updateToastKey > 0) {
             Toast(
                 title = stringResource(R.string.event_update_toast_title),
                 description = stringResource(R.string.event_update_toast_desc),
-                key = uiState.updateToastKey
+                key = updateToastKey
             )
         }
 
-        if (uiState.deleteToastKey > 0) {
+        if (deleteToastKey > 0) {
             Toast(
                 title = stringResource(R.string.event_delete_toast_title),
                 description = stringResource(R.string.event_delete_toast_desc),
-                key = uiState.deleteToastKey
+                key = deleteToastKey
             )
         }
     }
